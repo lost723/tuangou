@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'customer',
+        'passwords' => 'account',
     ],
 
     /*
@@ -36,14 +36,19 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'trader' => [
+            'driver' => 'jwt',
+            'provider' => 'trader',
         ],
 
-        'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+        'customer' => [
+            'driver' => 'jwt',
+            'provider' => 'customer',
+        ],
+
+        'distributor' => [
+            'driver' => 'jwt',
+            'provider' => 'distributor',
         ],
     ],
 
@@ -65,15 +70,20 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'trader' => [
             'driver' => 'eloquent',
-            'model' => App\User::class,
+            'model' => App\Models\Auth\Trader::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'customer' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Auth\Customer::class,
+        ],
+
+        'distributor' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Auth\Distributor::class,
+        ],
     ],
 
     /*
@@ -92,8 +102,8 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+        'account' => [
+            'provider' => 'distributor',
             'table' => 'password_resets',
             'expire' => 60,
         ],
