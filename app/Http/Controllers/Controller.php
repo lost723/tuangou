@@ -23,6 +23,7 @@ class Controller extends BaseController
         $this->middleware('auth', ['except' => []]);
     }
 
+    
 
 
 }
