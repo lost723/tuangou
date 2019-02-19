@@ -15,6 +15,7 @@ class CreateDistributorsTable extends Migration
     {
         Schema::create('distributors', function (Blueprint $table) {
             $table->increments('id');
+            $table->bigInteger('orgid')->nullable()->comment('所属商户id');
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');

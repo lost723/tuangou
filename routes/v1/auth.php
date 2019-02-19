@@ -25,3 +25,7 @@ Route::get('trader/refresh', 'Auth\TraderController@refresh');
 Route::put('trader/password', 'Auth\TraderController@password');
 Route::post('trader/register', 'Auth\TraderController@register');
 Route::post('trader/find/password', 'Auth\TraderController@findPassword');
+
+
+# 临时使用
+Route::resource('business', 'Business\BusinessController');
