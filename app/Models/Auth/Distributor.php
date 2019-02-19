@@ -11,6 +11,7 @@ class Distributor extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
+    protected $hidden = ['password'];
     protected $fillable = ['name', 'email', 'password', 'avatar'];
 
     /**

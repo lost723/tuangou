@@ -68,7 +68,7 @@ class DistributorController extends Controller
             $token = auth()->attempt($credentials);
             return $this->respondWithToken($token);
         }catch (\Exception $e){
-            # echo $e->getTraceAsString();
+            echo $e->getTraceAsString();
             return $this->warning('注册失败');
         }
     }
@@ -94,7 +94,7 @@ class DistributorController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return $this->unauthed();
+            return $this->unauthed('登陆失败，请检查用户名密码是否正确！');
         }
 
         return $this->respondWithToken($token);
