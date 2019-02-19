@@ -37,6 +37,7 @@ class TraderController extends Controller
             $token = auth()->attempt($credentials);
             return $this->respondWithToken($token);
         }catch (\Exception $e){
+            echo $e->getMessage();
             # echo $e->getTraceAsString();
             return $this->warning('注册失败');
         }

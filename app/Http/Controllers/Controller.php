@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Utils\NetHelper;
 use App\Utils\Reporter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
@@ -11,7 +12,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, Reporter;
-
+    use NetHelper;
     /**
      * Create a new instance.
      *
@@ -21,4 +22,7 @@ class Controller extends BaseController
     {
         $this->middleware('auth', ['except' => []]);
     }
+
+
+
 }

@@ -1,0 +1,16 @@
+[
+      {
+        letter: 'A',
+        list: [
+          { id: 1, city: '青岛' },
+          { id: 2, city: '衢州' }
+        ]
+      },
+      {
+        letter: 'R',
+        list: [
+          { id: 3, city: '日照' },
+          { id: 4, city: '饶州' }
+        ]
+      },
+ ]

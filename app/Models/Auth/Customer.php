@@ -10,8 +10,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Customer extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+    protected $fillable = ['openId', 'unionId', 'nickName',
+        'community_id', 'avatar', 'country', 'province', 'city', 'gender'];
 
-    protected $fillable = ['name', 'email', 'password', 'avatar'];
+    public function leader()
+    {
+        return $this->hasOne('App\Models\Leader', 'customer_id');
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -22,6 +27,7 @@ class Customer extends Authenticatable implements JWTSubject
     {
         return $this->getKey();
     }
+
 
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.

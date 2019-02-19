@@ -62,6 +62,30 @@ return [
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
         ],
+        'qiniu_public' => [
+            'driver'  => 'qiniu',
+            'domains' => [
+                'default'   => 'pmzybetpt.bkt.clouddn.com', //你的七牛域名
+                'https'     => '',         //你的HTTPS域名
+                'custom'    => '',     //你的自定义域名
+            ],
+            'access_key'=> 'cvoy4ArV2yoc3MNLa_mMqa1SGXh5iwswNP7YkbeJ',  //AccessKey
+            'secret_key'=> 'lTAwwWUgpcPMqcvBwAHBM60NqammAr3tt_bSuaLu',  //SecretKey
+            'bucket'    => 'test',  //Bucket名字
+            'notify_url'=> '',  //持久化处理回调地址
+        ],
+        'qiniu_private' => [
+            'driver'  => 'qiniu',
+            'domains' => [
+                'default'   => 'pm0mzqrq4.bkt.clouddn.com', //你的七牛域名
+                'https'     => '',         //你的HTTPS域名
+                'custom'    => '',     //你的自定义域名
+            ],
+            'access_key'=> 'cvoy4ArV2yoc3MNLa_mMqa1SGXh5iwswNP7YkbeJ',  //AccessKey
+            'secret_key'=> 'lTAwwWUgpcPMqcvBwAHBM60NqammAr3tt_bSuaLu',  //SecretKey
+            'bucket'    => 'laravel',  //Bucket名字
+            'notify_url'=> '',  //持久化处理回调地址
+        ]
 
     ],
 

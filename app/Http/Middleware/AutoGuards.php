@@ -16,20 +16,12 @@ class AutoGuards
      * @return mixed
      * @throws \Exception
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle($request, Closure $next, $guard = 'customer')
     {
 
-        if(empty($guard)){
-            $guard =  $request->header('Mua');
-            if(env('APP_DEBUG')){
-                $guard = $guard ?: $request->get('Mua');
-            }
-            if(empty($guard)){
-                throw new \Exception('Mua is missing ...');
-            }
-        }
+        $Mua = $request->header('Mua') ?: (config('app.debug')? $request->get('Mua'):$guard);
+        $guard = $Mua ?: $guard;
         Auth::setDefaultDriver($guard);
-
         return $next($request);
     }
 }

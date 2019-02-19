@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDistributorsTable extends Migration
+class CreateCommunitiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,18 @@ class CreateDistributorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('distributors', function (Blueprint $table) {
+        Schema::create('communities', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('avatar')->nullable()->default('./images/thumb.png');
+            $table->unsignedInteger('road_id');
+            $table->string('address');
+            $table->decimal('longitude',10,6);
+            $table->decimal('latitude',10,6);
 
-            $table->rememberToken();
+
+            $table->foreign('road_id')
+                ->references('id')
+                ->on('roads');
             $table->timestamps();
         });
     }
@@ -32,6 +36,6 @@ class CreateDistributorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('distributors');
+        Schema::dropIfExists('communities');
     }
 }
