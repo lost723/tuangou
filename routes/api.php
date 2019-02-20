@@ -14,3 +14,4 @@ use Illuminate\Http\Request;
 */
 
 Route::prefix('v1')->group(base_path('routes/v1/auth.php'));
+Route::prefix('v1')->group(base_path('routes/v1/index.php'));
