@@ -27,14 +27,6 @@ class CreateLeadersTable extends Migration
             $table->decimal('commission',10,2)->default(0)->comment('团长佣金');
             $table->char('status')->comment('团长审核状态 审核中：2 审核通过：1 审核拒绝：0 团长冻结：-1');
 
-            # 关联消费用户id
-            $table->foreign('customer_id')
-                ->references('id')
-                ->on('customers');
-            # 关联小区id
-            $table->foreign('community_id')
-                ->references('id')
-                ->on('communities');
 
             $table->timestamps();
         });

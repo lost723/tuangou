@@ -22,9 +22,7 @@ class CreateCommunitiesTable extends Migration
             $table->decimal('latitude',10,6);
 
 
-            $table->foreign('road_id')
-                ->references('id')
-                ->on('roads');
+
             $table->timestamps();
         });
     }
