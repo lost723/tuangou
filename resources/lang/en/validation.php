@@ -87,7 +87,8 @@ return [
     'unique'               => 'The :attribute has already been taken.',
     'uploaded'             => 'The :attribute failed to upload.',
     'url'                  => 'The :attribute format is invalid.',
-
+    # add idcards validation
+    'identitycards'        =>  'The :attribute must be idcards',
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

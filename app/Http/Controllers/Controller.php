@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Utils\NetHelper;
 use App\Utils\Reporter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,7 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, Reporter;
-
+    use NetHelper;
     /**
      * Create a new instance.
      *
