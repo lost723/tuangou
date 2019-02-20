@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redis;
 class CustomerController extends Controller
 {
 
+    const   CODE_TO_SESSION_URL = 'https://api.weixin.qq.com/sns/jscode2session?';
     private $appid;
     private $secret;
 
@@ -172,12 +173,10 @@ class CustomerController extends Controller
     {
 
         $js_code = $data['code'];
-        $url =  'https://api.weixin.qq.com/sns/jscode2session?';
-        $url .= 'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$js_code.'&grant_type=authorization_code';
+        $url = self::CODE_TO_SESSION_URL.'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$js_code.'&grant_type=authorization_code';
 
         $result = $this->http_get($url);
         $result = json_decode($result,true);
-        dump($result);
         if(!array_key_exists('errcode', $result)) {
 
             Redis::setex('openid:'.$result['openid'].':sessionKey', 7200, $result['session_key']);

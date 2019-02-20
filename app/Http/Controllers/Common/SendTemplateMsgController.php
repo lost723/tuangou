@@ -6,7 +6,7 @@ use App\Http\Controllers\Common\WXBaseController;
 
 class SendTemplateMsgController extends WXBaseController
 {
-    const TEMPLATE_SEND_URL = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send';
+    const TEMPLATE_SEND_URL = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?';
     /**
      * @param $touser           接收用户openid
      * @param $template_id      模板消息id
@@ -29,7 +29,7 @@ class SendTemplateMsgController extends WXBaseController
             'emphasis_keyword'  =>  $emphasis_keyword,
         ];
 
-        $result = $this->http_post(TEMPLATE_SEND_URL, $data);
+        $result = $this->http_post(self::TEMPLATE_SEND_URL, $data);
         return $result;
     }
 
