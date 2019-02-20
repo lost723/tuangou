@@ -9,6 +9,7 @@ class WXBaseController extends Controller
 {
     protected $appid;
     protected $secret;
+    const ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=';
     public function __construct()
     {
         $this->appid  = config('wx.minPro.appid');
@@ -24,8 +25,7 @@ class WXBaseController extends Controller
     {
 
         if($flag || !Redis::get('appid:'.$this->appid.':access_token')) {
-            $url  = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=';
-            $url .= $this->appid.'&secret='.$this->secret;
+            $url = self::ACCESS_TOKEN_URL.$this->appid.'&secret='.$this->secret;
             # 返回请求信息 access_token
             $result = $this->http_get($url);
             $result = json_decode($result,true);

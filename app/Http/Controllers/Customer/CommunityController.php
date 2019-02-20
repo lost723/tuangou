@@ -15,7 +15,7 @@ class CommunityController extends CustomerController
     # 小程序端 小区管理
     public function __construct()
     {
-        $this->middleware('auth',  ['except' => ['CommunityList', ]]);
+        $this->middleware('auth',  ['except' => ['' ]]);
     }
 
 

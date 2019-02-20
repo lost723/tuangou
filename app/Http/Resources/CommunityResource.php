@@ -20,7 +20,6 @@ class CommunityResource extends Resource
             'attribute'     =>  [
                 'name'      =>  $this->name,
                 'address'   =>  $this->address,
-                'distance'  =>  $this->distance,
             ],
         ];
     }

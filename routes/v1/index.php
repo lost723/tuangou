@@ -23,3 +23,9 @@ Route::post('customer/leader/register', 'Customer\LeaderController@register');
 # 文件上传
 Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg');
 Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');
+
+
+# 街道管理
+Route::resource('trader/road','Trader\RoadController');
+# 小区管理
+Route::resource('trader/community','Trader\CommunityController');
