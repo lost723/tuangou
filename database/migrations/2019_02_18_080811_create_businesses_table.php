@@ -20,7 +20,7 @@ class CreateBusinessesTable extends Migration
             $table->string('manager')->comment('联系人');
             $table->string('address')->comment('联系地址');
             $table->tinyInteger('level')->default(1)->comment('等级');
-            $table->boolean('status')->default(0)->comment('状态[0:未审核，1:冻结，9:正常]');
+            $table->boolean('status')->default('1')->comment("状态{ 1: '未提交认证信息', 2: '认证审核中', 3: '认证未通', 6: '冻结', 9: '正常' }");
             $table->timestamps();
         });
     }
