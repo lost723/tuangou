@@ -22,7 +22,6 @@ class CreateCommunitiesTable extends Migration
             $table->decimal('latitude',10,6);
 
 
-
             $table->timestamps();
         });
     }

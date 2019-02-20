@@ -34,6 +34,9 @@ Route::post('trader/find/password', 'Auth\TraderController@findPassword');
 
 
 
-# 临时使用
-Route::resource('business', 'Business\BusinessController');
 
+
+
+# 文件上传
+Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg');
+Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');

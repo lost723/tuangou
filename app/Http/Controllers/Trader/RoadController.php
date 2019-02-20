@@ -25,7 +25,7 @@ class RoadController extends TraderController
     }
 
     /**
-     * Show the form for creating a new resource.
+     * 显示上级街道信息
      *
      * @return \Illuminate\Http\Response
      */
@@ -47,23 +47,19 @@ class RoadController extends TraderController
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name'      =>  'required|string|max:20',
-            'leveltype' =>  'required|int',
-            ''
-        ]);
+
 
     }
 
     /**
-     * Display the specified resource.
-     *
+     * 显示当前街道信息
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        //
+        $item = Road::find($id);
+        return $this->ok($item);
     }
 
     /**
@@ -74,7 +70,8 @@ class RoadController extends TraderController
      */
     public function edit($id)
     {
-        //
+        $item = Road::find($id);
+        return $this->ok($item);
     }
 
     /**
