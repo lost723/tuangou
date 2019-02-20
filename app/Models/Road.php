@@ -8,8 +8,13 @@ class Road extends Model
 {
     //
     protected $fillable = ['parentid', 'leveltype', 'name', 'path', 'province', 'city', 'district', 'abbr'];
-    # 通过城市id 获取街道列表
 
+    public function community()
+    {
+        return $this->hasMany('App\Models\Community','road_id','id');
+    }
+
+    # 通过城市id 获取街道列表
     static public function getRoadsByParentId($id = 0)
     {
         if(0 >= $id) {

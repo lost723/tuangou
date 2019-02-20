@@ -3,10 +3,17 @@
 namespace App\Http\Controllers\Trader;
 
 use App\Http\Controllers\Auth\TraderController;
+use App\Models\Road;
 use Illuminate\Http\Request;
 
 class RoadController extends TraderController
 {
+    public function __construct()
+    {
+        # 测试 过滤token验证
+        $this->middleware('auth', ['except' => ['index', 'create']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +31,12 @@ class RoadController extends TraderController
      */
     public function create()
     {
-        //
+        # 上级id
+        $pid = request()->query('parent_id')?: 0;
+
+        $road = Road::where('parentid',$pid)->first();
+
+        return $this->ok($road);
     }
 
     /**
@@ -35,7 +47,12 @@ class RoadController extends TraderController
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'      =>  'required|string|max:20',
+            'leveltype' =>  'required|int',
+            ''
+        ]);
+
     }
 
     /**
@@ -70,6 +87,7 @@ class RoadController extends TraderController
     public function update(Request $request, $id)
     {
         //
+
     }
 
     /**
