@@ -20,7 +20,6 @@ Route::post('customer/list/community', 'Customer\CommunityController@CommunityLi
 Route::post('customer/leader/register', 'Customer\LeaderController@register');
 
 
-
 # 文件上传
 Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg');
 Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');

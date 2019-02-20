@@ -15,7 +15,7 @@ class AlterRoadsTable extends Migration
     {
         Schema::table('roads', function (Blueprint $table) {
             //
-            $table->char('abbr');
+            $table->char('abbr')->comment('大写首字母');
         });
     }
 

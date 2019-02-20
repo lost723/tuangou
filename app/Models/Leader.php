@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Leader extends Model
 {
     //
+    const NORMAL = 1;
+    const CREATE = 2;
+    const FROZEN = -1;
+    const DENY   = 0;
+
     protected $fillable = ['customer_id', 'community_id', 'name', 'mobile', 'idcard', 'idcard_front_url',
         'idcard_back_url', 'address', 'commission', 'status'];
 

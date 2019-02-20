@@ -22,8 +22,8 @@ class LeaderController extends CustomerController
         if(empty($customer)) {
             return $this->unauthed();
         }
-        if(!empty($customer->leader)) {
-            return $this->note('');
+        if(!empty($leader = $customer->leader)) {
+            return $this->note('请勿重复提交团长表单！');
         }
         $request->validate([
             'idcard'        =>  'required|string|identitycards',
@@ -52,7 +52,7 @@ class LeaderController extends CustomerController
                 'community_id'  =>  $community_id >0 ? $community_id : null,
                 'idcard_front'  =>  json_encode($idcard_front),
                 'idcard_back'   =>  json_encode($idcard_back),
-                'status'        =>  2,
+                'status'        =>  Leader::CREATE,
             ]);
         if($result)
         {

@@ -22,6 +22,7 @@ class CreateRoadsTable extends Migration
             $table->string('province');
             $table->string('city')->default('');
             $table->string('district')->default('');
+            $table->char('abbr')->comment('大写首字母');
             $table->timestamps();
         });
     }
