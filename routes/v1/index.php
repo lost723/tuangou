@@ -12,7 +12,7 @@ Route::get('customer/my/community', 'Auth\CustomerController@mycommunity');
 # 获取城市列表
 Route::post('customer/list/city', 'Customer\RoadController@listCity');
 # 坐标定位城市
-Route::post('customer/city', 'Customer\RoadController@myCity');
+Route::post('customer/my/city', 'Customer\RoadController@myCity');
 # 获取周边小区列表
 Route::post('customer/list/community', 'Customer\CommunityController@CommunityList');
 

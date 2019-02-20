@@ -17,28 +17,27 @@ class CommunityController extends CustomerController
 
 
     # 通过地理位置定位附近的小区
-
     public function CommunityList()
     {
-        $type = request()->input('type')?:1;
+        $type = request()->query('type')?:1;
         switch ($type) {
             # 通过城市id获取小区列表
             case 1:
-                $city_id = request()->input('city_id');
-                $page = request()->input('page');
+                $city_id = request()->query('city_id');
+                $page = request()->query('page');
                 $result = $this->getCommunityByCityId($city_id, $page);
                 break;
             # 通过名称获取小区列表
             case 2:
-                $city_id = request()->input('city_id');
-                $name = request()->input('name');
-                $page = request()->input('page');
+                $city_id = request()->query('city_id');
+                $name = request()->query('name');
+                $page = request()->query('page');
                 $result = $this->getCommunityByName($city_id, $name, $page);
                 break;
             case 3:
-                $longitude = request()->input('longitude');
-                $latitude  = request()->input('latitude');
-                $page      = request()->input('page');
+                $longitude = request()->query('longitude');
+                $latitude  = request()->query('latitude');
+                $page      = request()->query('page');
                 $result = $this->getCommunityByCoordinate($longitude, $latitude, $page);
                 break;
             default:
@@ -91,8 +90,7 @@ class CommunityController extends CustomerController
     {
         # 获取 city 下的所有 街道id
         $road = new Road();
-        $result = $road->getRoadsByParentId($id);
-
+        $result = $road->getRoadsByParentId($id);echo $id;die;
         if(!$result || empty($result)) {
             return false;
         }
