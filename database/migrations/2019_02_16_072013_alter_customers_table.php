@@ -17,9 +17,9 @@ class AlterCustomersTable extends Migration
             //
             $table->unsignedInteger('community_id')->default(0);
 
-            $table->foreign('community_id')
-                ->references('id')
-                ->on('communities');
+//            $table->foreign('community_id')
+//                ->references('id')
+//                ->on('communities');
         });
     }
 
