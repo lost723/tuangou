@@ -15,13 +15,13 @@ class CreateRoadsTable extends Migration
     {
         Schema::create('roads', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('parentid');
-            $table->char('leveltype');
-            $table->string('name');
-            $table->string('path')->default('');
-            $table->string('province');
-            $table->string('city')->default('');
-            $table->string('district')->default('');
+            $table->unsignedInteger('parentid')->comment('上级id');
+            $table->char('leveltype')->comment('1:省 2:市 3:区 4:街道');
+            $table->string('name')->comment('名称');
+            $table->string('path')->default('')->comment('保存路径,例 1,2,3,4');
+            $table->string('province')->comment('省名称');
+            $table->string('city')->default('')->comment('市名称');
+            $table->string('district')->default('')->comment('区名称');
             $table->char('abbr')->comment('大写首字母');
             $table->timestamps();
         });

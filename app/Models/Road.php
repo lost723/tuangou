@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Road extends Model
 {
     //
-
+    protected $fillable = ['parentid', 'leveltype', 'name', 'path', 'province', 'city', 'district', 'abbr'];
     # 通过城市id 获取街道列表
 
     public function getRoadsByParentId($id = 0)
