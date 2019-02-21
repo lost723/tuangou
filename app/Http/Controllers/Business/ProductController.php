@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Business;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Models\Business\Promotion;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Business\Product;
 use Illuminate\Support\Facades\Auth;

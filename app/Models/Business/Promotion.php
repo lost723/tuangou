@@ -3,6 +3,7 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
+use function foo\func;
 use http\Env\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,26 +22,31 @@ class Promotion extends BaseModel
 
 
     /**
-     * 获取某商户的商品列表
+     * 获取某商户的活动列表
      * @param $request
      * @return
      */
     static function getBusinessOwnList($request)
     {
         $orgid = Auth::user()->orgid;
+        $pid = $request->get('pid');
         $status = $request->get('status');
         $filter = $request->get('filter');
 
-        $result = self::select('title', 'picture', 'price', 'norm', 'status')
-            ->where('orgid', $orgid)
-            ->where('status', '!=', self::Del)
+        $result = DB::table('promotions as pm')
+            ->where('pm.orgid', $orgid)
+            ->where('pm.status', '!=', self::Del)
+            ->when($pid, function ($query) use ($pid) {
+                $query->where('pm.productid', $pid);
+            })
             ->when($status, function ($query) use ($status) {
-                $query->where('status', $status);
+                $query->where('pm.status', $status);
             })
             ->when($filter, function ($query) use ($filter){
-                $query->where('title', 'like', "%$filter%");
+                $query->where('pd.title', 'like', "%$filter%");
             })
-            ->simplePaginate(self::NPP);
+            ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.intro') ->simplePaginate(self::NPP);
         return $result;
     }
 
@@ -88,7 +94,7 @@ class Promotion extends BaseModel
     static function getDetails($id)
     {
         $item = DB::table('promotions as pm')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
             ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->where('pm.id', $id)
             ->get();
