@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Resources\CommunityResource;
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Common\WXBizDataCryptController;
@@ -20,7 +21,7 @@ class CustomerController extends Controller
     {
         $this->appid  = config('wx.minPro.appid');
         $this->secret = config('wx.minPro.secret');
-        $this->middleware('auth', ['except' => ['login', 'register', 'me', 'mycommunity', 'relateCommunity']]);
+        $this->middleware('auth', ['except' => ['login', 'register', 'me', 'myCommunity', 'relateCommunity']]);
     }
 
     /**
@@ -114,21 +115,15 @@ class CustomerController extends Controller
     }
 
     # 我的小区信息
-    public function mycommunity()
+    public function myCommunity()
     {
         $customer = auth()->user();
-
         if(0 < $customer['community_id']) {
-            $fillable = ['id', 'name', 'address', 'longitude', 'latitude', 'road_id'];
-            $community = Community::find($customer['community_id'], $fillable);
-            $road = $community->Road;
-            $community = $community->toArray();
-            $community['road'] = $road->province.$road->city.$road->district.$road->name;
-
-            unset($road);
-            unset($fillable);
-            unset($community['road_id']);
-            return $this->ok($community);
+            $community = Community::find($customer['community_id']);
+            if(!empty($community)) {
+                return new CommunityResource($community);
+            }
+            return $this->ok(['data' => []]);
         }
         return $this->warning('请检查参数是否正确！');
 
@@ -141,7 +136,7 @@ class CustomerController extends Controller
      */
     public function relateCommunity()
     {
-        $community_id  = request('community_id');
+        $community_id  = request()->post('community_id')?:0;
         if(0 < $community_id) {
             $customer = auth()->user();
             $customer->community_id = $community_id;

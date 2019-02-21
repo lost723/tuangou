@@ -8,7 +8,7 @@
 # 关联小区
 Route::post('customer/relate/community', 'Auth\CustomerController@relateCommunity');
 # 我的小区
-Route::get('customer/my/community', 'Auth\CustomerController@mycommunity');
+Route::get('customer/my/community', 'Auth\CustomerController@myCommunity');
 # 坐标定位城市
 Route::post('customer/my/city', 'Customer\RoadController@myCity');
 
