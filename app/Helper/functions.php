@@ -12,3 +12,13 @@ if (!function_exists('microtime_float')) {
         return ((float)$usec + (float)$sec);
     }
 }
+
+if(!function_exists('is_json')) {
+    function is_json($data, $assoc=false) {
+        $data = json_decode($data, $assoc);
+        if ($data && (is_object($data)) || (is_array($data) && !empty(current($data)))) {
+            return $data;
+        }
+        return false;
+    }
+}

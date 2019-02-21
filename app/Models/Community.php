@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Community extends Model
 {
-    protected $fillable = ['name', 'road_id', 'address', 'longitude', 'latitude'];
+    protected $fillable = ['name', 'logo', 'road_id', 'address', 'longitude', 'latitude'];
 
     # 获取小区所属的街道
     public function road()

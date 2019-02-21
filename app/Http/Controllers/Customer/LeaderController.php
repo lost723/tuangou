@@ -34,10 +34,10 @@ class LeaderController extends CustomerController
             'idcard_back'   =>  'required',
             'formid'        =>  'required'
         ]);
-        Redis::set('openid:'.$customer['openid'].':registerformid',$request->input('formid'));
-        $idcard_front = $request->input('idcard_front');
-        $idcard_back  = $request->input('idcard_back');
-        $community_id = $request->input('community_id');
+        Redis::set('openid:'.$customer['openid'].':registerformid',$request->post('formid'));
+        $idcard_front = $request->post('idcard_front');
+        $idcard_back  = $request->post('idcard_back');
+        $community_id = $request->post('community_id');
         $customer_id = 1;
 
         $result = Leader::firstOrCreate(
@@ -59,7 +59,7 @@ class LeaderController extends CustomerController
             return $this->created('团长申请成功！');
         }
 
-        return $this->nocontent('团长申请失败，请重新尝试');
+        return $this->warning('团长申请失败，请重新尝试');
     }
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Resources\CommunityResource;
+use App\Http\Resources\CustomerResource;
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Common\WXBizDataCryptController;
@@ -21,7 +22,7 @@ class CustomerController extends Controller
     {
         $this->appid  = config('wx.minPro.appid');
         $this->secret = config('wx.minPro.secret');
-        $this->middleware('auth', ['except' => ['login', 'register', 'me', 'myCommunity', 'relateCommunity']]);
+        $this->middleware('auth', ['except' => ['login', 'register', 'me', ]]);
     }
 
     /**
@@ -35,7 +36,6 @@ class CustomerController extends Controller
         $request->validate([
             'code'  =>  'string|required'
         ]);
-
 
         $customer = $this->code2SessionKey($request->all());
         if($customer) {
@@ -95,29 +95,13 @@ class CustomerController extends Controller
     }
 
     /**
-     *  返回用户个人信息 如果是团长同时返回团长信息
-     *
+     * 返回用户个人信息
+     * @return CustomerResource
      */
     public function me()
     {
-        $customer = auth()->user();
-
-        # 检测 团长 身份
-//        $leader = $customer->leader;
-
-        $customer = $customer->toArray();
-
-
-
-
-        return $this->ok($customer);
-
+        return new CustomerResource(auth()->user());
     }
-
-
-
-
-
 
     /**
      * 刷新token
@@ -126,6 +110,32 @@ class CustomerController extends Controller
     public function refresh()
     {
         return $this->respondWithToken(auth()->refresh());
+    }
+
+
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return $this->ok([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
+    }
+
+    /**
+     * 更新个人信息接口 手机号 更换头像 等等
+     */
+    public function updateinfo()
+    {
+
     }
 
 
@@ -152,31 +162,6 @@ class CustomerController extends Controller
         return null;
 
     }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
-    {
-        return $this->ok([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    }
-
-    /**
-     * 更新个人信息接口 手机号 更换头像 等等
-     */
-    public function updateinfo()
-    {
-
-    }
-
 
     /**
      * 解析 小程序api getUserinfo 的加密参数  并写入小程序用户数据库

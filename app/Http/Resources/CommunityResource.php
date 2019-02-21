@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Controllers\Common\QiNiuUploadController;
 use App\Models\Road;
 use function foo\func;
 use Illuminate\Http\Resources\Json\Resource;
@@ -19,6 +20,7 @@ class CommunityResource extends Resource
         return [
             'id'        =>  $this->id,
             'name'      =>  $this->name,
+            'logo'      =>  QiNiuUploadController::decodePath($this->logo),
             'address'   =>  $this->address,
             'longitude' =>  $this->longitude,
             'latitude'  =>  $this->latitude,
