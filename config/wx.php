@@ -12,5 +12,8 @@ return [
         'appid'     =>  'wxea3046e782289b03',
         'secret'    =>  '06e3de7d51d59cab60dcaaf6ea406e1e',
     ],
+    'location' =>[
+        'key'       =>  'BAXBZ-UD7E4-WPIUP-DY3VW-T2W62-WVF2E',
+    ]
 
 ];

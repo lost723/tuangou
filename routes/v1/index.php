@@ -11,7 +11,7 @@ Route::post('customer/relate/community', 'Auth\CustomerController@relateCommunit
 Route::get('customer/my/community', 'Auth\CustomerController@mycommunity');
 # 坐标定位城市
 Route::post('customer/my/city', 'Customer\RoadController@myCity');
-
+Route::post('customer/my/location', 'common\WXLocationController@getLocation');
 
 # 获取城市列表
 Route::post('customer/list/city', 'Customer\RoadController@listCity');

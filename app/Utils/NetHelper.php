@@ -37,7 +37,7 @@ trait NetHelper
      *
      * @return bool|mixed
      */
-    public function http_get($url)
+    static function http_get($url)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
