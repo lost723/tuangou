@@ -133,9 +133,15 @@ class CustomerController extends Controller
     /**
      * 更新个人信息接口 手机号 更换头像 等等
      */
-    public function updateinfo()
+    public function update()
     {
-
+        $user = auth()->user();
+        try{
+            $user->update(request()->all());
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
 

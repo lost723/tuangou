@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 class CommunityController extends TraderController
 {
+    # 后台小区管理
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'register']]);

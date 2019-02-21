@@ -41,4 +41,7 @@ class WXBaseController extends Controller
 
         return Redis::get('appid:'.$this->appid.':access_token');
     }
+
+
+
 }

@@ -20,12 +20,10 @@ class Road extends Model
         if(0 >= $id) {
             return false;
         }
-        # 获取区id[]
-        $district_ids = self::select('id')->where(function ($query) use ($id) {
-                            $query->where('parentid', $id);
-                         })->get()->toArray();
-        # 获取街道id[]
-        $result = self::whereIn('parentid',$district_ids)
+
+        $result = self::whereIn('parentid',function($query) use($id) {
+                    $query->select('id')->from('roads')->where('parentid', $id);
+                })
                 ->where('leveltype', 4)
                 ->get(['id'])
                 ->toArray();

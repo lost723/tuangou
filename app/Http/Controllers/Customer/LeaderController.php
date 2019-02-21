@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redis;
 
 class LeaderController extends CustomerController
 {
+    # 小程序端团长管理
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['register']]);
