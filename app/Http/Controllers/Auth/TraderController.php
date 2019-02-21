@@ -31,7 +31,7 @@ class TraderController extends Controller
         try{
             # 注册
             $this->registrationValidator($request->all())->validate();
-            $this->create($request->all());
+            $this->createCustomer($request->all());
             # 自动登陆
             $credentials = request(['email', 'password']);
             $token = auth()->attempt($credentials);
@@ -132,7 +132,7 @@ class TraderController extends Controller
      * @param  array  $data
      * @return \App\Models\Auth\User
      */
-    protected function create(array $data)
+    protected function createCustomer(array $data)
     {
         return Trader::firstOrCreate(
             [

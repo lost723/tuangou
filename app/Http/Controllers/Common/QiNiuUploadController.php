@@ -56,6 +56,7 @@ class QiNiuUploadController extends Controller
         $filename = end($data);
         if($public) {
             $contents = file_get_contents($file);
+
             $disk = \Storage::disk('qiniu_public');
             $disk->put($savePath,$contents);
 
@@ -97,7 +98,10 @@ class QiNiuUploadController extends Controller
 
         $savePath = 'images/' .date('Ymd').'/'.$newFileName;
 
-        return $this->encodePath($file, $savePath, $public);
+
+        $result = $this->encodePath($file, $savePath, $public);
+
+        return $result;
     }
 
 
@@ -116,8 +120,12 @@ class QiNiuUploadController extends Controller
             return $this->warning('非法扩展名,只接收jpg,png,jpeg,bmp图片格式!');
         }
         if(!empty($file) && $file->isValid()) {
-
-            $result = $this->uploadImg($file, true);
+            try{
+                $result = $this->uploadImg($file, true);
+            }
+            catch (\Exception $exception) {
+                return $this->warning('网络异常');
+            }
             if(!$result) {
                return $this->warning('文件上传失败!');
             }
@@ -142,7 +150,12 @@ class QiNiuUploadController extends Controller
         }
         if(!empty($file) && $file->isValid()) {
 
-            $result = $this->uploadImg($file, false);
+            try{
+                $result = $this->uploadImg($file, false);
+            }
+            catch (\Exception $exception) {
+                return $this->warning('网络异常');
+            }
             if(!$result) {
                 return $this->warning('文件上传失败!');
             }

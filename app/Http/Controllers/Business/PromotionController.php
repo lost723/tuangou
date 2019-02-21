@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Business\Product;
 use Illuminate\Http\Request;
 use App\Models\Business\Promotion;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

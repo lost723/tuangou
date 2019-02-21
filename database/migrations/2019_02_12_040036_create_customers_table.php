@@ -32,6 +32,9 @@ class CreateCustomersTable extends Migration
             $table->string('province', 20);
             $table->string('city', 20);
 
+            $table->unsignedInteger('community_id')->default(0);
+
+
 
             $table->rememberToken();
             $table->timestamps();

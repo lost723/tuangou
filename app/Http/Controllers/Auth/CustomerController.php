@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\MiniProgram\wxBizDataCrypt;
+use App\Http\Controllers\Common\WXBizDataCryptController;
 use App\Models\Community;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redis;
 class CustomerController extends Controller
 {
 
+    const   CODE_TO_SESSION_URL = 'https://api.weixin.qq.com/sns/jscode2session?';
     private $appid;
     private $secret;
 
@@ -88,10 +89,8 @@ class CustomerController extends Controller
             }
         }
         catch (\Exception $e) {
-
             return $this->warning('用户注册失败!');
         }
-
     }
 
     /**
@@ -106,9 +105,7 @@ class CustomerController extends Controller
 //        $leader = $customer->leader;
 
         $customer = $customer->toArray();
-//        if(empty($leader)) {
-//            $customer['leader'] = null;
-//        }
+
 
 
 
@@ -176,12 +173,10 @@ class CustomerController extends Controller
     {
 
         $js_code = $data['code'];
-        $url =  'https://api.weixin.qq.com/sns/jscode2session?';
-        $url .= 'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$js_code.'&grant_type=authorization_code';
+        $url = self::CODE_TO_SESSION_URL.'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$js_code.'&grant_type=authorization_code';
 
         $result = $this->http_get($url);
         $result = json_decode($result,true);
-        dump($result);
         if(!array_key_exists('errcode', $result)) {
 
             Redis::setex('openid:'.$result['openid'].':sessionKey', 7200, $result['session_key']);
@@ -230,15 +225,14 @@ class CustomerController extends Controller
         $encryptedData = $data['encryptedData'];
         $iv = $data['iv'];
         $sessionKey = Redis::get('openid:'.$openid.':sessionKey');
-
-        $wxBizDataCrypt = new WXBizDataCrypt($this->appid, $sessionKey);
+        $userinfo = null;
+        $wxBizDataCrypt = new WXBizDataCryptController($this->appid, $sessionKey);
         $wxBizDataCrypt->decryptData($encryptedData, $iv, $userinfo);
 
         $userinfo = json_decode($userinfo, true);
         if(empty($userinfo)) {
             return null;
         }
-
 
         return Customer::firstOrCreate(
             [
@@ -261,30 +255,4 @@ class CustomerController extends Controller
     }
 
 
-    /**
-     * 获取访问 微信API 接口凭证 token
-     * @param flag  是否从从缓存中获取
-     * @return |null
-     */
-//    private function getAccessToken($flag = true)
-//    {
-//
-//        if($flag || !Redis::get('appid:'.$this->appid.':access_token')) {
-//            $url  = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=';
-//            $url .= $this->appid.'&secret='.$this->secret;
-//            # 返回请求信息 access_token
-//            $result = $this->http_get($url);
-//            $result = json_decode($result,true);
-//
-//            if (!$result) {
-//                return null;
-//            }
-//            else {
-//                Redis::setex('appid:'.$this->appid.':access_token', 7200, $result['access_token']);
-//                return $result['access_token'];
-//            }
-//        }
-//
-//        return Redis::get('appid:'.$this->appid.':access_token');
-//    }
 }
