@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Auth\CustomerController;
+use App\Http\Controllers\Common\WXLocationController;
+use App\Http\Resources\RoadResource;
 use App\Models\Road;
 
 class RoadController extends CustomerController
@@ -10,14 +12,22 @@ class RoadController extends CustomerController
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['listCity']]);
+        $this->middleware('auth', ['except' => ['listCity', 'myCity']]);
     }
 
     # 坐标获取城市信息
     # 使用坐标通过腾讯地图获取城市信息
     public function myCity()
     {
-
+        # 获取当前城市
+        $location = WXLocationController::getLocation();
+        if(!empty($location)) {
+            $item = Road::where('name', $location['city'])->first();
+        }
+        if(!empty($item)) {
+            return new RoadResource($item);
+        }
+        return $this->ok(['data' => []]);
     }
 
     # 获取城市列表

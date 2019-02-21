@@ -22,7 +22,6 @@ class RoadResource extends Resource
             'district'  =>  $this->district,
             'name'      =>  $this->name,
             'level'     =>  $this->leveltype,
-
         ];
     }
 }
