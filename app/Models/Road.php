@@ -21,8 +21,8 @@ class Road extends Model
             return false;
         }
         # 获取区id[]
-        $district_ids = self::select('id')->where(function ($query) {
-                            $query->where('parentid', 2);
+        $district_ids = self::select('id')->where(function ($query) use ($id) {
+                            $query->where('parentid', $id);
                          })->get()->toArray();
         # 获取街道id[]
         $result = self::whereIn('parentid',$district_ids)
@@ -30,6 +30,24 @@ class Road extends Model
                 ->get(['id'])
                 ->toArray();
         return $result;
+    }
+
+    # 通过road_id 获取城市信息
+    static function getCityByRoadId($id)
+    {
+        $item = self::getParentItem($id);
+        return self::getParentItem($item['id']);
+    }
+
+    # 获取上层城市信息
+    static function getParentItem($id)
+    {
+        if(0 >= $id) {
+            return [];
+        }
+        $item = self::find($id);
+        $parent_item = self::find($item['parentid']);
+        return $parent_item;
     }
 
 }

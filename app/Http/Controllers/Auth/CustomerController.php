@@ -20,7 +20,7 @@ class CustomerController extends Controller
     {
         $this->appid  = config('wx.minPro.appid');
         $this->secret = config('wx.minPro.secret');
-        $this->middleware('auth', ['except' => ['login', 'register']]);
+        $this->middleware('auth', ['except' => ['login', 'register', 'me', 'mycommunity', 'relateCommunity']]);
     }
 
     /**

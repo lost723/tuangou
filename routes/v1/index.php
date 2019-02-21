@@ -9,12 +9,16 @@
 Route::post('customer/relate/community', 'Auth\CustomerController@relateCommunity');
 # 我的小区
 Route::get('customer/my/community', 'Auth\CustomerController@mycommunity');
-# 获取城市列表
-Route::post('customer/list/city', 'Customer\RoadController@listCity');
 # 坐标定位城市
 Route::post('customer/my/city', 'Customer\RoadController@myCity');
+
+
+# 获取城市列表
+Route::post('customer/list/city', 'Customer\RoadController@listCity');
 # 获取周边小区列表
 Route::post('customer/list/community', 'Customer\CommunityController@CommunityList');
+Route::post('customer/list/community1', 'Customer\CommunityController@testResource');
+
 
 # 团长注册
 Route::post('customer/leader/register', 'Customer\LeaderController@register');

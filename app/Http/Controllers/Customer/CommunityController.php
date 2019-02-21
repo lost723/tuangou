@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Auth\CustomerController;
-use App\Http\Resources\CommunityListResource;
 use App\Http\Resources\CommunityResource;
 use App\Models\Community;
 use App\Models\Road;
-use Illuminate\Support\Facades\DB;
 
 
 class CommunityController extends CustomerController
@@ -15,44 +13,51 @@ class CommunityController extends CustomerController
     # 小程序端 小区管理
     public function __construct()
     {
-        $this->middleware('auth',  ['except' => ['' ]]);
+        $this->middleware('auth',  ['except' => ['CommunityList', 'testResource' ]]);
     }
 
 
     # 通过地理位置定位附近的小区
     public function CommunityList()
     {
-        $type = request()->query('type')?:1;
+        $type = request()->post('type')?:1;
         switch ($type) {
             # 通过城市id获取小区列表
             case 1:
-                $city_id = request()->query('city_id');
-                $enable_coordinate = request()->query('enable_coordinate');
-                $longitude = request()->query('longitude');
-                $latitude  = request()->query('latitude');
-                $result = $this->getCommunityByCityId($city_id, $enable_coordinate, $longitude, $latitude );
+                $city_id = request()->post('city_id');
+                $enable_coordinate = request()->post('enable_coordinate');
+                $longitude = request()->post('longitude');
+                $latitude  = request()->post('latitude');
+                $city_id = request()->post('city_id');
+                $limit = request()->post('limit')?: 10;
+                $result = $this->getCommunityByCityId($city_id, $enable_coordinate, $longitude, $latitude, $limit);
                 break;
             # 通过名称获取小区列表
             case 2:
-                $city_id = request()->query('city_id');
-                $name = request()->query('name');
-                $enable_coordinate = request()->query('enable_coordinate');
-                $longitude = request()->query('longitude');
-                $latitude  = request()->query('latitude');
-                $result = $this->getCommunityByName($city_id, $name, $enable_coordinate, $longitude, $latitude);
+                $city_id = request()->post('city_id');
+                $name = request()->post('name');
+                $enable_coordinate = request()->post('enable_coordinate');
+                $longitude = request()->post('longitude');
+                $latitude  = request()->post('latitude');
+                $limit = request()->post('limit')?: 10;
+                $result = $this->getCommunityByName($city_id, $name, $enable_coordinate, $longitude, $latitude, $limit);
                 break;
             case 3:
-                $longitude = request()->query('longitude');
-                $latitude  = request()->query('latitude');
-                $result = $this->getCommunityByCoordinate($longitude, $latitude);
+                $longitude = request()->post('longitude');
+                $latitude  = request()->post('latitude');
+                $limit = request()->post('limit')?: 10;
+                $result = $this->getCommunityByCoordinate($longitude, $latitude, $limit);
                 break;
             default:
                 return $this->warning('参数请求错误的');
         }
-        if(!$result) {
-            return $this->nocontent('该城市还未有小区开通！');
+
+        if(empty($result)) {
+            return $this->ok(['data' => []]);
         }
-        return new CommunityListResource($result);
+        else {
+            return  CommunityResource::collection($result);
+        }
     }
 
     /**
@@ -60,74 +65,76 @@ class CommunityController extends CustomerController
      * @param $name 小区名称
      * @param $page 页码
      * @param $limit请求数量
-     * @return bool
+     * @return mixed
      */
     # 模糊搜索小區
-    public function getCommunityByName($id, $name, $enable_coordinate = true, $longitude, $latitude, $limit = 10)
+    public function getCommunityByName($id, $name, $enable_coordinate = false, $longitude, $latitude, $limit = 10)
     {
         # 获取 city 下的所有 街道id
         $road = new Road();
-        $result = $road->getRoadsByParentId($id);
+        $ids = $road->getRoadsByParentId($id);
 
-        if(!$result || empty($result)) {
-            return false;
+        if(!$ids || empty($ids)) {
+            return [];
         }
+
 
         if($enable_coordinate) {
-            $list = Community::whereIn('road_id', $result)
-                ->where('name', 'like', "%$name%")
-                ->select(DB::raw("*, st_distance(point(longitude, latitude), 
-                point($longitude, $latitude))/0.0111 as distance"))
-                ->with('road')
-                ->orderBy('distance', 'asc')
-                ->paginate($limit);
+            if(empty($longitude) || empty($latitude)) {
+                return [];
+            }
+            $list = Community::getCommunityByNameWithCoordinate($ids, $name, $longitude, $latitude, $limit);
         }
         else {
-            $list = Community::whereIn('road_id', $result)
-                ->where('name', 'like', "%$name%")
-                ->with('road')
-                ->orderBy('road_id', 'asc')
-                ->paginate($limit);
+            $list = Community::getCommunityByName($ids, $name, $limit);
         }
 
         return $list;
     }
 
-    # 通过城市id 获取小区列表
-    public function getCommunityByCityId($id, $enable_coordinate = true, $longitude , $latitude, $limit = 10)
+    /**
+     * 通过城市id 获取小区列表
+     * @param $id 城市id
+     * @param bool $enable_coordinate 是否启用经纬度查询
+     * @param $longitude 经度
+     * @param $latitude  纬度
+     * @param int $limit 每页条数
+     * @return bool
+     */
+    public function getCommunityByCityId($id, $enable_coordinate = false, $longitude , $latitude, $limit = 10)
     {
         # 获取 city 下的所有 街道id
-        $result = Road::getRoadsByParentId($id);
+        $ids = Road::getRoadsByParentId($id);
 
-        if(!$result || empty($result)) {
-            return false;
+        if(!$ids || empty($ids)) {
+            return [];
         }
 
         if($enable_coordinate) {
-            $list = Community::whereIn('road_id', $result)
-                ->select(DB::raw("*, st_distance(point(longitude, latitude), 
-                point($longitude, $latitude))/0.0111 as distance"))
-                ->with('road')
-                ->orderBy('distance', 'asc')
-                ->paginate($limit);
+            if(empty($longitude) || empty($latitude)) {
+                return [];
+            }
+            $list = Community::getCommunityListByCityIdWithCoordinate($ids, $longitude, $latitude, $limit);
         }
         else {
-            $list = Community::whereIn('road_id', $result)
-                ->with('road')
-                ->orderBy('road_id', 'asc')
-                ->paginate($limit);
+            $list = Community::getCommunityListByCityId($ids, $limit);
         }
         return $list;
     }
 
-    # 通过坐标获取附近小区列表
-    public function getCommunityByCoordinate($longitude, $latitude, $page = 1 , $limit = 10)
+    /**
+     * 通过经纬度获取周边小区列表
+     * @param $longitude 经度
+     * @param $latitude  纬度
+     * @param int $limit 每页条数
+     * @return mixed
+     */
+    public function getCommunityByCoordinate($longitude, $latitude, $limit = 10)
     {
-
-        $list = Community::select(DB::raw("*, st_distance(point(longitude, latitude), 
-                point($longitude, $latitude))/0.0111 as distance"))
-            ->with('road')
-            ->orderBy('distance', 'asc')->paginate($limit);
+        if(empty($longitude) || empty($latitude)) {
+            return [];
+        }
+        $list = Community::getCommunityListByCoordinate($longitude, $latitude, $limit);
         return $list;
     }
 
