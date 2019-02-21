@@ -16,6 +16,39 @@ class CommunityController extends CustomerController
         $this->middleware('auth',  ['except' => ['CommunityList', 'testResource' ]]);
     }
 
+    # 我的小区信息
+    public function myCommunity()
+    {
+        $customer = auth()->user();
+        if(0 < $customer['community_id']) {
+            $community = Community::find($customer['community_id']);
+            if(!empty($community)) {
+                return new CommunityResource($community);
+            }
+            return $this->ok(['data' => []]);
+        }
+        return $this->warning('请检查参数是否正确！');
+
+    }
+
+    /**
+     * 用户关联小区
+     * @param community_id 关联的小区id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function relateCommunity()
+    {
+        $community_id  = request()->post('community_id')?:0;
+        if(0 < $community_id) {
+            $customer = auth()->user();
+            $customer->community_id = $community_id;
+            if($customer->save()) {
+                return $this->note('成功关联小区');
+            }
+            return $this->warning('关联小区失败');
+        }
+        return $this->warning('请检查传入参数是否正确');
+    }
 
     # 通过地理位置定位附近的小区
     public function CommunityList()
