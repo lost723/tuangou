@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Business;
 
+use App\Http\Controllers\Controller;
 use App\Models\Business\Product;
 use Illuminate\Http\Request;
 use App\Models\Business\Promotion;

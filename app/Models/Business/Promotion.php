@@ -42,7 +42,7 @@ class Promotion extends Model
             ->simplePaginate(15);
         return $result;
     }
-    
+
     /**
      * 获取还没有结束的活动
      * @param $id
