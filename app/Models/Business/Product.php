@@ -3,11 +3,11 @@
 namespace App\Models\Business;
 
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class Product extends Model
+class Product extends BaseModel
 {
     const On = 9;  # 正常，在货架
     const Off = 1; # 下架，活动不可见
@@ -38,7 +38,7 @@ class Product extends Model
             ->when($filter, function ($query) use ($filter){
                 $query->where('title', 'like', "%$filter%");
             })
-            ->simplePaginate(15);
+            ->simplePaginate(self::NPP);
         return $result;
     }
 

@@ -2,10 +2,12 @@
 
 namespace App\Models\Business;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use function foo\func;
+use http\Env\Request;
 use Illuminate\Support\Facades\DB;
 
-class Promotion extends Model
+class Promotion extends BaseModel
 {
     const Deleted = 0;      #删除的活动
     const Unpublished = 1;  #未发布的活动
@@ -20,29 +22,58 @@ class Promotion extends Model
 
 
     /**
-     * 获取某商户的商品列表
+     * 获取某商户的活动列表
      * @param $request
      * @return
      */
     static function getBusinessOwnList($request)
     {
         $orgid = Auth::user()->orgid;
+        $pid = $request->get('pid');
         $status = $request->get('status');
         $filter = $request->get('filter');
 
-        $result = self::select('title', 'picture', 'price', 'norm', 'status')
-            ->where('orgid', $orgid)
-            ->where('status', '!=', self::Del)
+        $result = DB::table('promotions as pm')
+            ->where('pm.orgid', $orgid)
+            ->where('pm.status', '!=', self::Del)
+            ->when($pid, function ($query) use ($pid) {
+                $query->where('pm.productid', $pid);
+            })
             ->when($status, function ($query) use ($status) {
-                $query->where('status', $status);
+                $query->where('pm.status', $status);
             })
             ->when($filter, function ($query) use ($filter){
-                $query->where('title', 'like', "%$filter%");
+                $query->where('pd.title', 'like', "%$filter%");
             })
-            ->simplePaginate(15);
+            ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.intro') ->simplePaginate(self::NPP);
         return $result;
     }
-    
+
+
+    /**
+     * 获取团长的挑货列表
+     * @param $commid 小区id
+     * @param $request Request
+     * @return mixed
+     */
+    static function getLeaderChoiceList($commid, $request)
+    {
+        # todo 把团长已经挑选的，剔除掉
+        $resutl = DB::table('promotions as pm')
+            ->where('expire', '>', time())
+            ->where('status', '=', self::Ordering)
+            ->wherein('distid', function ($query) use ($commid) {
+                $query->select('distid')
+                    ->from(with(new DistrictItem)->getTable())
+                    ->where('commid', $commid);
+            })
+            ->join('products as pd', 'pm.productid', '=', 'pd.id')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
+            ->simplePaginate(self::NPP);
+        return $resutl;
+    }
+
     /**
      * 获取还没有结束的活动
      * @param $id
@@ -63,7 +94,7 @@ class Promotion extends Model
     static function getDetails($id)
     {
         $item = DB::table('promotions as pm')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
             ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->where('pm.id', $id)
             ->get();

@@ -18,7 +18,7 @@ class CreateProductionsTable extends Migration
             $table->unsignedInteger('orgid')->comment('商户id');
             $table->unsignedBigInteger('optid')->comment('操作人id');
             $table->unsignedInteger('mtpd')->comment('售后维保期限，单位：天');
-            $table->unsignedBigInteger('areaid')->comment('配送区域模版id');
+            $table->unsignedBigInteger('distid')->comment('配送区域模版id');
             $table->unsignedInteger('issue')->default(0)->comment('活动进行了几期');
             $table->string('title')->comment('商品名称');
             $table->string('norm')->comment('商品规格');
