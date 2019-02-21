@@ -2,10 +2,11 @@
 
 namespace App\Models\Business;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use http\Env\Request;
 use Illuminate\Support\Facades\DB;
 
-class Promotion extends Model
+class Promotion extends BaseModel
 {
     const Deleted = 0;      #删除的活动
     const Unpublished = 1;  #未发布的活动
@@ -39,8 +40,32 @@ class Promotion extends Model
             ->when($filter, function ($query) use ($filter){
                 $query->where('title', 'like', "%$filter%");
             })
-            ->simplePaginate(15);
+            ->simplePaginate(self::NPP);
         return $result;
+    }
+
+
+    /**
+     * 获取团长的挑货列表
+     * @param $commid 小区id
+     * @param $request Request
+     * @return mixed
+     */
+    static function getLeaderChoiceList($commid, $request)
+    {
+        # todo 把团长已经挑选的，剔除掉
+        $resutl = DB::table('promotions as pm')
+            ->where('expire', '>', time())
+            ->where('status', '=', self::Ordering)
+            ->wherein('distid', function ($query) use ($commid) {
+                $query->select('distid')
+                    ->from(with(new DistrictItem)->getTable())
+                    ->where('commid', $commid);
+            })
+            ->join('products as pd', 'pm.productid', '=', 'pd.id')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
+            ->simplePaginate(self::NPP);
+        return $resutl;
     }
 
     /**
