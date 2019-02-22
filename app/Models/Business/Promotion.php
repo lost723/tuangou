@@ -3,6 +3,7 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
+use App\Models\LeaderOrder;
 use function foo\func;
 use http\Env\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,23 +54,28 @@ class Promotion extends BaseModel
 
     /**
      * 获取团长的挑货列表
-     * @param $commid 小区id
-     * @param $request Request
+     * @param $commid   小区id
+     * @param $leaderid 团长id
      * @return mixed
      */
-    static function getLeaderChoiceList($commid, $request)
+    static function getLeaderChoiceList($commid, $leaderid)
     {
         # todo 把团长已经挑选的，剔除掉
         $resutl = DB::table('promotions as pm')
             ->where('expire', '>', time())
-            ->where('status', '=', self::Ordering)
+            ->where('pm.status',  self::Ordering)
             ->wherein('distid', function ($query) use ($commid) {
                 $query->select('distid')
                     ->from(with(new DistrictItem)->getTable())
                     ->where('commid', $commid);
             })
+            ->whereNotIn('pm.id', function ($query) use ($leaderid) {
+                $query->select('promotionid')
+                    ->from(with(new LeaderOrder)->getTable())
+                    ->where('leaderid', $leaderid);
+            })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.norm', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
             ->simplePaginate(self::NPP);
         return $resutl;
     }

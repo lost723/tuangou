@@ -20,13 +20,13 @@ class Road extends Model
         if(0 >= $id) {
             return false;
         }
-
         $result = self::whereIn('parentid',function($query) use($id) {
-                    $query->select('id')->from('roads')->where('parentid', $id);
+                    $query->select('id')
+                        ->from(with(new Road)->getTable())
+                        ->where('parentid', $id);
                 })
                 ->where('leveltype', 4)
-                ->get(['id'])
-                ->toArray();
+                ->get(['id']);
         return $result;
     }
 

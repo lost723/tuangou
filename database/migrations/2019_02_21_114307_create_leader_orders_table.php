@@ -13,16 +13,15 @@ class CreateLeaderOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('leader_orders', function (Blueprint $table) {
+        Schema::create('leader_promotions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('leaderid')->comment('团长id');
             $table->unsignedInteger('promotionid')->comment('活动id');
             $table->unsignedInteger('num')->default(0)->comment('挑选该商品数量');
             $table->unsignedInteger('sales')->default(0)->comment('该商品销量');
-            $table->unsignedInteger('expire')->comment('活动截止时间');
             $table->string('ordersn')->comment('订单号');
             $table->string('check')->comment('核销码');
-            $table->unsignedTinyInteger('status')->comment('-1:异常 1:进行中 2:配送中 0:已签收 ');
+            $table->unsignedTinyInteger('status')->default(1)->comment('-1:异常 1:进行中 2:配送中 0:已签收 ');
             $table->string('note')->comment('订单异常备注');
             $table->timestamps();
         });

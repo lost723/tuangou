@@ -14,6 +14,18 @@ class CustomerResource extends Resource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+//        return parent::toArray($request);
+        return [
+            'openid'    => $this->openId,
+            'mobile'    => $this->mobile,
+            'nickname'  => $this->nickName,
+            'avatar'    => $this->avatar,
+            'country'   => $this->country,
+            'province'  => $this->province,
+            'city'      => $this->city,
+            'gender'    => $this->gender,
+            'community' => new CommunityResource($this->community),
+            'leader'    => new LeaderResource($this->leader),
+        ];
     }
 }

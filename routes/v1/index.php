@@ -22,8 +22,13 @@ Route::post('customer/list/community', 'Customer\CommunityController@CommunityLi
 # 获取周边小区 通过腾讯api获取
 Route::post('customer/search/community', 'Customer\CommunityController@searchCommunity');
 
+
 # 团长注册
 Route::post('customer/leader/register', 'Customer\LeaderController@register');
+# 团长活动商品列表
+Route::get('customer/leader/promotion', 'Customer\LeaderPromotionController@getPromotions');
+
+
 
 
 # 文件上传

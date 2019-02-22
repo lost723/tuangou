@@ -7,7 +7,6 @@ use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\CommunityResource;
 use App\Models\Community;
 use App\Models\Road;
-use Illuminate\Http\Resources\Json\Resource;
 
 
 class CommunityController extends CustomerController
