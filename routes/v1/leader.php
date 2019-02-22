@@ -16,7 +16,6 @@ Route::post('customer/leader/add/promotion', 'Customer\LeaderPromotionController
 # 团长签收记录(记录列表/单个记录详情)
 Route::get('customer/leader/record/promotion', 'Customer\LeaderPromotionController@getReceivedPromotions');
 # 团长核销
-Route::get('ordersn', 'Customer\LeaderPromotionController@createOrderSn');
 
 
 

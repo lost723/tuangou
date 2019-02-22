@@ -15,12 +15,12 @@ class Customer extends Authenticatable implements JWTSubject
 
     public function leader()
     {
-        return $this->hasOne('App\Models\Leader', 'customer_id');
+        return $this->hasOne('App\Models\Customer\Leader', 'customer_id');
     }
 
     public function community()
     {
-        return $this->belongsTo('App\Models\Community', 'community_id');
+        return $this->belongsTo('App\Models\Customer\Community', 'community_id');
     }
 
     /**

@@ -126,7 +126,7 @@ class QiNiuUploadController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function uploadPrivateImg1(Request $request)
+    public function uploadPrivateImg(Request $request)
     {
         try{
             $file = $request->file('source');

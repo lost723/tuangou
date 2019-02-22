@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Auth\CustomerController;
-use App\Models\Leader;
+use App\Models\Customer\Leader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 

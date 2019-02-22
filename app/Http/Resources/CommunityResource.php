@@ -3,8 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Http\Controllers\Common\QiNiuUploadController;
-use App\Models\Road;
-use function foo\func;
+use App\Models\Customer\Road;
 use Illuminate\Http\Resources\Json\Resource;
 
 class CommunityResource extends Resource

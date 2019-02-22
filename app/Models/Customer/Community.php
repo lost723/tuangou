@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Customer;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ class Community extends Model
     # 获取小区所属的街道
     public function road()
     {
-        return $this->belongsTo('App\Models\Road', 'road_id', 'id');
+        return $this->belongsTo('App\Models\Customer\Road', 'road_id', 'id');
     }
 
     # 通过城市id 获取小区列表

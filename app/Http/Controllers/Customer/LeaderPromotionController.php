@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Models\Business\Promotion;
-use App\Models\Leader;
-use App\Models\LeaderPromotion;
+use App\Models\Customer\Leader;
+use App\Models\Customer\LeaderPromotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class LeaderPromotionController extends Controller
 {
+    # 小程序端 团长活动管理
     public function __construct()
     {
         $this->middleware('auth', ['except' =>  ['getPromotions', 'addPromotions', 'getReceivedPromotions'

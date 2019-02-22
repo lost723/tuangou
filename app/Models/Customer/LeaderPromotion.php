@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Customer;
 
 use http\Env\Request;
 use Illuminate\Support\Facades\DB;

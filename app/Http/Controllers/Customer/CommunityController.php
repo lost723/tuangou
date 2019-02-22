@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Auth\CustomerController;
 use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\CommunityResource;
-use App\Models\Community;
-use App\Models\Road;
+use App\Models\Customer\Community;
+use App\Models\Customer\Road;
 
 
 class CommunityController extends CustomerController
