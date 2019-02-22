@@ -15,7 +15,7 @@ class Road extends Model
     }
 
     # 通过城市id 获取街道列表
-    static public function getRoadsByParentId($id = 0)
+    static  function getRoadsByParentId($id = 0)
     {
         if(0 >= $id) {
             return false;
@@ -48,7 +48,6 @@ class Road extends Model
         return $parent_item;
     }
 
-    # 获取上级列表
 
 
 

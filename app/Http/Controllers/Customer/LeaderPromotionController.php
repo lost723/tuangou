@@ -12,7 +12,8 @@ class LeaderPromotionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' =>  ['getPromotions', 'addPromotions', 'getReceivedPromotions']]);
+        $this->middleware('auth', ['except' =>  ['getPromotions', 'addPromotions', 'getReceivedPromotions'
+        , 'createOrderSn']]);
     }
 
 
@@ -36,6 +37,7 @@ class LeaderPromotionController extends Controller
             case 2:
                 $list = LeaderPromotion::getSelectedPromotions($leader->id);
                 break;
+            # 获取单个指定活动详情数据
             case 3:
                 $id = $request->get('id');
                 $list = LeaderPromotion::getPromotion($leader->id, $id);
@@ -110,7 +112,7 @@ class LeaderPromotionController extends Controller
     }
 
     /**
-     * 生成订单号
+     * 生成唯一订单号
      * @return string
      */
     public function createOrderSn()

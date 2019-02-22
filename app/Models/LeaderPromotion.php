@@ -30,7 +30,7 @@ class LeaderPromotion extends BaseModel
     }
 
 
-    # 获取团长的 订单列表
+    # 获取团长的 活动列表
     static function getSelectedPromotions($leaderid)
     {
         $result = DB::table(with(new LeaderPromotion)->getTable().' as lpm')
@@ -45,7 +45,7 @@ class LeaderPromotion extends BaseModel
     }
 
     /**
-     * 添加选货至团长订单
+     * 添加选货至团长活动列表
      * @param Request $request
      * # @param
      */
