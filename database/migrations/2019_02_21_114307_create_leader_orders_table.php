@@ -21,7 +21,7 @@ class CreateLeaderOrdersTable extends Migration
             $table->unsignedInteger('sales')->default(0)->comment('该商品销量');
             $table->string('ordersn')->comment('订单号');
             $table->string('check')->comment('核销码');
-            $table->unsignedTinyInteger('status')->default(1)->comment('-1:异常 1:进行中 2:配送中 0:已签收 ');
+            $table->unsignedTinyInteger('status')->default(1)->comment('0:异常 1:进行中 2:配送中 3:已签收 ');
             $table->string('note')->comment('订单异常备注');
             $table->timestamps();
         });

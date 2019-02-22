@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Common\WXLoginController;
 use App\Http\Resources\CommunityResource;
 use App\Http\Resources\CustomerResource;
 use App\Models\Auth\Customer;
@@ -14,15 +15,9 @@ use Illuminate\Support\Facades\Redis;
 class CustomerController extends Controller
 {
 
-    const   CODE_TO_SESSION_URL = 'https://api.weixin.qq.com/sns/jscode2session?';
-    private $appid;
-    private $secret;
-
     public function __construct()
     {
-        $this->appid  = config('wx.minPro.appid');
-        $this->secret = config('wx.minPro.secret');
-        $this->middleware('auth', ['except' => ['login', 'register', 'me', ]]);
+        $this->middleware('auth', ['except' => ['login', 'register', ]]);
     }
 
     /**
@@ -32,21 +27,15 @@ class CustomerController extends Controller
      */
     public function login(Request $request)
     {
-        # 验证code
-        $request->validate([
-            'code'  =>  'string|required'
-        ]);
-
-        $customer = $this->code2SessionKey($request->all());
-        if($customer) {
+        try {
+            $request->validate([
+                'code'  =>  'string|required'
+            ]);
+            $customer = WXLoginController::code2SessionKey($request->post('code'));
             # 检测用户是否已注册
             $result = Customer::where(['openId' => $customer['openid']])->first();
-
             if(!empty($result)) {
-                # 用户已注册  返回 token
-                if(! $token = auth()->login($result)) {
-                    return $this->unauthed();
-                }
+                $token = auth()->login($result);
                 return $this->respondWithToken($token);
             }
             else {
@@ -55,11 +44,11 @@ class CustomerController extends Controller
                     'openid'    =>  $customer['openid'],
                     'message'   =>  '用户未注册'
                 ];
-                return response()->json($message, 400);
+                return $this->ok($message);
             }
         }
-        else {
-             return $this->warning('code已过期,接口请求异常!');
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
         }
     }
 
@@ -79,15 +68,12 @@ class CustomerController extends Controller
 
         try {
             # 注册用户信息
-            if($this->ParseUserinfo($request->all())) {
+            $data = WXLoginController::ParseUserinfo($request->all());
+            $this->created($data);
             # 自动登录
-                $customer = Customer::where('openId',$request->query('openid'))->first();
-                $token = auth()->login($customer);
-                return $this->respondWithToken($token);
-            }
-            else {
-                return $this->warning('用户注册失败');
-            }
+            $customer = Customer::where('openId',$request->query('openid'))->first();
+            $token = auth()->login($customer);
+            return $this->respondWithToken($token);
         }
         catch (\Exception $e) {
             return $this->warning('用户注册失败!');
@@ -145,51 +131,8 @@ class CustomerController extends Controller
     }
 
 
-    /**
-     * code 换取 SessionKey 并写入缓存 生命周期 2小时
-     * @param Request $request
-     * @return mixed|null
-     */
-    private function code2SessionKey(array $data)
+    public function create($userinfo)
     {
-
-        $js_code = $data['code'];
-        $url = self::CODE_TO_SESSION_URL.'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$js_code.'&grant_type=authorization_code';
-
-        $result = $this->http_get($url);
-        $result = json_decode($result,true);
-        if(!array_key_exists('errcode', $result)) {
-
-            Redis::setex('openid:'.$result['openid'].':sessionKey', 7200, $result['session_key']);
-
-            return $result;
-        }
-
-        return null;
-
-    }
-
-    /**
-     * 解析 小程序api getUserinfo 的加密参数  并写入小程序用户数据库
-     * @param Request $request
-     * @param iv openid encryptedData
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function ParseUserinfo(array $data)
-    {
-        $openid = $data['openid'];
-        $encryptedData = $data['encryptedData'];
-        $iv = $data['iv'];
-        $sessionKey = Redis::get('openid:'.$openid.':sessionKey');
-        $userinfo = null;
-        $wxBizDataCrypt = new WXBizDataCryptController($this->appid, $sessionKey);
-        $wxBizDataCrypt->decryptData($encryptedData, $iv, $userinfo);
-
-        $userinfo = json_decode($userinfo, true);
-        if(empty($userinfo)) {
-            return null;
-        }
-
         return Customer::firstOrCreate(
             [
                 'openId' => $userinfo['openId']
@@ -207,8 +150,6 @@ class CustomerController extends Controller
 
             ]
         );
-
     }
-
 
 }

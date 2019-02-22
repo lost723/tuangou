@@ -29,7 +29,7 @@ class SendTemplateMsgController extends WXBaseController
             'emphasis_keyword'  =>  $emphasis_keyword,
         ];
 
-        $result = $this->http_post(self::TEMPLATE_SEND_URL, $data);
+        $result = self::http_post(self::TEMPLATE_SEND_URL, $data);
         return $result;
     }
 
