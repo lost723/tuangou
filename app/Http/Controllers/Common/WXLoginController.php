@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Common;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redis;
 
 class WXLoginController extends WXBaseController
 {
@@ -14,11 +14,9 @@ class WXLoginController extends WXBaseController
      * @param Request $request
      * @return mixed|null
      */
-    static function code2SessionKey(array $data)
+    public function code2SessionKey($data)
     {
-        $js_code = $data['code'];
-        $url = self::CODE_TO_SESSION_URL.'appid='.self::appid.'&secret='.self::secret.'&js_code='.$js_code.'&grant_type=authorization_code';
-
+        $url = self::CODE_TO_SESSION_URL.'appid='.$this->appid.'&secret='.$this->secret.'&js_code='.$data.'&grant_type=authorization_code';
         $result = self::http_get($url);
         $result = json_decode($result,true);
         if(!array_key_exists('errcode', $result)) {
@@ -38,14 +36,14 @@ class WXLoginController extends WXBaseController
      * @param iv openid encryptedData
      * @return \Illuminate\Http\JsonResponse
      */
-    static function ParseUserinfo(array $data)
+    public function ParseUserinfo(array $data)
     {
         $openid = $data['openid'];
         $encryptedData = $data['encryptedData'];
         $iv = $data['iv'];
         $sessionKey = Redis::get('openid:'.$openid.':sessionKey');
         $userinfo = null;
-        $wxBizDataCrypt = new WXBizDataCryptController(self::appid, $sessionKey);
+        $wxBizDataCrypt = new WXBizDataCryptController($this->appid, $sessionKey);
         $wxBizDataCrypt->decryptData($encryptedData, $iv, $userinfo);
         $userinfo = json_decode($userinfo, true);
         return $userinfo;

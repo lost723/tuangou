@@ -9,7 +9,7 @@ trait NetHelper
      * @param $post_data
      * @return bool|mixed
      */
-    public function http_post($url, $post_data)
+    static function http_post($url, $post_data)
     {
 
             $ch = curl_init();

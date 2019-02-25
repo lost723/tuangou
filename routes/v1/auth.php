@@ -2,7 +2,7 @@
 
 # Customer
 Route::get('customer/me', 'Auth\CustomerController@me');
-Route::post('customer/login', 'Auth\CustomerController@login');
+Route::get('customer/login', 'Auth\CustomerController@login');
 Route::get('customer/refresh', 'Auth\CustomerController@refresh');
 Route::post('customer/register', 'Auth\CustomerController@register');
 

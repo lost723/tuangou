@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Common\WXLoginController;
-use App\Http\Resources\CommunityResource;
 use App\Http\Resources\CustomerResource;
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Common\WXBizDataCryptController;
 use App\Models\Community;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 
 class CustomerController extends Controller
 {
-
+    protected  $wxLogin;
     public function __construct()
     {
+        $this->wxLogin = new WXLoginController;
         $this->middleware('auth', ['except' => ['login', 'register', ]]);
     }
 
@@ -31,7 +29,10 @@ class CustomerController extends Controller
             $request->validate([
                 'code'  =>  'string|required'
             ]);
-            $customer = WXLoginController::code2SessionKey($request->post('code'));
+            $customer = $this->wxLogin->code2SessionKey($request->get('code'));
+            if(empty($customer)) {
+                throw new \Exception('code 已过期');
+            }
             # 检测用户是否已注册
             $result = Customer::where(['openId' => $customer['openid']])->first();
             if(!empty($result)) {
@@ -68,10 +69,13 @@ class CustomerController extends Controller
 
         try {
             # 注册用户信息
-            $data = WXLoginController::ParseUserinfo($request->all());
+            $data = $this->wxLogin->ParseUserinfo($request->all());
             $this->created($data);
             # 自动登录
             $customer = Customer::where('openId',$request->query('openid'))->first();
+            if(empty($customer)) {
+                throw new \Exception('用户注册失败!');
+            }
             $token = auth()->login($customer);
             return $this->respondWithToken($token);
         }

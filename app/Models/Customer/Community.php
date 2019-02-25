@@ -2,10 +2,10 @@
 
 namespace App\Models\Customer;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 use Illuminate\Support\Facades\DB;
 
-class Community extends Model
+class Community extends BaseModel
 {
     protected $fillable = ['name', 'logo', 'road_id', 'address', 'longitude', 'latitude'];
 

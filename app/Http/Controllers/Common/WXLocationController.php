@@ -16,6 +16,7 @@ class WXLocationController extends Controller
     {
         $this->middleware('auth', ['except' => ['getLocation']]);
     }
+
     static function getLocation()
     {
         $longitude = request()->post('longitude');

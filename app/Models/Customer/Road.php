@@ -2,9 +2,9 @@
 
 namespace App\Models\Customer;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 
-class Road extends Model
+class Road extends BaseModel
 {
     //
     protected $fillable = ['parentid', 'leveltype', 'name', 'path', 'province', 'city', 'district', 'abbr'];

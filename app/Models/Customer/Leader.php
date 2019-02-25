@@ -2,9 +2,9 @@
 
 namespace App\Models\Customer;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 
-class Leader extends Model
+class Leader extends BaseModel
 {
     //
     const NORMAL = 1;

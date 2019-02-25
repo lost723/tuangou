@@ -2,7 +2,7 @@
 
 namespace App\Models\Customer;
 
-use http\Env\Request;
+use App\Models\BaseModel;
 use Illuminate\Support\Facades\DB;
 
 class LeaderPromotion extends BaseModel
@@ -46,8 +46,8 @@ class LeaderPromotion extends BaseModel
 
     /**
      * 添加选货至团长活动列表
-     * @param Request $request
-     * # @param
+     * @param $data
+     * @return mixed
      */
     static function addPromotions($data) {
        $result =  DB::table(with(new LeaderPromotion)->getTable())

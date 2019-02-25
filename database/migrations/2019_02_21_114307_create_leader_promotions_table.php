@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLeaderOrdersTable extends Migration
+class CreateLeaderPromotionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -34,6 +34,6 @@ class CreateLeaderOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('leader_orders');
+        Schema::dropIfExists('leader_promotions');
     }
 }
