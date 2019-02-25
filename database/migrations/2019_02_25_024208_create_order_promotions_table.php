@@ -20,7 +20,8 @@ class CreateOrderPromotionsTable extends Migration
             $table->unsignedInteger('promotionid')->comment('leader_promotions表的id');
             $table->string('ordersn')->comment('当前活动的订单号');
             $table->unsignedInteger('num')->comment('购买数量');
-            $table->decimal('total',10,2)->comment('总价格');
+            $table->decimal('price',8,2)->comment('购买时活动单价');
+            $table->decimal('total',8,2)->comment('总价格');
             $table->tinyInteger('status')->comment('订单状态 0:超时异常 1:未支付 2:已退款 3:已支付待收货 4:订单完成');
             $table->string('note')->comment('订单备注');
             $table->timestamps();

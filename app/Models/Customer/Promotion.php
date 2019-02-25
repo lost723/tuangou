@@ -50,4 +50,16 @@ class Promotion extends BaseModel
 
         return $list;
     }
+
+
+    # 获取团长某活动的价格信息
+    static function getPromotionPrice($id)
+    {
+        $item = DB::table(with(new LeaderPromotion)->getTable().' as lm')
+            ->where('lm.id', $id)
+            ->leftjoin(with(new BPromotion)->getTable().' as pm', 'lm.promotionid', '=', 'pm.id')
+            ->select('lm.id', 'lm.promotionid', 'lm.num', 'lm.sales', 'pm.price', 'pm.status', 'pm.stock')
+            ->first();
+        return $item;
+    }
 }

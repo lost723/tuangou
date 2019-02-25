@@ -71,9 +71,11 @@ class LeaderPromotionController extends Controller
             $data = $request->post('data');
 
             $data = [];
-            foreach ($data as $key => &$val) {
+            foreach ($data as $key => $val) {
                 $val['ordersn']     = $this->createOrderSn();
                 $val['leaderid']    = $leader->id;
+                array_push($data, $val);
+                unset($val);
             }
 
             DB::beginTransaction();
@@ -116,7 +118,7 @@ class LeaderPromotionController extends Controller
      * 生成唯一订单号
      * @return string
      */
-    public function createOrderSn()
+    static function createOrderSn()
     {
         return date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     }
