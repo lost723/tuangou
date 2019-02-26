@@ -15,12 +15,17 @@ Route::resource('customer/promotion', 'Customer\CustomerController');
 # 订单列表 orderList （不同的支付状态）
 # 订单详情 orderDetail
 Route::post('customer/order/create','Customer\OrderController@createOrder');
-Route::get('customer/order/pay', 'Customer\OrderController@payOrder');
-Route::get('customer/order/cancel', 'Customer\OrderController@cancelOrder');
+Route::get('customer/order/pay/{id}', 'Customer\OrderController@payOrder');
+Route::get('customer/order/cancel/{id}', 'Customer\OrderController@cancelOrder');
 Route::post('customer/order/list', 'Customer\OrderController@listOrder');
-Route::get('customer/order/detail', 'Customer\OrderController@detailOrder');
+Route::get('customer/order/detail/{id}', 'Customer\OrderController@detailOrder');
 # 订单退款
-Route::get('customer/order/refund', 'Customer\OrderController@refundOrder');
+Route::get('customer/order/refund/{id}', 'Customer\OrderController@refundOrder');
+
+
+#通知
+Route::post('customer/order/notify/pay', 'Customer\NotifyController@payResult');
+Route::post('customer/order/notify/refund', 'Customer\NotifyController@refundResult');
 
 
 

@@ -8,7 +8,7 @@ class OrderPromotion extends Model
 {
     protected $fillable = ['customerid', 'orderid', 'promotionid', 'ordersn', 'num', 'price', 'total', 'status', 'note'];
     const OrderPrefix = '100'; # 子订单号前缀
-    const Expire = 0; # 订单超时异常
+    const Expire = 0; # 订单超时异常 或 取消
     const Unpaid = 1; # 未支付
     const Refund = 2; # 已退款
     const UnReceived = 3; # 已支付待收货

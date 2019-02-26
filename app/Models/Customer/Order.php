@@ -4,6 +4,7 @@ namespace App\Customer\Models;
 
 use App\Models\BaseModel;
 use App\Models\Customer\OrderPromotion;
+use Illuminate\Support\Facades\DB;
 
 class Order extends BaseModel
 {
@@ -24,11 +25,20 @@ class Order extends BaseModel
     static function checkOrder($id)
     {
         return DB::table('orders')->where('id', $id)
+            ->where('status', Order::Unpaid)
             ->where('paytime','>',(time()-Order::TimeOut*60))
             ->first();
     }
 
-    static function updateCasecadeOrder($id)
+    # 查找订单
+    static function findOrder($id)
+    {
+        return DB::table('orders')->where('id', $id)
+            ->first();
+    }
+
+    # 取消订单
+    static function cancelCasecadeOrder($id)
     {
 
         DB::table('orders')->where('id', $id)
