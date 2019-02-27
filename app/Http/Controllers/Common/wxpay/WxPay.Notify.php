@@ -106,4 +106,37 @@ class WxPayNotify extends WxPayNotifyReply
 		$this->LogAfterProcess($xml);
 		WxpayApi::replyNotify($xml);
 	}
+
+	#  添加参数返回校验 和 签名校验结果
+    public function check($objData, $config)
+    {
+        $data = $objData->GetValues();
+        //TODO 1、进行参数校验
+        if(!array_key_exists("return_code", $data)
+            ||(array_key_exists("return_code", $data) && $data['return_code'] != "SUCCESS")) {
+            //TODO失败,不是支付成功的通知
+            //如果有需要可以做失败时候的一些清理处理，并且做一些监控
+            $msg = "异常异常";
+            return false;
+        }
+        if($data['result_code'] != "SUCCESS") {
+            $msg = "支付异常";
+            return false;
+        }
+        if(!array_key_exists("transaction_id", $data)){
+            $msg = "输入参数不正确";
+            return false;
+        }
+
+        //TODO 2、进行签名验证
+        try {
+            $checkResult = $objData->CheckSign($config);
+            if($checkResult == false){
+                //签名错误
+                return false;
+            }
+        } catch(Exception $e) {
+
+        }
+    }
 }

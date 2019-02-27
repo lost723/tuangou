@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Customer\Models\Order;
 use App\Http\Controllers\Common\Wxpay\WxPayNotify;
+use App\Models\Customer\LeaderPromotion;
 
 
 class WXPayNotifyController extends WxPayNotify
@@ -16,36 +18,36 @@ class WXPayNotifyController extends WxPayNotify
      */
     public function NotifyProcess($objData, $config, &$msg)
     {
-        $data = $objData->GetValues();
-        //TODO 1、进行参数校验
-        if(!array_key_exists("return_code", $data)
-            ||(array_key_exists("return_code", $data) && $data['return_code'] != "SUCCESS")) {
-            //TODO失败,不是支付成功的通知
-            //如果有需要可以做失败时候的一些清理处理，并且做一些监控
-            $msg = "异常异常";
-            return false;
-        }
-        if(!array_key_exists("transaction_id", $data)){
-            $msg = "输入参数不正确";
-            return false;
-        }
+       # 参数 和 签名校验
+       if(!($this->check($objData, $config))) {
+           return false;
+       }
+       $data = $objData->GetValues();
+       # TODO
+       # 更新订单数据 更新团长活动销量 更新商户活动销量
+       $order = Order::findOrderByTradeNo($data['out_trade_no']);
+       if(!empty($order) && ($order['status'] == Order::Unpaid ) && ($data['total'] / 100 == $order['total'])) {
+            $record = [];
+            $record['transaction_id'] = $data['transaction_id'];
+            $record['status']         = Order::Finished;
+            try{
 
-        //TODO 2、进行签名验证
-        try {
-            $checkResult = $objData->CheckSign($config);
-            if($checkResult == false){
-                //签名错误
+                $result = Order::updateOrder($data,$order['id']);
+                $order_promotions = Order::getSubPromotions($order['id']); # 该订单下的所有子订单
+                DB::beginTransaction();
+                foreach($order_promotions as $key=>$val) {
+                    LeaderPromotion::incPromotionSales($val['promotionid'], $val['num']);
+                    LeaderPromotion::incBusinessPromotionSales($val['promotionid'], $val['num']);
+                }
+                DB::commit();
+                return true;
+            }
+            catch (\Exception $exception) {
+                DB::rollback();
                 return false;
             }
-        } catch(Exception $e) {
 
-        }
-
-        //TODO 3、处理业务逻辑
-        $notfiyOutput = array();
-        # 更新订单数据
-
-
-        return true;
+       }
+       return false;
     }
 }

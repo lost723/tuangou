@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Customer;
 
 use App\Customer\Models\Order;
 use App\Http\Controllers\Common\Wxpay\WxPayApi;
+use App\Http\Controllers\Common\Wxpay\WxPayRefund;
 use App\Http\Controllers\Common\Wxpay\WxPayUnifiedOrder;
 use App\Http\Controllers\Common\WXPayConfigController;
 use App\Http\Controllers\Common\WXPayController;
+use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
+use App\Models\Customer\RefundOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -76,9 +79,6 @@ class OrderController extends Controller
         }
         OrderPromotion::createOrderPromotions($orderpromotion);
         # end orderpromotion
-        unset($data);
-        unset($orderpromotion);
-        unset($items);
         return $orderid;
     }
     #  生成订单
@@ -89,6 +89,9 @@ class OrderController extends Controller
             $data = $request->post('data');
             if(!is_array($data)) {
                 throw new \Exception('参数错误');
+            }
+            if(!$this->checkPromotions()) {
+                throw new \Exception('请选择已绑定小区附近的商家，方便您提货!');
             }
             DB::beginTransaction();
             $this->preOrder($data);
@@ -101,11 +104,6 @@ class OrderController extends Controller
         }
     }
 
-    # 检查订单状态
-    public function checkOrder($id)
-    {
-
-    }
 
     #  支付订单 生成预支付参数
     public function payOrder($id)
@@ -132,7 +130,7 @@ class OrderController extends Controller
             return $this->warning($exception->getMessage());
         }
     }
-
+    # 准备支付参数
     public function prePayOrder($order)
     {
         $customer = auth()->user();
@@ -177,13 +175,108 @@ class OrderController extends Controller
     }
 
 
-    # 订单退款
+    /**
+     * 订单退款
+     * @param $id   id为用户所购买的某个商品的订单id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function refundOrder($id)
     {
+        try{
+            # 查询订单 (已支付 且 活动未结束)
+            if(!($order = OrderPromotion::checkOrderPromotions($id))) {
+                throw new \Exception('该商品所参与的活动已结束,请勿退款！');
+            }
+            # doRefund 创建退款单
+            if($refundArgs = $this->createRefund($order)) {
+                throw new \Exception('退款订单创建失败');
+            }
+            # 发起退款请求
+            if($data = $this->doRefund($refundArgs)) {
+                # 更新退款表状态 订单状态
+                # check result_code refund_fee #update refund_id status
+                if($data['result'] != 'SUCCESS') {
+                    throw new \Exception($data['err_code'].':'.$data['err_code_des']);
+                }
+                $refundOrder = RefundOrder::findOrderByRefundNo($data['out_refund_no']);
+                if(($refundOrder['status'] == RefundOrder::Refunding) && ($refundOrder['refund'] == ($data['refund_fee'] / 100))) {
+                    # update 退款表 订单状态表
+                    $updateArr = [];
+                    $updateArr['refund_id'] = $data['refund_id'];
+                    $updateArr['status'] = RefundOrder::Finished;
+                    try{
+                        DB::beginTransaction();
+                        # 更新退款单状态
+                        DB::table('refunds')
+                            ->where('id',$refundOrder['id'])
+                            ->update($updateArr);
+                        # 更新用户订单状态为已退款
+                        DB::table('order_promotions')
+                            ->where('id',$refundOrder['order_promotionid'])
+                            ->update(['status' => OrderPromotion::Refund]);
+                        # 更新团长活动销量
+                        # 更新商户活动销量
+                        LeaderPromotion::decPromotionSales($order['promotionid'],$order['num']);
+                        LeaderPromotion::decBusinessPromotionSales($order['promotionid'],$order['num']);
+                        DB::commit();
+                    }
+                    catch (\Exception $exception){
+                        DB::rollback();
+                        return $this->warning($exception->getMessage());
+                    }
+                }
+                else {
+                    # 订单异常
+                }
+            }
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
 
+
+
+
+    # 创建退款订单
+    public function createRefund($data)
+    {
+        $customer = auth()->user();
+        $record = [];
+        $record['customerid']   = $customer->id;
+        $record['orderid']   = $customer->id;
+        $record['order_promotionid']   = $customer->id;
+        $record['trade_no'] = $data['trade_no'];
+        $record['transaction_id'] = $data['transaction_id'];
+        $record['total']   = $customer->id;
+        $record['refund']   = $customer->id;
+        $record['refund_no']   = $customer->id;
+        $record['status']   = RefundOrder::Refunding;
+        $record['note']   = $customer->id;
+        if(RefundOrder::createRefund($record, $record['order_promotionid'])) {
+            return $record;
+        }
+        else {
+            return false;
+        }
+    }
+
+    # doRefund 发起退款请求
+    public function doRefund($data)
+    {
+        $input = new WxPayRefund();
+        $input->SetTransaction_id($data['transaction_id']);
+        $input->SetTotal_fee($data['total']*100);
+        $input->SetRefund_fee($data['refund']*100);
+
+        $config = new WxPayConfig();
+        $input->SetOut_refund_no($data['refund_no']);
+        $input->SetOp_user_id($config->GetMerchantId());
+        printf_info(WxPayApi::refund($config, $input));
     }
 
     # 订单列表
+    # 全部订单 待支付订单  待收货订单 已完成
     public function listOrder()
     {
 

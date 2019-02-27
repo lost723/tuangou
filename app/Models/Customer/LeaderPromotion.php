@@ -104,4 +104,41 @@ class LeaderPromotion extends BaseModel
     {
         return self::find($id)->update(['status' => $status]);
     }
+
+    # 更新团长活动销量
+    static function incPromotionSales($id, $num = 1)
+    {
+        return  DB::table('order_promotions')
+            ->where('id', $id)
+            ->increment('sales', $num);
+    }
+
+    # 更新团长活动销量
+    static function decPromotionSales($id, $num = 1)
+    {
+        return  DB::table('order_promotions')
+            ->where('id', $id)
+            ->decrement('sales', $num);
+    }
+
+    # 通过团长订单id 来更新 商户订单的销量
+    static function incBusinessPromotionSales($id, $num = 1)
+    {
+        return DB::table('promotions as pm')
+            ->join('leader_promotions as lpm', 'lpm.promotionid', '=', 'pm.id')
+            ->where('lpm.id', $id)
+            ->increment('pm.sales', $num);
+
+    }
+    # 通过团长订单id 来更新 商户订单的销量
+    static function decBusinessPromotionSales($id, $num = 1)
+    {
+        return DB::table('promotions as pm')
+            ->join('leader_promotions as lpm', 'lpm.promotionid', '=', 'pm.id')
+            ->where('lpm.id', $id)
+            ->decrement('pm.sales', $num);
+
+    }
+
+
 }

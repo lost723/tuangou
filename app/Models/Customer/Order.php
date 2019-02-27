@@ -16,10 +16,7 @@ class Order extends BaseModel
 
     const TimeOut = 15;
 
-    static function createOrder($data)
-    {
-        return DB::table('orders')->insertGetId($data);
-    }
+
 
     # 检查订单是否超时
     static function checkOrder($id)
@@ -36,7 +33,29 @@ class Order extends BaseModel
         return DB::table('orders')->where('id', $id)
             ->first();
     }
+    # 通过订单号查询订单
+    static function findOrderByTradeNo(string $trade_no)
+    {
+        return DB::table('orders')
+            ->where('trade_no', $trade_no)
+            ->first();
+    }
 
+
+
+    # 生成订单
+    static function createOrder($data)
+    {
+        return DB::table('orders')->insertGetId($data);
+    }
+
+    # 更新订单信息
+    static function updateOrder($data, $id)
+    {
+        return DB::table('orders')
+            ->where('id', $id)
+            ->update($data);
+    }
     # 取消订单
     static function cancelCasecadeOrder($id)
     {
@@ -48,4 +67,19 @@ class Order extends BaseModel
             ->update(['status' => OrderPromotion::Expire]);
 
     }
+
+    # 通过总订单查找订单详情列表
+    static function getSubPromotions($id)
+    {
+        return DB::table('order_promotions')
+            ->where('order_id', $id)
+            ->get();
+    }
+
+    # 批量更新订单关联销量数据
+    static function batchIncSales($id)
+    {
+
+    }
+
 }
