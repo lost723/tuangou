@@ -20,7 +20,7 @@ class Order extends BaseModel
 
     # 检查订单是否超时
     static function checkOrder($id)
-    {
+    {   #todo 该活动还在进行中
         return DB::table('orders')->where('id', $id)
             ->where('status', Order::Unpaid)
             ->where('paytime','>',(time()-Order::TimeOut*60))
@@ -76,10 +76,6 @@ class Order extends BaseModel
             ->get();
     }
 
-    # 批量更新订单关联销量数据
-    static function batchIncSales($id)
-    {
 
-    }
 
 }

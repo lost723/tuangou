@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Customer\Models\Order;
 use App\Http\Controllers\Common\Wxpay\WxPayNotify;
 use App\Models\Customer\LeaderPromotion;
+use App\Models\Customer\OrderPromotion;
 
 
 class WXPayNotifyController extends WxPayNotify
@@ -23,7 +24,6 @@ class WXPayNotifyController extends WxPayNotify
            return false;
        }
        $data = $objData->GetValues();
-       # TODO
        # 更新订单数据 更新团长活动销量 更新商户活动销量
        $order = Order::findOrderByTradeNo($data['out_trade_no']);
        if(!empty($order) && ($order['status'] == Order::Unpaid ) && ($data['total'] / 100 == $order['total'])) {
@@ -31,13 +31,13 @@ class WXPayNotifyController extends WxPayNotify
             $record['transaction_id'] = $data['transaction_id'];
             $record['status']         = Order::Finished;
             try{
-
-                $result = Order::updateOrder($data,$order['id']);
+                Order::updateOrder($data,$order['id']); # 更新用户订单状态
                 $order_promotions = Order::getSubPromotions($order['id']); # 该订单下的所有子订单
                 DB::beginTransaction();
                 foreach($order_promotions as $key=>$val) {
-                    LeaderPromotion::incPromotionSales($val['promotionid'], $val['num']);
-                    LeaderPromotion::incBusinessPromotionSales($val['promotionid'], $val['num']);
+                    OrderPromotion::updatePromotionStatus(OrderPromotion::UnReceived, $val['id']); # 订单状态->已支付
+                    LeaderPromotion::incPromotionSales($val['promotionid'], $val['num']); # 更新团长订单销量
+                    LeaderPromotion::incBusinessPromotionSales($val['promotionid'], $val['num']); # 更新商户活动销量
                 }
                 DB::commit();
                 return true;
@@ -46,7 +46,6 @@ class WXPayNotifyController extends WxPayNotify
                 DB::rollback();
                 return false;
             }
-
        }
        return false;
     }

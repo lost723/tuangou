@@ -13,6 +13,7 @@ class QiNiuUploadController extends Controller
 
     public function __construct()
     {
+        # todo 生产环境 需添加验证
         $this->middleware('auth', ['except' => ['uploadPublicImg', 'uploadPrivateImg']]);
     }
 

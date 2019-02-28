@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Resources\Customer\BusinessPromotionDetail;
+use App\Http\Resources\Customer\BusinessPromotions;
 use App\Models\Business\Promotion;
 use App\Models\Customer\Leader;
 use App\Models\Customer\LeaderPromotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class LeaderPromotionController extends Controller
 {
     # 小程序端 团长活动管理
     public function __construct()
     {
+        # todo 生产环境需取消 非token验证方法
         $this->middleware('auth', ['except' =>  ['getPromotions', 'addPromotions', 'getReceivedPromotions'
-        , 'createOrderSn']]);
+        , 'getPromotion']]);
     }
 
 
@@ -26,6 +30,7 @@ class LeaderPromotionController extends Controller
     public function getPromotions(Request $request)
     {
         $type = $request->get('type')?: 1;
+        # todo 默认团长测试
         # $leader = auth()->user()->leader;
         # 测试 id =1 的leader数据
         $leader = Leader::find(1);
@@ -39,14 +44,22 @@ class LeaderPromotionController extends Controller
                 $list = LeaderPromotion::getSelectedPromotions($leader->id);
                 break;
             # 获取单个指定活动详情数据
-            case 3:
-                $id = $request->get('id');
-                $list = LeaderPromotion::getPromotion($leader->id, $id);
-                break;
             default:
                 return $this->warning('参数错误');
         }
-        return $this->ok($list);
+        return BusinessPromotions::collection($list);
+    }
+
+    # 团长选购查看商品详情
+    public function getPromotion($id)
+    {
+        try{
+            $item = LeaderPromotion::getPromotion($id);
+            return new BusinessPromotionDetail($item);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
 
@@ -58,30 +71,25 @@ class LeaderPromotionController extends Controller
      */
     public function addPromotions(Request $request)
     {
-        # leaderid
-        # promotionid
-        # num
-        # ordersn 生成
-        # 检查活动库存
+        # leaderid promotionid num ordersn 生成
+        # todo 检查活动库存 挑货校验（活动是否在团长所在小区 提交活动数据是否合法）
         try {
             # $leader = auth()->user()->leader;
-            # 测试 id =1 的leader数据
+            #  todo 默认团长测试
             $leader = Leader::find(1);
             # 整理上传数据
             $data = $request->post('data');
-
-            $data = [];
+            $promotions = [];
             foreach ($data as $key => $val) {
-                $val['ordersn']     = $this->createOrderSn();
+                $val['ordersn']     = self::createOrderSn();
                 $val['leaderid']    = $leader->id;
-                array_push($data, $val);
+                array_push($promotions, $val);
                 unset($val);
             }
-
             DB::beginTransaction();
-            $result = LeaderPromotion::addPromotions($data);
+            $result = LeaderPromotion::addPromotions($promotions);
             DB::commit();
-            return $this->ok($result);
+            return $this->ok();
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -94,7 +102,7 @@ class LeaderPromotionController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getReceivedPromotions(Request $request)
-    {
+    {   #todo 验收代码未完成
         try{
             # $leader = auth()->user()->leader;
             # 测试 id =1 的leader数据
@@ -120,6 +128,9 @@ class LeaderPromotionController extends Controller
      */
     static function createOrderSn()
     {
-        return date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+//        return date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+        $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
+        return $yCode[intval(date('Y')) - 2019] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
+
     }
 }

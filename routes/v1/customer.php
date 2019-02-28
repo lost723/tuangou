@@ -6,7 +6,7 @@
  * Time: 18:25
  */
 # 用户首页 商品列表页
-Route::resource('customer/promotion', 'Customer\CustomerController');
+Route::get('customer/promotion/{id}', 'Customer\CustomerController@getPromotions');
 # 商品详情页
 
 # 生成订单 createOrder

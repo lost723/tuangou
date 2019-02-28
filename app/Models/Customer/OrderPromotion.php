@@ -34,7 +34,21 @@ class OrderPromotion extends Model
                 ->where('pm.expire', '>', time())
                 ->where('pm.status', '=', \App\Models\Business\Promotion::Ordering)
                 ->select('*')
-                ->get();
+                ->first();
+    }
+
+    static function findOrderById($id)
+    {
+        return DB::table('order_promotions')->find($id);
+
+    }
+
+    # 更新用户子订单状态
+    static function updatePromotionStatus($status, $id)
+    {
+        return DB::table('order_promotions')
+            ->where('id', $id)
+            ->update('status', $status);
     }
 
 

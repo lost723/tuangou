@@ -71,14 +71,17 @@ class Promotion extends BaseModel
             })
             ->whereNotIn('pm.id', function ($query) use ($leaderid) {
                 $query->select('promotionid')
-                    ->from(with(new LeaderOrder)->getTable())
+                    ->from('leader_promotions')
                     ->where('leaderid', $leaderid);
             })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
             ->simplePaginate(self::NPP);
         return $resutl;
     }
+
+
 
     /**
      * 获取还没有结束的活动

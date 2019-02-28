@@ -28,11 +28,36 @@ class RefundOrder extends BaseModel
             ->where('refund_no', $refund_no)
             ->first();
     }
+    # 通过微信退款单号查询退款信息
+    static function findOrderByRefundId($refund_id)
+    {
+        return DB::table('refunds')
+            ->where('refund_id', $refund_id)
+            ->first();
+    }
+
     # 创建退款订单
     static function createRefund($data, $id)
     {
         return DB::table('refunds')
             ->updateOrInsert($data,['order_promotionid' => $id]);
     }
+
+    # 更新退款单数据
+    static function updateRefund($data, $id)
+    {
+        return DB::table('refunds')
+            ->where('id', $id)
+            ->update($data);
+    }
+
+    # 更新 退款订单
+    static function updateRefundStatus($status, $id)
+    {
+        return DB::table('refunds')
+            ->where('id', $id)
+            ->update('status', $status);
+    }
+
 
 }

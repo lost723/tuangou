@@ -203,21 +203,16 @@ class OrderController extends Controller
                     # update 退款表 订单状态表
                     $updateArr = [];
                     $updateArr['refund_id'] = $data['refund_id'];
-                    $updateArr['status'] = RefundOrder::Finished;
+                    $updateArr['status'] = RefundOrder::Refunding;
                     try{
                         DB::beginTransaction();
                         # 更新退款单状态
-                        DB::table('refunds')
-                            ->where('id',$refundOrder['id'])
-                            ->update($updateArr);
+                        RefundOrder::updateRefund($updateArr, $refundOrder['id']);
                         # 更新用户订单状态为已退款
                         DB::table('order_promotions')
                             ->where('id',$refundOrder['order_promotionid'])
-                            ->update(['status' => OrderPromotion::Refund]);
-                        # 更新团长活动销量
-                        # 更新商户活动销量
-                        LeaderPromotion::decPromotionSales($order['promotionid'],$order['num']);
-                        LeaderPromotion::decBusinessPromotionSales($order['promotionid'],$order['num']);
+                            ->update(['status' => OrderPromotion::Refunding]);
+                        OrderPromotion::findOrderById();
                         DB::commit();
                     }
                     catch (\Exception $exception){
@@ -243,16 +238,17 @@ class OrderController extends Controller
     {
         $customer = auth()->user();
         $record = [];
-        $record['customerid']   = $customer->id;
-        $record['orderid']   = $customer->id;
-        $record['order_promotionid']   = $customer->id;
-        $record['trade_no'] = $data['trade_no'];
-        $record['transaction_id'] = $data['transaction_id'];
-        $record['total']   = $customer->id;
-        $record['refund']   = $customer->id;
-        $record['refund_no']   = $customer->id;
-        $record['status']   = RefundOrder::Refunding;
-        $record['note']   = $customer->id;
+        $record['customerid']            = $customer->id;
+        $record['orderid']               = $data['orderid'];
+        $record['order_promotionid']     = $data['order_promotionid'];
+        $record['trade_no']              = $data['trade_no'];
+        $record['transaction_id']        = $data['transaction_id'];
+        $record['total']                 = $data['total'];
+        $record['refund']                = $data['refund'];
+        $record['refund_no']             = RefundOrder::RefundPrefix.LeaderPromotionController::createOrderSn();
+        $record['status']                = RefundOrder::Refunding;
+        $record['note']                  = $data['note'];
+        # 生成退款订单
         if(RefundOrder::createRefund($record, $record['order_promotionid'])) {
             return $record;
         }
@@ -269,10 +265,10 @@ class OrderController extends Controller
         $input->SetTotal_fee($data['total']*100);
         $input->SetRefund_fee($data['refund']*100);
 
-        $config = new WxPayConfig();
+        $config = new WXPayConfigController();
         $input->SetOut_refund_no($data['refund_no']);
         $input->SetOp_user_id($config->GetMerchantId());
-        printf_info(WxPayApi::refund($config, $input));
+        return WxPayApi::refund($config, $input);
     }
 
     # 订单列表

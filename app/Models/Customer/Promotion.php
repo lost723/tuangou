@@ -14,17 +14,21 @@ class Promotion extends BaseModel
     static function getPromotions($commid)
     {
         # 获取该小区的所有团长下的活动
-        $list = DB::table(with(new LeaderPromotion)->getTable().' as lm')
+        $cid = request()->get('cid');
+        $list = DB::table('leader_promotions as lm')
             ->whereIn('lm.leaderid', function ($query) use ($commid) {
                 $query->select('id')
                     ->from(with(new Leader)->getTable())
                     ->where('community_id',$commid);
             })
-            ->where('lm.status', LeaderPromotion::Odering)
+            ->where('pm.status', BPromotion::Ordering)
             ->leftjoin(with(new BPromotion)->getTable().' as pm', 'lm.promotionid', '=', 'pm.id')
             ->where('pm.expire', '>', time())
             ->leftjoin(with(new Product)->getTable().' as pd', 'pm.productid', '=', 'pd.id')
-            ->select('*')
+            ->when($cid, function ($query) use ($cid) {
+                $query->where('pd.cid', $cid);
+            })
+            ->select('lm.id as lid','pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
             ->simplePaginate(BaseModel::NPP);
         return $list;
     }

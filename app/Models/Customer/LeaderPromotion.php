@@ -3,6 +3,7 @@
 namespace App\Models\Customer;
 
 use App\Models\BaseModel;
+use App\Models\Business\Promotion as BPromotion;
 use Illuminate\Support\Facades\DB;
 
 class LeaderPromotion extends BaseModel
@@ -14,45 +15,49 @@ class LeaderPromotion extends BaseModel
 
     protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'status'];
 
-    # 获取单个活动
-    static function getPromotion($leaderid, $id)
-    {
-        $result = DB::table(with(new LeaderPromotion)->getTable().' as lpm')
-            ->where('pm.expire', '>', time())
-            ->where('lpm.leaderid', $leaderid)
-            ->where('lpm.id', $id)
-            ->where('status', LeaderPromotion::Odering)
-            ->leftjoin('promotions as pm', 'pm.id', '=', 'promotionid')
+    /**
+     * 获取活动详情
+     * 2019/2/28 晚测试
+     * @return mixed
+     */
+    static function getPromotion($id)
+    {   # todo 该货物是否属于团长 状态标识
+        $result = DB::table('promotions as pm')
+            ->where('pm.id', $id)
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
             ->first();
         return $result;
     }
 
-
-    # 获取团长的 活动列表
+    /**
+     * 获取团长的 活动列表
+     * 2019/2/28 晚测试
+     * @param $leaderid
+     * @return mixed
+     */
     static function getSelectedPromotions($leaderid)
     {
-        $result = DB::table(with(new LeaderPromotion)->getTable().' as lpm')
+        $result = DB::table('leader_promotions as lpm')
                 ->where('pm.expire', '>', time())
                 ->where('lpm.leaderid', $leaderid)
-                ->where('pm.status', LeaderPromotion::Odering)
-                ->leftjoin('promotions as pm', 'pm.id', '=', 'promotionid')
+                ->where('pm.status', BPromotion::Ordering)
+                ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-                ->select('pm.*', 'pd.title', 'pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+                ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
                 ->simplePaginate(self::NPP);
         return $result;
     }
 
     /**
      * 添加选货至团长活动列表
+     * 2019/2/28 晚测试
      * @param $data
      * @return mixed
      */
     static function addPromotions($data) {
-       $result =  DB::table(with(new LeaderPromotion)->getTable())
+        return  DB::table(with(new LeaderPromotion)->getTable())
             ->insert($data);
-       return $result;
     }
 
     /**

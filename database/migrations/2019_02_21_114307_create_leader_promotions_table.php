@@ -20,9 +20,8 @@ class CreateLeaderPromotionsTable extends Migration
             $table->unsignedInteger('num')->default(0)->comment('挑选该商品数量');
             $table->unsignedInteger('sales')->default(0)->comment('该商品销量');
             $table->string('ordersn')->comment('订单号');
-            $table->string('check')->comment('核销码');
-            $table->unsignedTinyInteger('status')->default(1)->comment('0:异常 1:进行中 2:配送中 3:已签收 ');
-            $table->string('note')->comment('订单异常备注');
+            $table->string('check')->default('')->comment('核销码');
+            $table->string('note')->default('')->comment('订单异常备注');
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Models\Customer\Category;
 use App\Models\Customer\Promotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,7 +12,21 @@ class CustomerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' =>  ['index']]);
+        # todo 正式生产环境 需进行token校验
+        $this->middleware('auth', ['except' =>  ['getPromotions']]);
+    }
+
+    /**
+     * 获取该小区内的所有的商品活动
+     * @param $id  小区id
+     * # @param
+     */
+    public function getPromotions($id)
+    {
+        # 商品分类
+//        $cates = Category::getAllCategories();
+        $promotions = Promotion::getPromotions($id);
+        dump($promotions);
     }
 
 

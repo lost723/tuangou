@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Common\WXPayConfigController;
-use App\Http\Controllers\Common\WXPayNotifyController;
-use App\Http\Controllers\Common\WXRefundNotifyController;
+use App\Http\Controllers\Customer\WXPayNotifyController;
+use App\Http\Controllers\Customer\WXRefundNotifyController;
 
 class NotifyController
 {
@@ -24,6 +24,5 @@ class NotifyController
         $notify = new WXRefundNotifyController();
         $config = new WXPayConfigController();
         $notify->Handle($config, false);
-
     }
 }
