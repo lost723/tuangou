@@ -7,8 +7,7 @@ use Illuminate\Http\Resources\Json\Resource;
 class BusinessPromotionDetail extends Resource
 {
     /**
-     * Transform the resource into an array.
-     *
+     * 商品活动详情页
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */

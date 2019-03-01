@@ -23,9 +23,9 @@ class CreateCustomersTable extends Migration
              * @date 2019-2-13
              * 添加所需字段
              */
-            $table->string('openId', 50)->unique();
-            $table->string('unionId', 50)->unique();
-            $table->string('nickName', 20);
+            $table->string('openid', 50)->unique();
+            $table->string('unionid', 50)->unique();
+            $table->string('nickname', 20);
             $table->boolean('gender')->comment('0:女 1:男')->default(0);
             $table->string('mobile', 20)->default('');
             $table->string('country', 20);

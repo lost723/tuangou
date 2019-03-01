@@ -7,10 +7,13 @@ use App\Models\BaseModel;
 class Leader extends BaseModel
 {
     //
-    const NORMAL = 1;
-    const CREATE = 2;
-    const FROZEN = -1;
-    const DENY   = 0;
+    const FROZEN = 0;  # 身份冻结
+    const DENY   = 1;  # 审核拒绝
+    const CREATE = 2;  # 审核中
+    const NORMAL = 3;  # 正常
+
+
+
 
     protected $fillable = ['customer_id', 'community_id', 'name', 'mobile', 'idcard', 'idcard_front_url',
         'idcard_back_url', 'address', 'commission', 'status'];

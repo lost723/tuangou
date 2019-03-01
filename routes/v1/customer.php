@@ -5,9 +5,15 @@
  * Date: 2019/2/22
  * Time: 18:25
  */
-# 用户首页 商品列表页
-Route::get('customer/promotion/{id}', 'Customer\CustomerController@getPromotions');
+# 商品分类信息
+Route::get('customer/category', 'Customer\CustomerController@getCategories');
+# 用户首页 商品列表页 id 为小区id
+Route::get('customer/promotions/{commid}', 'Customer\CustomerController@getPromotions');
 # 商品详情页
+Route::get('customer/promotions/detail/{id}', 'Customer\CustomerController@getPromotionDetail');
+# 已购买该商品的用户信息
+Route::get('customer/promotions/purchaserecord/{id}', 'Customer\CustomerController@purchaseRecord');
+
 
 # 生成订单 createOrder
 # 支付订单 payOrder

@@ -102,7 +102,7 @@ class LeaderPromotionController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getReceivedPromotions(Request $request)
-    {   #todo 验收代码未完成
+    {   #todo 验收代码未完成 团长测试数据
         try{
             # $leader = auth()->user()->leader;
             # 测试 id =1 的leader数据
@@ -115,7 +115,6 @@ class LeaderPromotionController extends Controller
                 $list = LeaderPromotion::getReceivedPromotions(1);
             }
             return $this->ok($list);
-
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

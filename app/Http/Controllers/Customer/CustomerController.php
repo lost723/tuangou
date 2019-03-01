@@ -2,64 +2,96 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Resources\Customer\PromotionDetail;
+use App\Http\Resources\Customer\Promotions as PromotionResource;
+use App\Http\Resources\Customer\PurchaseRecord;
 use App\Models\Customer\Category;
+use App\Http\Resources\Customer\Category as CategroyResource;
 use App\Models\Customer\Promotion;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Resources\Json\Resource;
+ use App\Http\Controllers\Controller;
 
 class CustomerController extends Controller
 {
+    # 用户首页 + 详情页 所需接口数据
     public function __construct()
     {
         # todo 正式生产环境 需进行token校验
-        $this->middleware('auth', ['except' =>  ['getPromotions']]);
+        $this->middleware('auth', ['except' =>  ['getCategories', 'getPromotions', 'getPromotionDetail'
+        , 'purchaseRecord']]);
+    }
+
+    /**
+     * 轮播图
+     * @param $id 小区id
+     * @return array
+     */
+    public function getSlides($id)
+    {
+        # todo 轮播图
+        $list = [];
+        return $list;
+    }
+
+    /**
+     * 获取分类信息
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getCategories()
+    {
+        try{
+            $cates = Category::getTopLevelCategory();
+            return CategroyResource::collection($cates);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
     /**
      * 获取该小区内的所有的商品活动
      * @param $id  小区id
-     * # @param
      */
-    public function getPromotions($id)
-    {
-        # 商品分类
-//        $cates = Category::getAllCategories();
-        $promotions = Promotion::getPromotions($id);
-        dump($promotions);
-    }
-
-
-    # 消费者用户 常用数据展示
-    public function index(Request $request)
+    public function getPromotions($commid)
     {
         try{
-            $commid = $request->get('commid');
-            $list = Promotion::getPromotions($commid);
-//            return Resource::collection($list);
-            return $this->ok($list->toArray());
+            $promotions = Promotion::getPromotions($commid);
+            return PromotionResource::collection(($promotions));
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
     }
 
-    # 团长下的某商品详情页 团长活动->活动>商品
-    public function show($id)
+
+    /**
+     * 获取某个团长活动详情
+     * @param $id 团长活动id
+     * @return PromotionDetail|\Illuminate\Http\JsonResponse
+     */
+    public function getPromotionDetail($id)
     {
         try{
-            $item = Promotion::getPromotion($id);
-            return new Resource($item);
+            return new PromotionDetail(Promotion::getPromotion($id));
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
     }
 
-    # 商品的购买记录
-    public function history($id)
-    {
 
+    /**
+     * 商品的购买记录
+     * @param $id 团长活动id
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function purchaseRecord($id)
+    {
+        try{
+            return PurchaseRecord::collection(Promotion::getPurchaseRecord($id));
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
 

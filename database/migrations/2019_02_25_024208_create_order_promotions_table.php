@@ -16,7 +16,7 @@ class CreateOrderPromotionsTable extends Migration
         Schema::create('order_promotions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('customerid')->comment('消费者id');
-            $table->unsignedInteger('orderid')->comment('订单id');
+            $table->unsignedInteger('orderid')->comment('订单id') ;
             $table->unsignedInteger('promotionid')->comment('leader_promotions表的id');
             $table->string('ordersn')->comment('当前活动的订单号');
             $table->unsignedInteger('num')->comment('购买数量');

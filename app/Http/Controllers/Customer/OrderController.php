@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    # 用户订单相关页面
     public function __construct()
     {
         $this->middleware('auth', ['except'=>['createOrder', 'payOrder', 'cancelOrder']]);

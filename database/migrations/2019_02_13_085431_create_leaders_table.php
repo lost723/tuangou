@@ -25,9 +25,7 @@ class CreateLeadersTable extends Migration
             $table->string('idcard_back_url')->comment('身份证件反面照信息');
             $table->string('address', 50)->comment('团长真实地址');
             $table->decimal('commission',10,2)->default(0)->comment('团长佣金');
-            $table->char('status')->comment('团长审核状态 审核中：2 审核通过：1 审核拒绝：0 团长冻结：-1');
-
-
+            $table->char('status')->comment('团长审核状态 0:团长冻结 1:审核拒绝  2:审核中 3:审核通过');
             $table->timestamps();
         });
     }

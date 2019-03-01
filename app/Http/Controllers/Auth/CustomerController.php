@@ -34,7 +34,7 @@ class CustomerController extends Controller
                 throw new \Exception('code 已过期');
             }
             # 检测用户是否已注册
-            $result = Customer::where(['openId' => $customer['openid']])->first();
+            $result = Customer::where(['openid' => $customer['openid']])->first();
             if(!empty($result)) {
                 $token = auth()->login($result);
                 return $this->respondWithToken($token);
@@ -72,7 +72,7 @@ class CustomerController extends Controller
             $data = $this->wxLogin->ParseUserinfo($request->all());
             $this->created($data);
             # 自动登录
-            $customer = Customer::where('openId',$request->query('openid'))->first();
+            $customer = Customer::where('openid',$request->query('openid'))->first();
             if(empty($customer)) {
                 throw new \Exception('用户注册失败!');
             }
@@ -139,13 +139,12 @@ class CustomerController extends Controller
     {
         return Customer::firstOrCreate(
             [
-                'openId' => $userinfo['openId']
+                'openid' => $userinfo['openId']
             ],
             [
-                'unionId'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
-                'nickName' => $userinfo['nickName'],
+                'unionid'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
                 'avatar'   => $userinfo['avatarUrl'],
-                'nickName' => $userinfo['nickName'],
+                'nickname' => $userinfo['nickName'],
                 'country'  => $userinfo['country'],
                 'province' => $userinfo['province'],
                 'city'     => $userinfo['city'],

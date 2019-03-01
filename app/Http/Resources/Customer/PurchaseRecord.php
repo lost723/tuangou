@@ -4,10 +4,10 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class Business extends Resource
+class PurchaseRecord extends Resource
 {
     /**
-     *  商户信息
+     * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
@@ -15,10 +15,10 @@ class Business extends Resource
     public function toArray($request)
     {
         return [
-            'title'     =>  $this->title,
-            'phone'     =>  $this->manager,
-            'address'   =>  $this->address,
-            'manager'   =>  $this->manager
+            'id'            => $this->id,
+            'avatar'        => $this->avatar,
+            'num'           => $this->num,
+            'created_at'    => $this->created_at,
         ];
     }
 }
