@@ -11,7 +11,8 @@
 Route::post('customer/my/city', 'Customer\RoadController@myCity');
 # 获取城市列表
 Route::post('customer/list/city', 'Customer\RoadController@listCity');
-
+# 获取下级城市信息
+Route::get('customer/sub/road', 'Customer\RoadController@getSubRoads');
 
 # 我的小区
 Route::get('customer/my/community', 'Customer\CommunityController@myCommunity');

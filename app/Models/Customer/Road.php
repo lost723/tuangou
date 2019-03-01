@@ -3,6 +3,7 @@
 namespace App\Models\Customer;
 
 use App\Models\BaseModel;
+use Illuminate\Support\Facades\DB;
 
 class Road extends BaseModel
 {
@@ -47,6 +48,15 @@ class Road extends BaseModel
         $parent_item = self::find($item['parentid']);
         return $parent_item;
     }
+
+    # 获取子类街道信息
+    static function getSubItems($id)
+    {
+        return DB::table('roads')
+            ->where('parentid', $id)
+            ->simplePaginate(BaseModel::NPP);
+    }
+
 
 
 

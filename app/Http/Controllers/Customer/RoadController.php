@@ -6,13 +6,14 @@ use App\Http\Controllers\Auth\CustomerController;
 use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\RoadResource;
 use App\Models\Customer\Road;
+use Illuminate\Http\Request;
 
 class RoadController extends CustomerController
 {
     # 小程序端街道管理
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['listCity', 'myCity']]);
+        $this->middleware('auth', ['except' => ['listCity', 'myCity', 'getSubRoads']]);
     }
 
     # 坐标获取城市信息
@@ -52,4 +53,13 @@ class RoadController extends CustomerController
         return $this->ok($list);
     }
 
+    public function getSubRoads(Request $request)
+    {
+        try {
+            $parentid = $request->get('pid') > 0 ? $request->get('pid') : 0;
+            return RoadResource::collection(Road::getSubItems($parentid));
+        } catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
 }
