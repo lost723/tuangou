@@ -14,7 +14,8 @@ class Product extends BaseModel
     const Del = 0; # 删除，商家不可见
 
     protected $fillable = [
-        #todo 填入字段
+        'title', 'intro', 'thumb', 'price', 'content', 'norm', 'mtpd', 'rate',
+        'quotation', 'picture', 'orgid', 'optid', 'distid', 'catid'
     ];
 
 
@@ -29,7 +30,7 @@ class Product extends BaseModel
         $status = $request->get('status');
         $filter = $request->get('filter');
 
-        $result = self::select('title', 'picture', 'price', 'norm', 'status')
+        $result = self::select('id', 'title', 'intro', 'thumb', 'price', 'rate', 'quotation', 'issue', 'norm', 'status')
             ->where('orgid', $orgid)
             ->where('status', '!=', self::Del)
             ->when($status, function ($query) use ($status) {
@@ -38,8 +39,9 @@ class Product extends BaseModel
             ->when($filter, function ($query) use ($filter){
                 $query->where('title', 'like', "%$filter%");
             })
-            ->simplePaginate(self::NPP);
-        return $result;
+            ->paginate(self::NPP);
+
+        return self::paginationFormater($result);
     }
 
 }

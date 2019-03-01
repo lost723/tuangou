@@ -7,10 +7,6 @@ Route::get('customer/refresh', 'Auth\CustomerController@refresh');
 Route::post('customer/register', 'Auth\CustomerController@register');
 
 
-
-
-
-
 # Distributor
 Route::get('distributor/me', 'Auth\DistributorController@me');
 Route::post('distributor/login', 'Auth\DistributorController@login');
@@ -32,11 +28,5 @@ Route::post('trader/register', 'Auth\TraderController@register');
 Route::post('trader/find/password', 'Auth\TraderController@findPassword');
 
 
-
-
-
-
-
-# 文件上传
-Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg');
-Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');
+# Tools
+Route::get('tools/ping', 'Common\ToolsController@ping');

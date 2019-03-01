@@ -40,9 +40,13 @@ class ProductController extends Controller
     {
         try{
             $user = Auth::user();
+//            return $this->ok($user);
             $all = $request->all();
             $all['optid'] = $user->id;
             $all['orgid'] = $user->orgid;
+            $all['thumb'] = $all['picture'][0];
+            $all['picture'] = json_encode($all['picture']);
+            $all['content'] = json_encode($all['content']);
             Product::create($all);
             return $this->created();
         }catch (\Exception $e){

@@ -15,6 +15,7 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedInteger('catid')->comment('分类id');
             $table->unsignedInteger('orgid')->comment('商户id');
             $table->unsignedBigInteger('optid')->comment('操作人id');
             $table->unsignedInteger('mtpd')->comment('售后维保期限，单位：天');
@@ -23,7 +24,8 @@ class CreateProductsTable extends Migration
             $table->string('title')->comment('商品名称');
             $table->string('norm')->comment('商品规格');
             $table->string('intro')->comment('商品简介');
-            $table->string('picture')->comment('商品头图');
+            $table->string('thumb')->comment('商品列表图');
+            $table->string('picture')->comment('商品详情头部大图片');
             $table->string('content')->comment('商品详情富文本');
             $table->unsignedDecimal('rate', 4,2)->comment('团长佣金返点');
             $table->unsignedDecimal('price', 8,2)->comment('商品售价');

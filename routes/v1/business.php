@@ -4,12 +4,12 @@
 Route::resource('business', 'Business\BusinessController');
 
 # 区域模版
-Route::resource('district',  'Business\PromotionController');
+Route::resource('district',  'Business\DistrictController');
 
 # 活动信息
 Route::resource('promotion', 'Business\PromotionController');
 
 # 商品信息
-Route::resource('production', 'Business\ProductController');
+Route::resource('product', 'Business\ProductController');
 
 

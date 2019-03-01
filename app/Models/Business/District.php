@@ -2,12 +2,14 @@
 
 namespace App\Models\Business;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 
-class District extends Model
+class District extends BaseModel
 {
-    //
-
+    #
+    protected $fillable = [
+        'orgid', 'title', 'note', 'status'
+    ];
 
     /**
      * 获取某个区域模版附带所有小区详情
