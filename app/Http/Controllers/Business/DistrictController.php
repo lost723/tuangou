@@ -23,10 +23,11 @@ class DistrictController extends Controller
     {
         try{
             $orgid = Auth::user()->orgid;
-            $result = District::where('orgid', $orgid)->get();
+            $result = District::where('orgid', $orgid)->paginate(District::NPP);
+            $result = District::paginationFormater($result);
             return $this->ok($result);
         }catch (\Exception $e){
-            return $this->warning($e->getMessage());
+            return $this->ok($e->getMessage());
         }
     }
 
@@ -77,7 +78,9 @@ class DistrictController extends Controller
     {
         try{
             $all = $request->all();
-            $obj = District::find($id)->update($all);
+            $obj = District::find($id);
+            $this->checkBusinessOwnship($obj->orgid);
+            $obj->update($all);
             return $this->ok($obj);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());

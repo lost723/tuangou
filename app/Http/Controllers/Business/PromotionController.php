@@ -20,7 +20,8 @@ class PromotionController extends Controller
     public function index(Request $request)
     {
         try{
-            $result = Product::getBusinessOwnList($request);
+            $dat = Product::getBusinessOwnList($request);
+
             return $this->ok($result);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());

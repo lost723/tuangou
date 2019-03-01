@@ -29,10 +29,10 @@ class Controller extends BaseController
      * @param $id
      * @throws BusinessException
      */
-    protected function checkBusinessOwnship($id)
+    protected function checkBusinessOwnship($orgid)
     {
         if('distributor' == Auth::guard()){
-            if ($id <> Auth::user()->orgid){
+            if ($orgid <> Auth::user()->orgid){
                 throw new BusinessException('只能操作自己的商户信息');
             }
         }
