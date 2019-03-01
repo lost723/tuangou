@@ -10,12 +10,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Customer extends Authenticatable implements JWTSubject
 {
     use Notifiable;
-    protected $fillable = ['openId', 'unionId', 'nickName',
+    protected $fillable = ['openId', 'unionId', 'nickName', 'mobile',
         'community_id', 'avatar', 'country', 'province', 'city', 'gender'];
 
     public function leader()
     {
-        return $this->hasOne('App\Models\Leader', 'customer_id');
+        return $this->hasOne('App\Models\Customer\Leader', 'customer_id');
+    }
+
+    public function community()
+    {
+        return $this->belongsTo('App\Models\Customer\Community', 'community_id');
     }
 
     /**

@@ -7,7 +7,6 @@ use App\Http\Controllers\Auth\TraderController;
 use App\Models\Community;
 use App\Models\Road;
 use Illuminate\Http\Request;
-use mysql_xdevapi\Exception;
 
 class RoadController extends TraderController
 {

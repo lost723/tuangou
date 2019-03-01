@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Auth\CustomerController;
 use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\RoadResource;
-use App\Models\Road;
+use App\Models\Customer\Road;
 
 class RoadController extends CustomerController
 {

@@ -6,7 +6,6 @@ Route::post('customer/login', 'Auth\CustomerController@login');
 Route::get('customer/refresh', 'Auth\CustomerController@refresh');
 Route::post('customer/register', 'Auth\CustomerController@register');
 
-
 # Distributor
 Route::get('distributor/me', 'Auth\DistributorController@me');
 Route::post('distributor/login', 'Auth\DistributorController@login');

@@ -10,6 +10,7 @@ class WXBaseController extends Controller
     protected $appid;
     protected $secret;
     const ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=';
+
     public function __construct()
     {
         $this->appid  = config('wx.minPro.appid');
@@ -41,6 +42,11 @@ class WXBaseController extends Controller
 
         return Redis::get('appid:'.$this->appid.':access_token');
     }
+
+
+
+
+
 
 
 

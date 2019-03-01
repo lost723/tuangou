@@ -49,7 +49,7 @@ class QiNiuUploadController extends Controller
     public function encodePath($file, $savePath, $public = true)
     {
         if(empty($savePath)) {
-            return false;
+            throw new \Exception('保存路径不能为空！');
         }
 
         $result = [];
@@ -80,9 +80,6 @@ class QiNiuUploadController extends Controller
 
     }
 
-
-    # 图片上传
-
     /**
      * 图片上传公共接口
      * @param $file 文件句柄
@@ -92,16 +89,11 @@ class QiNiuUploadController extends Controller
     public function uploadImg($file, $public = true)
     {
         $ext = $file->getClientOriginalExtension();
-
         $filename = $file->getClientOriginalName();
         # 重新生成文件名
         $newFileName = md5($filename . time() . mt_rand(1, 10000)) . '.' . $ext;
-
         $savePath = 'images/' .date('Ymd').'/'.$newFileName;
-
-
         $result = $this->encodePath($file, $savePath, $public);
-
         return $result;
     }
 
@@ -114,54 +106,40 @@ class QiNiuUploadController extends Controller
     public function uploadPublicImg(Request $request)
     {
 
-        $file = $request->file('source');
-        $ext = $file->getClientOriginalExtension();
-        # 扩展名校验
-        if(! in_array(strtolower($ext), $this->allowedImgExt)) {
-            return $this->warning('非法扩展名,只接收jpg,png,jpeg,bmp图片格式!');
-        }
-        if(!empty($file) && $file->isValid()) {
-            try{
-                $result = $this->uploadImg($file, true);
+        try{
+            $file = $request->file('source');
+            $ext = $file->getClientOriginalExtension();
+            # 扩展名校验
+            if(! in_array(strtolower($ext), $this->allowedImgExt)) {
+                throw new \Exception('非法扩展名,只接收jpg,png,jpeg,bmp图片格式!');
             }
-            catch (\Exception $exception) {
-                return $this->warning('网络异常');
-            }
-            if(!$result) {
-               return $this->warning('文件上传失败!');
-            }
+            $result = $this->uploadImg($file, true);
             return $this->ok($result);
-
         }
-        return $this->warning('请检查上传文件是否存在!');
+        catch (\Exception $exception) {
+            $this->warning($exception->getMessage());
+        }
     }
 
     /**
-     * 上传图片 至 公有bucket
+     * 上传图片 至 私有bucket
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadPrivateImg(Request $request)
     {
-        $file = $request->file('source');
-        $ext = $file->getClientOriginalExtension();
-        # 扩展名校验
-        if(! in_array(strtolower($ext), $this->allowedImgExt)) {
-            return $this->warning('非法扩展名,只接收jpg,png,jpeg,bmp图片格式!');
-        }
-        if(!empty($file) && $file->isValid()) {
-
-            try{
-                $result = $this->uploadImg($file, false);
+        try{
+            $file = $request->file('source');
+            $ext = $file->getClientOriginalExtension();
+            # 扩展名校验
+            if(! in_array(strtolower($ext), $this->allowedImgExt)) {
+                throw new \Exception('非法扩展名,只接收jpg,png,jpeg,bmp图片格式!');
             }
-            catch (\Exception $exception) {
-                return $this->warning('网络异常');
-            }
-            if(!$result) {
-                return $this->warning('文件上传失败!');
-            }
+            $result = $this->uploadImg($file, false);
             return $this->ok($result);
         }
-        return $this->warning('请检查上传文件');
+        catch (\Exception $exception) {
+            $this->warning($exception->getMessage());
+        }
     }
 }

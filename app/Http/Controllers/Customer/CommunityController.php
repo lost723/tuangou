@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Auth\CustomerController;
+use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\CommunityResource;
-use App\Models\Community;
-use App\Models\Road;
+use App\Models\Customer\Community;
+use App\Models\Customer\Road;
 
 
 class CommunityController extends CustomerController
@@ -13,7 +14,7 @@ class CommunityController extends CustomerController
     # 小程序端 小区管理
     public function __construct()
     {
-        $this->middleware('auth',  ['except' => ['CommunityList', 'testResource' ]]);
+        $this->middleware('auth',  ['except' => ['CommunityList', 'searchCommunity' ]]);
     }
 
     # 我的小区信息
@@ -29,6 +30,17 @@ class CommunityController extends CustomerController
         }
         return $this->warning('请检查参数是否正确！');
 
+    }
+
+    # 通过腾讯地图api搜索附近小区
+    public function searchCommunity()
+    {
+        $item = WXLocationController::Search('小区');
+        if(!empty($item))
+        {
+            return $this->ok(['data' => $item]);
+        }
+        return $this->ok(['data' => []]);
     }
 
     /**

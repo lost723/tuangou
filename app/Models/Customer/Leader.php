@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Customer;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +22,7 @@ class Leader extends Model
 
     public function community()
     {
-        return $this->belongsTo('App\Models\Community', 'community_id');
+        return $this->belongsTo('App\Models\Customer\Community', 'community_id');
     }
 
 }

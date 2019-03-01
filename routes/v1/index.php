@@ -19,10 +19,10 @@ Route::get('customer/my/community', 'Customer\CommunityController@myCommunity');
 Route::post('customer/relate/community', 'Customer\CommunityController@relateCommunity');
 # 获取周边小区列表
 Route::post('customer/list/community', 'Customer\CommunityController@CommunityList');
+# 获取周边小区 通过腾讯api获取
+Route::post('customer/search/community', 'Customer\CommunityController@searchCommunity');
 
 
-# 团长注册
-Route::post('customer/leader/register', 'Customer\LeaderController@register');
 
 
 # 文件上传

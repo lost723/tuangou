@@ -8,4 +8,7 @@
 
 include base_path('routes/v1/auth.php');
 include base_path('routes/v1/index.php');
+include base_path('routes/v1/leader.php');
+include base_path('routes/v1/customer.php');
 include base_path('routes/v1/business.php');
+

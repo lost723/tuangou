@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Customer;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,18 +15,18 @@ class Road extends Model
     }
 
     # 通过城市id 获取街道列表
-    static public function getRoadsByParentId($id = 0)
+    static  function getRoadsByParentId($id = 0)
     {
         if(0 >= $id) {
             return false;
         }
-
         $result = self::whereIn('parentid',function($query) use($id) {
-                    $query->select('id')->from('roads')->where('parentid', $id);
+                    $query->select('id')
+                        ->from(with(new Road)->getTable())
+                        ->where('parentid', $id);
                 })
                 ->where('leveltype', 4)
-                ->get(['id'])
-                ->toArray();
+                ->get(['id']);
         return $result;
     }
 
@@ -48,7 +48,6 @@ class Road extends Model
         return $parent_item;
     }
 
-    # 获取上级列表
 
 
 
