@@ -57,7 +57,7 @@ class RoadController extends CustomerController
     {
         try {
             $parentid = $request->get('pid') > 0 ? $request->get('pid') : 0;
-            return RoadResource::collection(Road::getSubItems($parentid));
+            return Road::getSubItems($parentid);
         } catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }

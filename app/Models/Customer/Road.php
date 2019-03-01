@@ -52,13 +52,10 @@ class Road extends BaseModel
     # 获取子类街道信息
     static function getSubItems($id)
     {
-        return DB::table('roads')
-            ->where('parentid', $id)
-            ->simplePaginate(BaseModel::NPP);
+        return $result =  DB::table('roads')
+                ->where('parentid', $id)
+                ->Paginate(BaseModel::NPP);
+        return self::paginationFormater($result);
     }
-
-
-
-
 
 }
