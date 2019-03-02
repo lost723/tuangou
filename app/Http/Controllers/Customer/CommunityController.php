@@ -21,8 +21,8 @@ class CommunityController extends CustomerController
     public function myCommunity()
     {
         $customer = auth()->user();
-        if(0 < $customer['community_id']) {
-            $community = Community::find($customer['community_id']);
+        if(0 < $customer['commid']) {
+            $community = Community::find($customer['commid']);
             if(!empty($community)) {
                 return new CommunityResource($community);
             }
@@ -50,10 +50,10 @@ class CommunityController extends CustomerController
      */
     public function relateCommunity()
     {
-        $community_id  = request()->post('community_id')?:0;
-        if(0 < $community_id) {
+        $commid  = request()->post('community_id')?:0;
+        if(0 < $commid) {
             $customer = auth()->user();
-            $customer->community_id = $community_id;
+            $customer->commid = $commid;
             if($customer->save()) {
                 return $this->note('成功关联小区');
             }

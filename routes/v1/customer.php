@@ -25,6 +25,7 @@ Route::get('customer/order/pay/{id}', 'Customer\OrderController@payOrder');
 Route::get('customer/order/cancel/{id}', 'Customer\OrderController@cancelOrder');
 Route::post('customer/order/list', 'Customer\OrderController@listOrder');
 Route::get('customer/order/detail/{id}', 'Customer\OrderController@detailOrder');
+Route::get('customer/order/detailpromotion/{id}', 'Customer\OrderController@detailPromotionOrder');
 # 订单退款
 Route::get('customer/order/refund/{id}', 'Customer\OrderController@refundOrder');
 

@@ -9,7 +9,9 @@
 namespace App\Http\Controllers\Common;
 
 
-class ToolsController
+use App\Http\Controllers\Controller;
+
+class ToolsController extends Controller
 {
 
     /**

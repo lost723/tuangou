@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Resources\Customer\BusinessPromotionDetail;
 use App\Http\Resources\Customer\BusinessPromotions;
+use App\Models\Auth\Customer;
 use App\Models\Business\Promotion;
 use App\Models\Customer\Leader;
 use App\Models\Customer\LeaderPromotion;
@@ -21,6 +22,18 @@ class LeaderPromotionController extends Controller
         , 'getPromotion']]);
     }
 
+    /**
+     * 检测当前用户是否为团长 并且 团长已绑定小区
+     * @throws \Exception
+     */
+    public function checkLeader()
+    {
+//        $customer =  auth()->user();
+        $customer = Customer::find(2);
+        if(empty($customer->leader) || ($customer->leader->status != Leader::NORMAL) || empty($customer->leader->commid)   ) {
+            throw new \Exception('请先申请成为团长并绑定小区');
+        }
+    }
 
     /**
      * 获取团长已参与|可参与的活动列表|获取单个指定活动详情
@@ -29,25 +42,31 @@ class LeaderPromotionController extends Controller
      */
     public function getPromotions(Request $request)
     {
-        $type = $request->get('type')?: 1;
-        # todo 默认团长测试
-        # $leader = auth()->user()->leader;
-        # 测试 id =1 的leader数据
-        $leader = Leader::find(1);
-        switch ($type) {
-            # 可选活动列表
-            case 1:
-                $list = Promotion::getLeaderChoiceList($leader->community_id, $leader->id);
-                break;
-            # 已选活动列表
-            case 2:
-                $list = LeaderPromotion::getSelectedPromotions($leader->id);
-                break;
-            # 获取单个指定活动详情数据
-            default:
-                return $this->warning('参数错误');
+        try{
+            $this->checkLeader();
+            $type = $request->get('type')?: 1;
+            # todo 默认团长测试
+            # $leader = auth()->user()->leader;
+            # 测试 id =1 的leader数据
+            $leader = Leader::find(1);
+            switch ($type) {
+                # 可选活动列表
+                case 1:
+                    $list = Promotion::getLeaderChoiceList($leader->community_id, $leader->id);
+                    break;
+                # 已选活动列表
+                case 2:
+                    $list = LeaderPromotion::getSelectedPromotions($leader->id);
+                    break;
+                # 获取单个指定活动详情数据
+                default:
+                    return $this->warning('参数错误');
+            }
+            return BusinessPromotions::collection($list);
         }
-        return BusinessPromotions::collection($list);
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
     # 团长选购查看商品详情
@@ -76,12 +95,12 @@ class LeaderPromotionController extends Controller
         try {
             # $leader = auth()->user()->leader;
             #  todo 默认团长测试
-            $leader = Leader::find(1);
+            $leader = Leader::find(2);
             # 整理上传数据
             $data = $request->post('data');
             $promotions = [];
             foreach ($data as $key => $val) {
-                $val['ordersn']     = self::createOrderSn();
+                $val['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
                 $val['leaderid']    = $leader->id;
                 array_push($promotions, $val);
                 unset($val);

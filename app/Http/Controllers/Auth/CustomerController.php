@@ -149,8 +149,6 @@ class CustomerController extends Controller
                 'province' => $userinfo['province'],
                 'city'     => $userinfo['city'],
                 'gender'   => $userinfo['gender'],
-
-
             ]
         );
     }

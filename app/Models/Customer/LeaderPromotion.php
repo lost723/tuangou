@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class LeaderPromotion extends BaseModel
 {
+    const LeaderPrefix = '300'; # 团长订单号前缀
     const Terminated = 0;  # 异常结束
     const Odering = 1;      # 进行中
     const Dispatching = 2;  # 配送中

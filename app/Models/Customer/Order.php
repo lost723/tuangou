@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Order extends BaseModel
 {
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
-    const OrderPrefix = "400"; # 子订单号前缀
+    const OrderPrefix = "400"; # 总订单号前缀
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
@@ -74,6 +74,25 @@ class Order extends BaseModel
         return DB::table('order_promotions')
             ->where('order_id', $id)
             ->get();
+    }
+
+
+    # 待支付订单详情信息
+    static function getOrderDetail($id)
+    {
+        return DB::table('order_promotions as om')
+                ->where('orders.id', $id)
+                ->where('orders.status', Order::Unpaid)
+                ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
+                ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
+                ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+                ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+                ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
+                    'om.num', 'om.total',
+                    'lm.leaderid', 'pm.price',
+                    'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
+                ->get()
+                ->groupBy('leaderid');
     }
 
 

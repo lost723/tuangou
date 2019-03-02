@@ -26,7 +26,7 @@ class Promotions extends Resource
             "bussiness" =>  $this->btitle,
             "leader"    =>  [
                 'id'        =>  $this->leaderid,
-                'commid'    =>  $this->community_id,
+                'commid'    =>  $this->commid,
                 'name'      =>  $this->name,
                 'mobile'    =>  $this->mobile,
                 'status'    =>  $this->lstatus,

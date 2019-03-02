@@ -8,7 +8,10 @@ use App\Http\Controllers\Common\Wxpay\WxPayRefund;
 use App\Http\Controllers\Common\Wxpay\WxPayUnifiedOrder;
 use App\Http\Controllers\Common\WXPayConfigController;
 use App\Http\Controllers\Common\WXPayController;
-use App\Models\Customer\LeaderPromotion;
+use App\Http\Resources\Customer\OrderItem;
+use App\Http\Resources\LeaderResource;
+use App\Models\Auth\Customer;
+use App\Models\Customer\Leader;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
 use App\Models\Customer\RefundOrder;
@@ -19,85 +22,85 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     # 用户订单相关页面
+    # todo 未设置库存处理
     public function __construct()
     {
-        $this->middleware('auth', ['except'=>['createOrder', 'payOrder', 'cancelOrder']]);
+        $this->middleware('auth', ['except'=>['createOrder', 'payOrder', 'cancelOrder'
+        ,'detailOrder']]);
     }
     # 消费者用户 订单相关接口处理
 
-    # 商品检测 检测商品列表中是否有商品不属于当前小区
-    public function checkPromotions()
-    {
-
-    }
-
     # 计算商品价格
-    public function calculate($data,&$items=[])
+    public function calculate($data, $customer, &$items=[])
     {
         $price = 0.0;
         foreach ($data as $key => $val) {
-                $item = Promotion::getPromotionPrice($val['id']);
-                $items[$val['id']] = $item;
+                $item = (array)Promotion::getPromotion($val['id']);
+                #检测商品列表中是否有商品不属于当前小区
                 if(empty($item)) {
-                    throw  new \Exception('没有查找到相应活动');
+                    throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
                 }
-                $price += $item['price']*intval($val['num']);
+                if($item['commid'] != $customer->commid) {
+                    throw new \Exception("请选择已绑定小区附近的商家，方便您提货!");
+                }
+                $items[$val['id']] = $item;
+                $price += $item['price'] * $val['num'] ;
         }
         return $price;
     }
     # 预生成订单 返回总订单id
     public function preOrder($data)
-    {
-        $customer = auth()->user();
+    {   # todo customer 授权默认用户
+//        $customer = auth()->user();
+        $customer = Customer::find(1);
         # crate order;
         $order = [];
         $order['customerid'] = $customer->id;
         $order['trade_no']   = Order::OrderPrefix.LeaderPromotionController::createOrderSn();
-        $order['total']      = $this->calculate($data, $items);
+        $order['total']      = $this->calculate($data, $customer, $items);
         $order['paytime']    = time();
         $order['status']     = Order::Unpaid;
         $order['note']       = '';
-        if($order <= 0) {
+        if($order['total'] <= 0) {
             throw new \Exception('订单总价格异常');
         }
         $orderid = Order::createOrder($order);
         # end crateorder
         unset($order);
         $orderpromotion = [];
-        # create orderpromotion
+        $insert = [];
+        # create orderpromotion 创建相关子订单
         foreach ($data as $key => $val) {
-            $val['customerid']  =   $customer->id;
-            $val['orderid']     =   $orderid;
-            $val['promotionid'] =   $val['id'];
-            $val['ordersn']     =   OrderPromotion::OrderPrefix.LeaderPromotionController::createOrderSn();
-            $val['num']         =   $val['num'];
-            $val['price']       =   $items[$val['id']]['price'];
-            $val['total']       =   $val['num']*$items[$val['id']]['price'];
-            $val['status']      =   OrderPromotion::Unpaid;
-            $val['note']        =   '';
-            array_push($orderpromotion, $val);
+            $insert['customerid']  =   $customer->id;
+            $insert['orderid']     =   $orderid;
+            $insert['promotionid'] =   $val['id'];
+            $insert['ordersn']     =   OrderPromotion::OrderPrefix.LeaderPromotionController::createOrderSn();
+            $insert['num']         =   $val['num'];
+            $insert['price']       =   $items[$val['id']]['price'];
+            $insert['total']       =   $val['num']*$items[$val['id']]['price'];
+            $insert['status']      =   OrderPromotion::Unpaid;
+            $insert['note']        =   '';
+            array_push($orderpromotion, $insert);
+            unset($insert);
             unset($val);
         }
         OrderPromotion::createOrderPromotions($orderpromotion);
         # end orderpromotion
-        return $orderid;
+        return Order::findOrder($orderid);
     }
     #  生成订单
     public function createOrder(Request $request)
     {
         #todo 更新库存数量
         try{
-            $data = $request->post('data');
+            $data =  $request->post('data');
             if(!is_array($data)) {
                 throw new \Exception('参数错误');
             }
-            if(!$this->checkPromotions()) {
-                throw new \Exception('请选择已绑定小区附近的商家，方便您提货!');
-            }
             DB::beginTransaction();
-            $this->preOrder($data);
+            $order = $this->preOrder($data);
             DB::commit();
-            return $this->ok();
+            return $this->ok($order);
         }
         catch (\Exception $exception) {
             DB::rollback();
@@ -133,18 +136,18 @@ class OrderController extends Controller
     }
     # 准备支付参数
     public function prePayOrder($order)
-    {
-        $customer = auth()->user();
+    {   # todo customer 授权默认用户
+//        $customer = auth()->user();
+        $customer = Customer::find(1);
         # 启动微信支付 所需参数
         $jspay  = new WXPayController();
         $config = new WXPayConfigController(); # 支付配置参数
         $input  = new WxPayUnifiedOrder(); #  支付统一下单实例
-        $input->SetBody("test");
-        $input->SetAttach("test");
-        $input->SetOut_trade_no("sdkphp".date("YmdHis"));
-        $input->SetTotal_fee("1");
+        $input->SetBody($order['trade_no']);
+        $input->SetOut_trade_no($order['trade_no']);
+        $input->SetTotal_fee(($order['total']*100));
         $input->SetTrade_type("JSAPI");
-        $input->SetOpenid('openid');
+        $input->SetOpenid($customer['openid']);
         $wxorder = WxPayApi::unifiedOrder($config, $input); # 执行统一下单
         $parameters = $jspay->GetJsApiParameters($wxorder);
         return $parameters;
@@ -157,13 +160,14 @@ class OrderController extends Controller
             if(!($order = Order::findOrder($id))) {
                 throw new \Exception('订单不存在');
             }
-            if($order['status'] != Order::Unpaid) {
+            if($order->status != Order::Unpaid) {
                 throw new \Exception('只能取消未支付的订单');
             }
             try{
                 DB::beginTransaction();
                 Order::cancelCasecadeOrder($id);
                 DB::commit();
+                return $this->ok();
             }
             catch (\Exception $exception) {
                 DB::rollback();
@@ -272,6 +276,40 @@ class OrderController extends Controller
         return WxPayApi::refund($config, $input);
     }
 
+
+    # 主订单详情
+    public function detailOrder($id)
+    {
+        try{
+            $data = Order::getOrderDetail($id);
+            $first = $data->first()->first();
+            $result = [];
+            # 数据整理
+            $result['total']  = $first->ttotal;
+            $result['paytime']  = $first->paytime;
+            $result['status']  = $first->status;
+            $result['trade_no']  = $first->trade_no;
+            $result['orders'] = [];
+            $orders = [];
+            foreach($data as $key =>  $val) {
+                $leader = Leader::find($key);
+                $orders['leader'] = json_decode(json_encode(new LeaderResource($leader)));
+                $orders['items'] = json_decode(json_encode(OrderItem::collection($val)),true);
+                array_push($result['orders'],$orders);
+                unset($orders);
+            }
+            return $this->ok(['data'=>$result]);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+    # 子订单订单详情
+    public function detailPromotionOrder($id)
+    {
+
+    }
+
     # 订单列表
     # 全部订单 待支付订单  待收货订单 已完成
     public function listOrder()
@@ -279,11 +317,7 @@ class OrderController extends Controller
 
     }
 
-    # 订单详情
-    public function detailOrder($id)
-    {
 
-    }
 
 
 

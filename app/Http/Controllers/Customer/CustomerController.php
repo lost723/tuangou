@@ -87,7 +87,8 @@ class CustomerController extends Controller
     public function purchaseRecord($id)
     {
         try{
-            return PurchaseRecord::collection(Promotion::getPurchaseRecord($id));
+//            return PurchaseRecord::collection(Promotion::getPurchaseRecord($id));
+            return Promotion::getPurchaseRecord($id);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

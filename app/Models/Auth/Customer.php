@@ -11,7 +11,7 @@ class Customer extends Authenticatable implements JWTSubject
 {
     use Notifiable;
     protected $fillable = ['openId', 'unionId', 'nickName', 'mobile',
-        'community_id', 'avatar', 'country', 'province', 'city', 'gender'];
+        'commid', 'avatar', 'country', 'province', 'city', 'gender'];
 
     public function leader()
     {
