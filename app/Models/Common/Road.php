@@ -19,7 +19,7 @@ class Road extends BaseModel
     # 获取街道详情
     static function getRoadList(Request $request)
     {
-        
+
 
 //        retrun DB::table('roads')
 //            ->
