@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Customer;
+namespace App\Models\Common;
 
 use App\Models\BaseModel;
 use Illuminate\Http\Request;
@@ -16,13 +16,29 @@ class Road extends BaseModel
         return $this->hasMany('App\Models\Community','road_id','id');
     }
 
-    # 获取街道详情
+    # 获取所有街道信息
     static function getRoadList(Request $request)
     {
 
+        $filter = $request->get('filter');
+        $id     = $request->get('id');
+        $result =  DB::table('roads')
+            ->where('leveltype',4)
+            ->when($id, function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->when($filter, function ($query) use ($filter) {
+                $query->orWhere('name', 'like',  "%$filter%");
+                $query->orWhere('province', 'like',  "%$filter%");
+                $query->orWhere('city', 'like',  "%$filter%");
+                $query->orWhere('district', 'like',  "%$filter%");
+            })
+            ->orderBy('abbr', 'ASC')
+            ->paginate(self::NPP);
 
-//        retrun DB::table('roads')
-//            ->
+        return self::paginationFormater($result);
+
+
     }
 
     # 通过城市id 获取街道列表

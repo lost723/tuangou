@@ -12,15 +12,22 @@ use App\Models\Common\Road;
 
 class RoadController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth',  ['except' => ['index']]);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try{
-//            $result =
+            $result =  Road::getRoadList($request);
+            return $this->ok($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

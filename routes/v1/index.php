@@ -8,11 +8,15 @@
 
 
 # 坐标定位城市
-Route::post('customer/my/city', 'Customer\RoadController@myCity');
+Route::post('road/city/my', 'Common\RoadController@myCity');
 # 获取城市列表
-Route::post('customer/list/city', 'Customer\RoadController@listCity');
+Route::post('road/city', 'Common\RoadController@listCity');
 # 获取下级城市信息
-Route::get('customer/sub/road', 'Customer\RoadController@getSubRoads');
+Route::get('road/sub', 'Common\RoadController@getSubRoads');
+Route::resource('road','Common\RoadController');
+
+
+
 
 # 我的小区
 Route::get('customer/my/community', 'Customer\CommunityController@myCommunity');
@@ -31,8 +35,3 @@ Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg'
 Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');
 
 
-
-# 街道管理
-Route::resource('trader/road','Trader\RoadController');
-# 小区管理
-Route::resource('trader/community','Trader\CommunityController');
