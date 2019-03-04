@@ -5,19 +5,13 @@ namespace App\Http\Controllers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Exceptions\RoadException;
-use App\Models\Community;
+use App\Models\Customer\Community;
 use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\RoadResource;
 use App\Models\Common\Road;
 
 class RoadController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth',  ['except' => ['index']]);
-    }
-
-
     /**
      * Display a listing of the resource.
      *
@@ -161,37 +155,48 @@ class RoadController extends Controller
     # 使用坐标通过腾讯地图获取城市信息
     public function myCity()
     {
-        # 获取当前城市
-        $location = WXLocationController::getLocation();
-        if(!empty($location)) {
+        try {
+            # 获取当前城市
+            $location = WXLocationController::getLocation();
+            if(empty($location)) {
+                throw new \Exception('暂时无法获取当前位置信息');
+            }
             $item = Road::where('name', $location['city'])->first();
-        }
-        if(!empty($item)) {
+            if(empty($item)) {
+                return $this->ok(['data' => []]);
+            }
             return new RoadResource($item);
         }
-        return $this->ok(['data' => []]);
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
     # 获取城市列表
     public function listCity()
     {
-        $city = Road::where('leveltype', 2)->orderBy('abbr', 'asc')->get()->groupby('abbr')->toArray();
-        if(empty($city)) {
-            return $this->warning('城市跑丢了。。');
+        try{
+            $city = Road::getAllCity();
+            if(empty($city)) {
+                throw new \Exception('城市跑丢了!');
+            }
+            $list = [];
+            foreach ($city as $key=>$val) {
+                $tmp['letter'] = $key;
+                $tmp['list'] = [];
+                foreach ($val as $k=>$v) {
+                    array_push($tmp['list'], ['id' => $v['id'], 'name' => $v['name']]);
+                }
+                array_push($list, $tmp);
+                unset($tmp);
+            }
+            unset($city);
+            return $this->ok($list);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
         }
 
-        $list = [];
-        foreach ($city as $key=>$val) {
-            $tmp['letter'] = $key;
-            $tmp['list'] = [];
-            foreach ($val as $k=>$v) {
-                array_push($tmp['list'], ['id' => $v['id'], 'name' => $v['name']]);
-            }
-            array_push($list, $tmp);
-            unset($tmp);
-        }
-        unset($city);
-        return $this->ok($list);
     }
 
     public function getSubRoads(Request $request)

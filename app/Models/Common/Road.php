@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Road extends BaseModel
 {
     //
-    protected $fillable = ['parentid', 'leveltype', 'name', 'path', 'province', 'city', 'district', 'abbr'];
+    protected $fillable = ['parentid', 'leveltype', 'life', 'name', 'path', 'province', 'city', 'district', 'abbr'];
 
     public function community()
     {
@@ -37,9 +37,27 @@ class Road extends BaseModel
             ->paginate(self::NPP);
 
         return self::paginationFormater($result);
-
-
     }
+
+    # 获取子类街道信息
+    static function getSubItems($id)
+    {
+        return $result =  DB::table('roads')
+                ->where('parentid', $id)
+                ->Paginate(BaseModel::NPP);
+        return self::paginationFormater($result);
+    }
+
+    # 获取所有城市列表
+    static function getAllCity()
+    {
+        return self::where('leveltype', 2)
+            ->orderBy('abbr', 'asc')
+            ->get()
+            ->groupby('abbr')
+            ->toArray();
+    }
+
 
     # 通过城市id 获取街道列表
     static function getRoadsByParentId($id = 0)
@@ -48,12 +66,12 @@ class Road extends BaseModel
             return false;
         }
         $result = self::whereIn('parentid',function($query) use($id) {
-                    $query->select('id')
-                        ->from(with(new Road)->getTable())
-                        ->where('parentid', $id);
-                })
-                ->where('leveltype', 4)
-                ->get(['id']);
+            $query->select('id')
+                ->from(with(new Road)->getTable())
+                ->where('parentid', $id);
+        })
+            ->where('leveltype', 4)
+            ->get(['id']);
         return $result;
     }
 
@@ -73,15 +91,6 @@ class Road extends BaseModel
         $item = self::find($id);
         $parent_item = self::find($item['parentid']);
         return $parent_item;
-    }
-
-    # 获取子类街道信息
-    static function getSubItems($id)
-    {
-        return $result =  DB::table('roads')
-                ->where('parentid', $id)
-                ->Paginate(BaseModel::NPP);
-        return self::paginationFormater($result);
     }
 
 }
