@@ -277,7 +277,12 @@ class OrderController extends Controller
     }
 
 
-    # 主订单详情
+
+    /**
+     * 支付订单详情
+     * @param $id  支付订单id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function detailOrder($id)
     {
         try{
@@ -307,7 +312,12 @@ class OrderController extends Controller
     # 子订单订单详情
     public function detailPromotionOrder($id)
     {
+        try{
 
+        }
+        catch (\Exception $exception) {
+            $this->warning($exception->getMessage());
+        }
     }
 
     # 订单列表

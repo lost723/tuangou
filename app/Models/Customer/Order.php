@@ -88,11 +88,24 @@ class Order extends BaseModel
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
                 ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
                 ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
-                    'om.num', 'om.total',
+                    'om.id as oid', 'om.num', 'om.total',
                     'lm.leaderid', 'pm.price',
                     'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
                 ->get()
                 ->groupBy('leaderid');
+    }
+
+    # 商品订单详情
+    static function getOrderPromotionDetail($id)
+    {
+        return DB::table('order_promotions as om')
+            ->where('om.id', $id)
+            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('om.id', 'om.price', 'om.num', 'om.total', 'om.checkCode', 'om.status',
+                'pm.expire', 'pm.deliveryday', 'pm.aftersale', '')
+            ->first();
     }
 
 

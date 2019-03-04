@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class LeaderPromotion extends BaseModel
 {
     const LeaderPrefix = '300'; # 团长订单号前缀
-    const Terminated = 0;  # 异常结束
+    const Terminated = 0;   # 异常结束
     const Odering = 1;      # 进行中
     const Dispatching = 2;  # 配送中
     const Received = 3;     # 已签收
@@ -46,7 +46,7 @@ class LeaderPromotion extends BaseModel
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
                 ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
-                ->simplePaginate(self::NPP);
+                ->Paginate(self::NPP);
         return $result;
     }
 
@@ -75,7 +75,7 @@ class LeaderPromotion extends BaseModel
            ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
            ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
            ->select('lpm.*', 'pm.*', 'pd.title','pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture')
-           ->simplePaginate(self::NPP);
+           ->Paginate(self::NPP);
        return $result;
     }
 

@@ -102,6 +102,7 @@ class LeaderPromotionController extends Controller
             foreach ($data as $key => $val) {
                 $val['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
                 $val['leaderid']    = $leader->id;
+                $val['status']      = LeaderPromotion::Odering;
                 array_push($promotions, $val);
                 unset($val);
             }

@@ -37,7 +37,7 @@ class Promotion extends BaseModel
                 'pd.title', 'pd.cid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture',
                 'bs.title as btitle' ,
                 'cg.title as ctitle', 'cg.parentid', 'cg.level', 'cg.logo')
-            ->simplePaginate(BaseModel::NPP);
+            ->Paginate(BaseModel::NPP);
     }
 
     # 获取团长下的某商品详情

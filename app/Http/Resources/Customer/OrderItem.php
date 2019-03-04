@@ -15,13 +15,14 @@ class OrderItem extends Resource
     public function toArray($request)
     {
         return [
+            'id'            =>  $this->oid,
             'title'         =>  $this->title,
             'picture'       =>  $this->picture,
             'price'         =>  $this->price,
             'quotation'     =>  $this->quotation,
+            'num'           =>  $this->num,
             'norm'          =>  $this->norm,
             'total'         =>  $this->total,
-
         ];
     }
 }

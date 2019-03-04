@@ -3,6 +3,7 @@
 namespace App\Models\Customer;
 
 use App\Models\BaseModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class Road extends BaseModel
@@ -15,8 +16,17 @@ class Road extends BaseModel
         return $this->hasMany('App\Models\Community','road_id','id');
     }
 
+    # 获取街道详情
+    static function getRoadList(Request $request)
+    {
+        
+
+//        retrun DB::table('roads')
+//            ->
+    }
+
     # 通过城市id 获取街道列表
-    static  function getRoadsByParentId($id = 0)
+    static function getRoadsByParentId($id = 0)
     {
         if(0 >= $id) {
             return false;

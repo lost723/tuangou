@@ -21,6 +21,7 @@ class CreateLeaderPromotionsTable extends Migration
             $table->unsignedInteger('sales')->default(0)->comment('该商品销量');
             $table->string('ordersn')->comment('订单号');
             $table->string('check')->default('')->comment('核销码');
+            $table->string('status')->default(1)->comment('0:异常结束 1:进行中 2:配送中 3:已签收');
             $table->string('note')->default('')->comment('订单异常备注');
             $table->timestamps();
         });
