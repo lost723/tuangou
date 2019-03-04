@@ -5,6 +5,8 @@
  * Date: 2019/2/22
  * Time: 18:25
  */
+## 消费者相关接口
+
 # 商品分类信息
 Route::get('customer/category', 'Customer\CustomerController@getCategories');
 # 用户首页 商品列表页 id 为小区id
@@ -15,6 +17,7 @@ Route::get('customer/promotions/detail/{id}', 'Customer\CustomerController@getPr
 Route::get('customer/promotions/purchaserecord/{id}', 'Customer\CustomerController@purchaseRecord');
 
 
+# 订单相关路由
 # 生成订单 createOrder
 # 支付订单 payOrder
 # 取消订单 cancelOrder

@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class RefundOrder extends BaseModel
 {
-    protected $fillable = [];
     const RefundPrefix = '200'; # 退款订单号前缀
     const Expire = 0; # 退款失败
     const Refunding = 1; # 退款中 已创建退款订单
     const Finished = 2; # 已退款
+
+    protected $fillable = [];
 
     # 通过商品订单id查询退款信息
     static function findOrderByOrderid($id)

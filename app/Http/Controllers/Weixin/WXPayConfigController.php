@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Common;
+namespace App\Http\Controllers\Weixin;
 
-use App\Http\Controllers\Common\Wxpay\WxPayConfigInterface;
+use App\Http\Controllers\Weixin\Wxpay\WxPayConfigInterface;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

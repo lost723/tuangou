@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Common\Wxpay;
+namespace App\Http\Controllers\Weixin\Wxpay;
 
-use App\Http\Controllers\Common\Wxpay\WxPayApi;
+use App\Http\Controllers\Weixin\Wxpay\WxPayApi;
 /**
  * 
  * 回调基础类

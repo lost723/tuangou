@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Customer;
+namespace App\Models\Common;
 
 use App\Models\BaseModel;
 
@@ -14,14 +14,6 @@ class Leader extends BaseModel
     protected $fillable = ['customerid', 'commid', 'name', 'mobile', 'idcard', 'idcard_front_url',
         'idcard_back_url', 'address', 'commission', 'status'];
 
-    public function customer()
-    {
-        return $this->belongsTo('App\Models\Auth\Customer', 'customer_id');
-    }
 
-    public function community()
-    {
-        return $this->belongsTo('App\Models\Customer\Community', 'community_id');
-    }
 
 }

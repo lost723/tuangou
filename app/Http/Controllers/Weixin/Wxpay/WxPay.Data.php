@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Common\Wxpay;
+namespace App\Http\Controllers\Weixin\Wxpay;
 
-use \App\Http\Controllers\Common\Wxpay\WxPayException;
+use \App\Http\Controllers\Weixin\Wxpay\WxPayException;
 /**
  * 
  * 数据对象基础类，该类中定义数据类最基本的行为，包括：

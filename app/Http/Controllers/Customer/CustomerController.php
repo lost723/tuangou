@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Resources\Customer\PromotionDetail;
 use App\Http\Resources\Customer\Promotions as PromotionResource;
 use App\Http\Resources\Customer\PurchaseRecord;
-use App\Models\Customer\Category;
 use App\Http\Resources\Customer\Category as CategroyResource;
+use App\Models\Common\Category;
 use App\Models\Customer\Promotion;
  use App\Http\Controllers\Controller;
 
@@ -87,7 +87,6 @@ class CustomerController extends Controller
     public function purchaseRecord($id)
     {
         try{
-//            return PurchaseRecord::collection(Promotion::getPurchaseRecord($id));
             return Promotion::getPurchaseRecord($id);
         }
         catch (\Exception $exception) {

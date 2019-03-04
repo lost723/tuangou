@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Customer\Models\Order;
-use App\Http\Controllers\Common\Wxpay\WxPayApi;
-use App\Http\Controllers\Common\Wxpay\WxPayRefund;
-use App\Http\Controllers\Common\Wxpay\WxPayUnifiedOrder;
-use App\Http\Controllers\Common\WXPayConfigController;
-use App\Http\Controllers\Common\WXPayController;
+use App\Http\Controllers\Weixin\Wxpay\WxPayApi;
+use App\Http\Controllers\Weixin\Wxpay\WxPayRefund;
+use App\Http\Controllers\Weixin\Wxpay\WxPayUnifiedOrder;
+use App\Http\Controllers\Weixin\WXPayConfigController;
+use App\Http\Controllers\Weixin\WXPayController;
 use App\Http\Resources\Customer\OrderItem;
-use App\Http\Resources\LeaderResource;
+use App\Http\Resources\Customer\LeaderResource;
 use App\Models\Auth\Customer;
-use App\Models\Customer\Leader;
+use App\Models\Common\Leader;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
 use App\Models\Customer\RefundOrder;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Common;
+namespace App\Http\Controllers\Weixin;
 
 /**
  * 对微信小程序用户加密数据的解密示例代码.

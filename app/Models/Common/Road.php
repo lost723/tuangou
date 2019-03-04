@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Road extends BaseModel
 {
     //
-    protected $fillable = ['parentid', 'leveltype', 'life', 'name', 'path', 'province', 'city', 'district', 'abbr'];
+    protected $fillable = ['parentid', 'level', 'life', 'name', 'path', 'province', 'city', 'district', 'abbr'];
 
     public function community()
     {
@@ -23,7 +23,7 @@ class Road extends BaseModel
         $filter = $request->get('filter');
         $id     = $request->get('id');
         $result =  DB::table('roads')
-            ->where('leveltype',4)
+            ->where('level',4)
             ->when($id, function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -51,7 +51,7 @@ class Road extends BaseModel
     # 获取所有城市列表
     static function getAllCity()
     {
-        return self::where('leveltype', 2)
+        return self::where('level', 2)
             ->orderBy('abbr', 'asc')
             ->get()
             ->groupby('abbr')
@@ -60,17 +60,14 @@ class Road extends BaseModel
 
 
     # 通过城市id 获取街道列表
-    static function getRoadsByParentId($id = 0)
+    static function getRoadsByCityId($id = 0)
     {
-        if(0 >= $id) {
-            return false;
-        }
         $result = self::whereIn('parentid',function($query) use($id) {
-            $query->select('id')
-                ->from(with(new Road)->getTable())
-                ->where('parentid', $id);
-        })
-            ->where('leveltype', 4)
+                $query->select('id')
+                    ->from(with(new Road)->getTable())
+                    ->where('parentid', $id);
+            })
+            ->where('level', 4)
             ->get(['id']);
         return $result;
     }

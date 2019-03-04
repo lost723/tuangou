@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Customer\Models\Order;
-use App\Http\Controllers\Common\Wxpay\WxPayNotify;
+
+use App\Http\Controllers\Weixin\Wxpay\WxPayNotify;
 use App\Models\Customer\LeaderPromotion;
+use App\Models\Customer\Order;
 use App\Models\Customer\OrderPromotion;
 
 

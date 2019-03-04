@@ -7,11 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Exceptions\RoadException;
 use App\Models\Customer\Community;
 use App\Http\Controllers\Common\WXLocationController;
-use App\Http\Resources\RoadResource;
+use App\Http\Resources\Customer\RoadResource;
 use App\Models\Common\Road;
 
 class RoadController extends Controller
 {
+    public function __construct()
+    {
+        # todo 正式生产环境 需进行token校验
+        $this->middleware('auth', ['except' =>  ['index']]);
+    }
     /**
      * Display a listing of the resource.
      *

@@ -65,7 +65,7 @@ class Promotion extends BaseModel
             ->where('om.promotionid', $id)
             ->where('om.status', OrderPromotion::Finished)
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.id', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.id', 'customer.avatar', 'customers.nickname', 'om.num', 'om.created_at')
             ->orderBy('om.created_at', 'DESC')
             ->Paginate();
         return self::paginationFormater($result);

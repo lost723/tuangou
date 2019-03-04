@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class OrderPromotion extends Model
 {
-    protected $fillable = ['customerid', 'orderid', 'promotionid', 'ordersn', 'num', 'price', 'total', 'status', 'note'];
     const OrderPrefix = '100'; # 子订单号前缀
     const Expire = 0; # 订单超时异常 或 取消
     const Unpaid = 1; # 未支付
@@ -16,6 +15,9 @@ class OrderPromotion extends Model
     const UnReceived = 4; # 已支付未发货
     const Dispatched = 5; # 已发货
     const Finished = 6; # 已完成
+
+    protected $fillable = ['customerid', 'orderid', 'promotionid', 'ordersn', 'num', 'price', 'total', 'status', 'note'];
+    protected $table = 'order_promotions';
 
     # 创建 批量订单
     static function createOrderPromotions($data)

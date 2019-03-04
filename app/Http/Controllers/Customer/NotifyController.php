@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Http\Controllers\Common\WXPayConfigController;
+use App\Http\Controllers\Weixin\WXPayConfigController;
 use App\Http\Controllers\Customer\WXPayNotifyController;
 use App\Http\Controllers\Customer\WXRefundNotifyController;
 

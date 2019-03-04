@@ -6,7 +6,7 @@ use App\Http\Resources\Customer\BusinessPromotionDetail;
 use App\Http\Resources\Customer\BusinessPromotions;
 use App\Models\Auth\Customer;
 use App\Models\Business\Promotion;
-use App\Models\Customer\Leader;
+use App\Models\Common\Leader;
 use App\Models\Customer\LeaderPromotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Customer\Models;
+namespace App\Models\Customer;
 
 use App\Models\BaseModel;
 use App\Models\Customer\OrderPromotion;
@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\DB;
 
 class Order extends BaseModel
 {
-    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
     const OrderPrefix = "400"; # 总订单号前缀
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
-
     const TimeOut = 15;
+
+    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
 
 
 

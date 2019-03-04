@@ -14,6 +14,7 @@ class LeaderPromotion extends BaseModel
     const Dispatching = 2;  # 配送中
     const Received = 3;     # 已签收
 
+    protected $table = 'leader_promotions';
     protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'status'];
 
     /**

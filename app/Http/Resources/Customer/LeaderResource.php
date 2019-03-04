@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Customer;
 
-use App\Models\Customer\Community;
+use App\Models\Common\Community;
 use Illuminate\Http\Resources\Json\Resource;
 
 class LeaderResource extends Resource
