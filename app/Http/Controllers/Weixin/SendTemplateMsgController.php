@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Weixin;
 
-use App\Http\Controllers\Common\WXBaseController;
+use App\Http\Controllers\Weixin\WXBaseController;
 
 class SendTemplateMsgController extends WXBaseController
 {

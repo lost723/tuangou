@@ -1,35 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\Trader;
+namespace App\Http\Controllers\Common;
 
-use App\Exceptions\RoadException;
-use App\Http\Controllers\Auth\TraderController;
-use App\Models\Community;
-use App\Models\Road;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Exceptions\RoadException;
+use App\Models\Customer\Community;
+use App\Http\Controllers\Common\WXLocationController;
+use App\Http\Resources\Customer\RoadResource;
+use App\Models\Common\Road;
 
-class RoadController extends TraderController
+class RoadController extends Controller
 {
-    # 后台街道管理
     public function __construct()
     {
-        # 测试 过滤token验证
-        $this->middleware('auth', ['except' => ['index', 'create']]);
+        # todo 正式生产环境 需进行token校验
+        $this->middleware('auth', ['except' =>  ['index']]);
     }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-
+        try{
+            $result =  Road::getRoadList($request);
+            return $this->ok($result);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
     /**
-     * 显示上级街道信息
+     * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
@@ -37,14 +42,13 @@ class RoadController extends TraderController
     {
         try {
             # 返回父级菜单
-             $pid = request()->get('parent_id')?: 0;
-             $road = Road::where('id',$pid)->first();
-             return $this->ok($road);
+            $pid = request()->get('parent_id')?: 0;
+            $road = Road::where('id',$pid)->first();
+            return $this->ok($road);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
-
     }
 
     /**
@@ -64,11 +68,11 @@ class RoadController extends TraderController
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
-
     }
 
     /**
-     * 显示当前街道信息
+     * Display the specified resource.
+     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -151,4 +155,65 @@ class RoadController extends TraderController
         }
 
     }
+
+    # 坐标获取城市信息
+    # 使用坐标通过腾讯地图获取城市信息
+    public function myCity()
+    {
+        try {
+            # 获取当前城市
+            $location = WXLocationController::getLocation();
+            if(empty($location)) {
+                throw new \Exception('暂时无法获取当前位置信息');
+            }
+            $item = Road::where('name', $location['city'])->first();
+            if(empty($item)) {
+                return $this->ok(['data' => []]);
+            }
+            return new RoadResource($item);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+    # 获取城市列表
+    public function listCity()
+    {
+        try{
+            $city = Road::getAllCity();
+            if(empty($city)) {
+                throw new \Exception('城市跑丢了!');
+            }
+            $list = [];
+            foreach ($city as $key=>$val) {
+                $tmp['letter'] = $key;
+                $tmp['list'] = [];
+                foreach ($val as $k=>$v) {
+                    array_push($tmp['list'], ['id' => $v['id'], 'name' => $v['name']]);
+                }
+                array_push($list, $tmp);
+                unset($tmp);
+            }
+            unset($city);
+            return $this->ok($list);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+
+    }
+
+    public function getSubRoads(Request $request)
+    {
+        try {
+            $parentid = $request->get('pid') > 0 ? $request->get('pid') : 0;
+            return Road::getSubItems($parentid);
+        } catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Customer\Models;
+namespace App\Models\Customer;
 
 use App\Models\BaseModel;
 use App\Models\Customer\OrderPromotion;
@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\DB;
 
 class Order extends BaseModel
 {
-    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
-    const OrderPrefix = "400"; # 子订单号前缀
+    const OrderPrefix = "400"; # 总订单号前缀
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
-
     const TimeOut = 15;
+
+    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
 
 
 
@@ -74,6 +74,38 @@ class Order extends BaseModel
         return DB::table('order_promotions')
             ->where('order_id', $id)
             ->get();
+    }
+
+
+    # 待支付订单详情信息
+    static function getOrderDetail($id)
+    {
+        return DB::table('order_promotions as om')
+                ->where('orders.id', $id)
+                ->where('orders.status', Order::Unpaid)
+                ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
+                ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
+                ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+                ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+                ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
+                    'om.id as oid', 'om.num', 'om.total',
+                    'lm.leaderid', 'pm.price',
+                    'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
+                ->get()
+                ->groupBy('leaderid');
+    }
+
+    # 商品订单详情
+    static function getOrderPromotionDetail($id)
+    {
+        return DB::table('order_promotions as om')
+            ->where('om.id', $id)
+            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('om.id', 'om.price', 'om.num', 'om.total', 'om.checkCode', 'om.status',
+                'pm.expire', 'pm.deliveryday', 'pm.aftersale', '')
+            ->first();
     }
 
 

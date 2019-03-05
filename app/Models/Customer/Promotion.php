@@ -19,7 +19,7 @@ class Promotion extends BaseModel
             ->whereIn('lm.leaderid', function ($query) use ($commid) {
                 $query->select('id')
                     ->from('leaders')
-                    ->where('community_id',$commid);
+                    ->where('commid',$commid);
             })
             ->where('ld.status', Leader::NORMAL)
             ->where('pm.status', BPromotion::Ordering)
@@ -32,12 +32,12 @@ class Promotion extends BaseModel
             ->leftjoin('categories as cg', 'cg.id', '=', 'pd.cid')
             ->leftjoin('leaders as ld', 'ld.id', '=', 'lm.leaderid')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
-            ->select('lm.*', 'ld.community_id', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
+            ->select('lm.*', 'ld.commid', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
                 'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.stock', 'pm.status',
                 'pd.title', 'pd.cid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture',
                 'bs.title as btitle' ,
                 'cg.title as ctitle', 'cg.parentid', 'cg.level', 'cg.logo')
-            ->simplePaginate(BaseModel::NPP);
+            ->Paginate(BaseModel::NPP);
     }
 
     # 获取团长下的某商品详情
@@ -50,7 +50,7 @@ class Promotion extends BaseModel
             ->leftjoin('categories as cg', 'cg.id', '=', 'pd.cid')
             ->leftjoin('leaders as ld', 'ld.id', '=', 'lm.leaderid')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
-            ->select('lm.*', 'ld.community_id', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
+            ->select('lm.*', 'ld.commid', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
                 'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.stock', 'pm.status',
                 'pd.title', 'pd.cid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content',
                 'bs.title as btitle' ,
@@ -61,13 +61,14 @@ class Promotion extends BaseModel
     # 获取团长某活动 的历史订单
     static function getPurchaseRecord($id)
     {
-        return DB::table('order_promotions as om')
+        $result=DB::table('order_promotions as om')
             ->where('om.promotionid', $id)
             ->where('om.status', OrderPromotion::Finished)
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.id', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.id', 'customer.avatar', 'customers.nickname', 'om.num', 'om.created_at')
             ->orderBy('om.created_at', 'DESC')
-            ->get();
+            ->Paginate();
+        return self::paginationFormater($result);
     }
 
 }

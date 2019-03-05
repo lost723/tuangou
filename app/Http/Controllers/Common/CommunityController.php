@@ -1,22 +1,14 @@
 <?php
+namespace App\Http\Controllers\Common;
 
-namespace App\Http\Controllers\Trader;
-
-use App\Http\Controllers\Auth\TraderController;
-use App\Http\Resources\CommunityResource;
-use App\Models\Auth\Customer;
-use App\Models\BaseModel;
-use App\Models\Customer\Community;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Customer\CommunityResource;
+use App\Models\Common\Community;
+use App\Models\Common\Road;
 
-class CommunityController extends TraderController
+class CommunityController extends Controller
 {
-    # 后台小区管理
-    public function __construct()
-    {
-        $this->middleware('auth', ['except' => ['index', 'register']]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -24,15 +16,23 @@ class CommunityController extends TraderController
      */
     public function index(Request $request)
     {
-        //
         try {
-            $rid = $request->get('rid');
-            $list = Community::where('road_id', $rid)->OrderBy('id','asc')->paginate(Community::NPP);
-            return Community::paginationFormater($list);
+            $result = Community::getCommunityList($request);
+            return Community::paginationFormater($result);
         }
         catch (\Exception $exception) {
-            return $this->warning($exception->getMessage());
+            $this->warning($exception->getMessage());
         }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -125,15 +125,108 @@ class CommunityController extends TraderController
     public function destroy($id)
     {
         try{
-            # customer 关联小区
+            # customer 关联小区检测
             $count_customer = Customer::where('community_id', $id)->count();
             if($count_customer >= 1) {
                 throw new \Exception('当前小区被消费者用户关联，请勿删除');
             }
-            # leader 关联小区
+            # leader 关联小区检测
             $count_leader = Customer::where('community_id', $id)->count();
             if($count_leader >= 1) {
                 throw new \Exception('当前小区被团长关联，请勿删除');
+            }
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+
+
+    #小程序端小区相关接口
+
+    # 我的小区信息
+    public function myCommunity()
+    {
+        try {
+            $customer = auth()->user();
+            if(0 < $customer['commid']) {
+                $community = Community::find($customer['commid']);
+                if(!empty($community)) {
+                    return new CommunityResource($community);
+                }
+                return $this->ok(['data' => []]);
+            }
+            throw new \Exception('该用户还未绑定小区');
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+    # 通过腾讯地图api搜索附近小区
+    public function searchCommunity()
+    {
+        try {
+            $item = WXLocationController::Search('小区');
+            if(!empty($item))
+            {
+                return $this->ok(['data' => $item]);
+            }
+            return $this->ok(['data' => []]);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+
+    }
+
+    /**
+     * 用户关联小区
+     * @param community_id 关联的小区id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function relateCommunity()
+    {
+        try {
+            $commid  = request()->post('commid')?:0;
+            if(0 < $commid) {
+                $customer = auth()->user();
+                $customer->commid = $commid;
+                $customer->save();
+                return $this->ok();
+             }
+            throw new \Exception('传入参数异常');
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+    # 通过地理位置定位附近的小区
+    /**
+     * 通过城市id 获取小区列表
+     * @param $id 城市id
+     * @param $filter 小区名称或地址名
+     * @param $longitude 经度
+     * @param $latitude  纬度
+     * @param int page 页码
+     * @return bool
+     */
+    public function CommunityList(Request $request)
+    {
+        try{
+            $cid = $request->get('cid');
+            $rids = [];
+            if(!empty($cid)) {
+                $rids = Road::getRoadsByCityId($cid);
+            }
+            $result = Community::getCommunityList($request, $rids);
+            if(empty($result)) {
+                return $this->ok(['data' => []]);
+            }
+            else {
+                return  CommunityResource::collection($result);
             }
         }
         catch (\Exception $exception) {

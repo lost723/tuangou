@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Common;
+namespace App\Http\Controllers\Weixin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;

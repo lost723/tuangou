@@ -25,18 +25,16 @@ class QiNiuUploadController extends Controller
     static public function  decodePath($jsonString = '')
     {
         if(!empty($jsonString)) {
-
             $result = json_decode($jsonString);
-
             if('private' == $result['access']) {
                 $disk = \Storage::disk('qiniu_private');
                 if(!empty($result['savePath'])) {
                     $result['access_url'] = $disk->$disk->downloadUrl($result['savePath']);
                 }
             }
-            return $result;
+            return $result['access_url'];
         }
-        return [];
+        return "";
     }
 
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Common\WXLoginController;
+use App\Http\Controllers\Weixin\WXLoginController;
 use App\Http\Resources\CustomerResource;
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
@@ -149,8 +149,6 @@ class CustomerController extends Controller
                 'province' => $userinfo['province'],
                 'city'     => $userinfo['city'],
                 'gender'   => $userinfo['gender'],
-
-
             ]
         );
     }

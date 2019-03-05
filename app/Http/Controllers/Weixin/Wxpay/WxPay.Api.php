@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Common\Wxpay;
+namespace App\Http\Controllers\Weixin\Wxpay;
 
-use App\Http\Controllers\Common\Wxpay\WxPayException;
+use App\Http\Controllers\Weixin\Wxpay\WxPayException;
 /**
  * 
  * 接口访问类，包含所有微信支付API列表的封装，类中方法为static方法，

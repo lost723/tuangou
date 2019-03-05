@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Common;
+namespace App\Http\Controllers\Weixin;
 
-use App\Http\Controllers\Common\Wxpay\WxPayApi;
-use App\Http\Controllers\Common\Wxpay\WxPayException;
-use App\Http\Controllers\Common\Wxpay\WxPayJsApiPay;
+use App\Http\Controllers\Weixin\Wxpay\WxPayApi;
+use App\Http\Controllers\Weixin\Wxpay\WxPayException;
+use App\Http\Controllers\Weixin\Wxpay\WxPayJsApiPay;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

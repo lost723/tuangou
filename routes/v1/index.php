@@ -6,23 +6,27 @@
  * Time: 17:22
  */
 
-
+# 街道相关路由
 # 坐标定位城市
-Route::post('customer/my/city', 'Customer\RoadController@myCity');
+Route::post('road/city/my', 'Common\RoadController@myCity');
 # 获取城市列表
-Route::post('customer/list/city', 'Customer\RoadController@listCity');
+Route::post('road/city', 'Common\RoadController@listCity');
 # 获取下级城市信息
-Route::get('customer/sub/road', 'Customer\RoadController@getSubRoads');
+Route::get('road/sub', 'Common\RoadController@getSubRoads');
+Route::resource('road','Common\RoadController');
+
+
+
 
 # 我的小区
-Route::get('customer/my/community', 'Customer\CommunityController@myCommunity');
+Route::get('community/my', 'Common\CommunityController@myCommunity');
 # 关联小区
-Route::post('customer/relate/community', 'Customer\CommunityController@relateCommunity');
+Route::post('community/relate', 'Common\CommunityController@relateCommunity');
 # 获取周边小区列表
-Route::post('customer/list/community', 'Customer\CommunityController@CommunityList');
+Route::get('community/list', 'Common\CommunityController@CommunityList');
 # 获取周边小区 通过腾讯api获取
-Route::post('customer/search/community', 'Customer\CommunityController@searchCommunity');
-
+Route::post('community/search', 'Common\CommunityController@searchCommunity');
+Route::resource('community', 'Common\CommunityController');
 
 
 
@@ -31,8 +35,3 @@ Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg'
 Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');
 
 
-
-# 街道管理
-Route::resource('trader/road','Trader\RoadController');
-# 小区管理
-Route::resource('trader/community','Trader\CommunityController');

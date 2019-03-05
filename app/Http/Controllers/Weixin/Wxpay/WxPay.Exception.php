@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Common\Wxpay;
+namespace App\Http\Controllers\Weixin\Wxpay;
 
 /**
  * 

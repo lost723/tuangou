@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
@@ -21,7 +21,8 @@ class RoadResource extends Resource
             'city'      =>  $this->city,
             'district'  =>  $this->district,
             'name'      =>  $this->name,
-            'level'     =>  $this->leveltype,
+            'level'     =>  $this->level,
+            'life'      =>  $this->life,
         ];
     }
 }

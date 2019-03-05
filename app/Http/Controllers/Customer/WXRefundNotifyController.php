@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Http\Controllers\Common\OpenSSLAESController;
-use App\Http\Controllers\Common\Wxpay\WxPayNotify;
+use App\Http\Controllers\Weixin\OpenSSLAESController;
+use App\Http\Controllers\Weixin\Wxpay\WxPayNotify;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\RefundOrder;
 use Illuminate\Support\Facades\DB;
