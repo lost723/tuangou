@@ -3,7 +3,7 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
-use App\Models\Customer\Community;
+use App\Models\Common\Community;
 use Illuminate\Support\Facades\DB;
 
 class District extends BaseModel
