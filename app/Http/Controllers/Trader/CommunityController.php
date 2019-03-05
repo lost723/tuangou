@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Trader;
 
 use App\Http\Controllers\Auth\TraderController;
-use App\Http\Controllers\Common\QiNiuUploadController;
 use App\Http\Resources\CommunityResource;
 use App\Models\Auth\Customer;
 use App\Models\BaseModel;
-use App\Models\Community;
+use App\Models\Customer\Community;
 use Illuminate\Http\Request;
 
 class CommunityController extends TraderController
@@ -23,12 +22,13 @@ class CommunityController extends TraderController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
         try {
-            $list = Community::OrderBy('id','asc')->paginate(BaseModel::NPP);
-            return CommunityResource::collection($list);
+            $rid = $request->get('rid');
+            $list = Community::where('road_id', $rid)->OrderBy('id','asc')->paginate(Community::NPP);
+            return Community::paginationFormater($list);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
