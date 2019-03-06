@@ -3,6 +3,9 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
+use App\Models\Common\Community;
+use Illuminate\Support\Facades\DB;
+use Qiniu\Auth;
 
 class District extends BaseModel
 {
@@ -12,15 +15,58 @@ class District extends BaseModel
     ];
 
     /**
-     * 获取某个区域模版附带所有小区详情
+     * 按照条件获取列表
+     * @param $request
+     * @return mixed
+     */
+    static function getList($request)
+    {
+        $ids = $request->get('ids');
+        $orgid = Auth::user()->orgid;
+        $status = $request->get('status');
+
+        $result = District::where('orgid', $orgid)
+            ->when($status, function ($query) use ($status){
+                $query->where('status', $status);
+            })
+            ->when($ids, function ($query) use ($ids){
+                $query->wherein('id', $ids);
+            })
+            ->paginate(self::NPP);
+        return self::paginationFormater($result);
+    }
+
+    /**
+     * 获取某个区域模版附带所有关联小区的id
      * @param $id
      * @return mixed
      */
     static function  findWithItmes($id)
     {
         $obj = self::find($id);
-        # todo 需要关联小区表
-        $obj->items = DistrictItem::where('distid', $id)->get();
+        $items = [];
+        $list = DistrictItem::where('distid', $id)->get();
+        foreach ($list as $row){
+            $items[] = $row['commid'];
+        }
+        $obj->items = $items;
         return $obj;
+    }
+
+    /**
+     * 获取小区列表
+     * @param $distid
+     * @return mixed
+     */
+    static function getCommunitys($distid)
+    {
+        $result = DB::table(with(new Community())->getTable())
+            ->wherein('id', function ($query) use ($distid) {
+                $query->select('commid')
+                    ->from(with(new DistrictItem)->getTable())
+                    ->where('distid', $distid);
+            })
+            ->paginate(self::NPP);
+        return self::paginationFormater($result);
     }
 }

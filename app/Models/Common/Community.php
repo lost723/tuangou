@@ -20,6 +20,7 @@ class Community extends BaseModel
     static function getCommunityList(Request $request, $road_ids = [])
     {
         $id     = $request->get('id');
+        $rid    = $request->get('rid');
         $filter = $request->get('filter');
         $longitude = request()->get('longitude');
         $latitude  = request()->get('latitude');
@@ -29,6 +30,9 @@ class Community extends BaseModel
             ->when($filter, function ($query) use ($filter) {
                 $query->orWhere('name', 'like', "%$filter%");
                 $query->orWhere('address', 'like', "%$filter%");
+            })
+            ->when($rid, function ($query) use ($rid) {
+                $query->where('road_id', $rid);
             })
             ->when($road_ids, function ($query) use ($road_ids) {
                 $query->whereIn('road_id', $road_ids);

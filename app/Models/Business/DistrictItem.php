@@ -10,9 +10,20 @@ class DistrictItem extends Model
 
     protected $fillable = ['distid', 'commid'];
 
-    public function addAll(Array $data)
+    /**
+     * 批量添加
+     * @param $distid
+     * @param $commids
+     * @return mixed
+     */
+    public static function addAll($distid, $commids)
     {
-        $rs = DB::table($this->getTable())->insert($data);
+        $obj = new self();
+        $datas = [];
+        foreach ($commids as $commid){
+            $datas[] = ['distid'=>$distid, 'commid'=>$commid];
+        }
+        $rs = DB::table($obj->getTable())->insert($datas);
         return $rs;
     }
 

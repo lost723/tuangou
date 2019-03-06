@@ -5,6 +5,10 @@ Route::resource('business', 'Business\BusinessController');
 
 # 区域模版
 Route::resource('district',  'Business\DistrictController');
+Route::post('district/communitys/{id}',  'Business\DistrictController@updateItems');
+Route::get('district/communitys/{id}',  'Business\DistrictController@getCommunitys');
+
+
 
 # 活动信息
 Route::resource('promotion', 'Business\PromotionController');

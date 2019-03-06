@@ -9,10 +9,12 @@ use App\Models\Business\DistrictItem;
 use App\Models\Business\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DistrictController extends Controller
 {
     /**
+     * todo
      * 获取某商户的区域模版
      * 供商家后台使用
      * @param Request $request
@@ -22,9 +24,7 @@ class DistrictController extends Controller
     public function index(Request $request)
     {
         try{
-            $orgid = Auth::user()->orgid;
-            $result = District::where('orgid', $orgid)->paginate(District::NPP);
-            $result = District::paginationFormater($result);
+            $result =  District::getList($request);
             return $this->ok($result);
         }catch (\Exception $e){
             return $this->ok($e->getMessage());
@@ -43,7 +43,7 @@ class DistrictController extends Controller
         try{
             $all = $request->all();
             $all['orgid'] = Auth::user()->orgid;
-            $item = District::create($all);
+            District::create($all);
             return $this->created('创建成功');
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
@@ -60,6 +60,7 @@ class DistrictController extends Controller
     {
         try{
             $item = District::findWithItmes($id);
+            $this->checkBusinessOwnship($item->orgid);
             return $this->ok($item);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
@@ -96,12 +97,36 @@ class DistrictController extends Controller
     public function updateItems(Request $request, $id)
     {
         try{
+            $obj = District::find($id);
+            # 执行业务
             $items = $request->get('items');
-            DistrictItem::where('orgid', $id)->delete();
-            DistrictItem::addAll($items);
+            DB::beginTransaction();
+            DistrictItem::where('distid', $id)->delete();
+            DistrictItem::addAll($id, $items);
+            $obj->totals = count($items);
+            $obj->save();
+            DB::commit();
             return $this->created('更新成功');
         }catch (\Exception $e){
+            DB::rollBack();
             return $this->warning($e->getMessage());
+        }
+    }
+
+    /**
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCommunitys($id)
+    {
+        try{
+            $obj = District::find($id);
+            $this->checkBusinessOwnship($obj->orgid);
+            $result = District::getCommunitys($id);
+            return $this->ok($result);
+        }catch (\Exception $e){
+            return $this->ok($e->getMessage());
         }
     }
 
@@ -115,14 +140,12 @@ class DistrictController extends Controller
     public function destroy($id)
     {
         try{
-            # 先检查有没有使用过
-            $products = Product::getByDistrict($id);
-            if($products) {
+            # 有使在产品中使用过，不能删除
+            if(Product::getByDistrict($id)) {
                 throw new BusinessException('此区域模版还在商品中使用，不能删除。');
             }
-            # 没有使用过
             # 先删除 items
-            DistrictItem::where('orgid', $id)->delete();
+            DistrictItem::where('distid', $id)->delete();
             # 后删除记录本身
             District::destory($id);
         }catch (BusinessException $e){

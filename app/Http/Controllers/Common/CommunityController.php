@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Common;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Common\WXLocationController;
 use App\Http\Resources\Customer\CommunityResource;
 use App\Models\Common\Community;
 use App\Models\Common\Road;
