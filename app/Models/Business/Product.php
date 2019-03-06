@@ -27,12 +27,17 @@ class Product extends BaseModel
     static function getBusinessOwnList($request)
     {
         $orgid = Auth::user()->orgid;
+        $date = $request->get('date');
         $status = $request->get('status');
         $filter = $request->get('filter');
 
         $result = self::select('id', 'title', 'intro', 'thumb', 'price', 'rate', 'quotation', 'issue', 'norm', 'status')
             ->where('orgid', $orgid)
             ->where('status', '!=', self::Del)
+            ->when($date, function ($query) use ($date) {
+                $query->where('created_at','>=', ($date[0]))
+                    ->where('created_at','<', ($date[1]));
+            })
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })

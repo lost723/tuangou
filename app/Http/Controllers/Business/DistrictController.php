@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 class DistrictController extends Controller
 {
     /**
-     * todo security detect
+     * todo
      * 获取某商户的区域模版
      * 供商家后台使用
      * @param Request $request
@@ -24,9 +24,7 @@ class DistrictController extends Controller
     public function index(Request $request)
     {
         try{
-            $orgid = Auth::user()->orgid;
-            $result = District::where('orgid', $orgid)->paginate(District::NPP);
-            $result = District::paginationFormater($result);
+            $result =  District::getList($request);
             return $this->ok($result);
         }catch (\Exception $e){
             return $this->ok($e->getMessage());
@@ -100,7 +98,6 @@ class DistrictController extends Controller
     {
         try{
             $obj = District::find($id);
-            $this->checkBusinessOwnship($obj->orgid);
             # 执行业务
             $items = $request->get('items');
             DB::beginTransaction();
@@ -116,6 +113,11 @@ class DistrictController extends Controller
         }
     }
 
+    /**
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getCommunitys($id)
     {
         try{
@@ -138,14 +140,12 @@ class DistrictController extends Controller
     public function destroy($id)
     {
         try{
-            # 先检查有没有使用过
-            $products = Product::getByDistrict($id);
-            if($products) {
+            # 有使在产品中使用过，不能删除
+            if(Product::getByDistrict($id)) {
                 throw new BusinessException('此区域模版还在商品中使用，不能删除。');
             }
-            # 没有使用过
             # 先删除 items
-            DistrictItem::where('orgid', $id)->delete();
+            DistrictItem::where('distid', $id)->delete();
             # 后删除记录本身
             District::destory($id);
         }catch (BusinessException $e){

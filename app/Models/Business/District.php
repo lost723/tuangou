@@ -5,6 +5,7 @@ namespace App\Models\Business;
 use App\Models\BaseModel;
 use App\Models\Common\Community;
 use Illuminate\Support\Facades\DB;
+use Qiniu\Auth;
 
 class District extends BaseModel
 {
@@ -12,6 +13,28 @@ class District extends BaseModel
     protected $fillable = [
         'orgid', 'title', 'note', 'status'
     ];
+
+    /**
+     * 按照条件获取列表
+     * @param $request
+     * @return mixed
+     */
+    static function getList($request)
+    {
+        $ids = $request->get('ids');
+        $orgid = Auth::user()->orgid;
+        $status = $request->get('status');
+
+        $result = District::where('orgid', $orgid)
+            ->when($status, function ($query) use ($status){
+                $query->where('status', $status);
+            })
+            ->when($ids, function ($query) use ($ids){
+                $query->wherein('id', $ids);
+            })
+            ->paginate(self::NPP);
+        return self::paginationFormater($result);
+    }
 
     /**
      * 获取某个区域模版附带所有关联小区的id
