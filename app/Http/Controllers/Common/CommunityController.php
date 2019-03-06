@@ -128,12 +128,12 @@ class CommunityController extends Controller
     {
         try{
             # customer 关联小区检测
-            $count_customer = Customer::where('community_id', $id)->count();
+            $count_customer = Customer::where('commid', $id)->count();
             if($count_customer >= 1) {
                 throw new \Exception('当前小区被消费者用户关联，请勿删除');
             }
             # leader 关联小区检测
-            $count_leader = Customer::where('community_id', $id)->count();
+            $count_leader = Customer::where('commid', $id)->count();
             if($count_leader >= 1) {
                 throw new \Exception('当前小区被团长关联，请勿删除');
             }
@@ -185,7 +185,7 @@ class CommunityController extends Controller
 
     /**
      * 用户关联小区
-     * @param community_id 关联的小区id
+     * @param commid 关联的小区id
      * @return \Illuminate\Http\JsonResponse
      */
     public function relateCommunity()

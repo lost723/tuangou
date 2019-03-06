@@ -20,7 +20,7 @@ class BusinessPromotionDetail extends Resource
             'title'     =>  $this->title,                   # 商品名
             'norm'      =>  $this->norm,                    # 商品规格
             'pic'       =>  $this->picture,                 # 商品图
-            'rate'      =>  ($this->rate * $this->price),   # 佣金
+            'rate'      =>  $this->rate,                    # 佣金
             'price'     =>  $this->price,                   # 活动价
             'quotation' =>  $this->quotation,               # 市场价
             'stock'     =>  $this->stock,

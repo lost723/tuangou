@@ -5,18 +5,13 @@ namespace App\Http\Controllers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Exceptions\RoadException;
-use App\Models\Customer\Community;
-use App\Http\Controllers\Common\WXLocationController;
-use App\Http\Resources\Customer\RoadResource;
+use App\Models\Common\Community;
 use App\Models\Common\Road;
+use App\Http\Controllers\Weixin\WXLocationController;
+use App\Http\Resources\Customer\RoadResource;
 
 class RoadController extends Controller
 {
-    public function __construct()
-    {
-        # todo 正式生产环境 需进行token校验
-        $this->middleware('auth', ['except' =>  ['index']]);
-    }
     /**
      * Display a listing of the resource.
      *

@@ -4,8 +4,8 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class OrderItem extends Resource
-{   # 子订单列表信息
+class SubOrder extends Resource
+{
     /**
      * Transform the resource into an array.
      *
@@ -26,6 +26,7 @@ class OrderItem extends Resource
             'num'           =>  $this->num,
             'norm'          =>  $this->norm,
             'total'         =>  $this->total,
+            'status'        =>  $this->status,
             'ordersn'       =>  $this->ordersn,
             'createtime'    =>  $this->createtime,
         ];

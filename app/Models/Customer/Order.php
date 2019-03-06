@@ -17,6 +17,59 @@ class Order extends BaseModel
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
 
 
+    # 查询订单
+    static function getOrder($request)
+    {
+        $id             = $request->post('id');
+        $trade_no       = $request->post('trade_no');
+        $transaction_id = $request->post('ransaction_id');
+        $status         = $request->post('status');
+        return DB::table('orders')
+            ->when($id, function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->when($trade_no, function ($query) use ($trade_no) {
+                $query->where('trade_no', $trade_no);
+            })
+            ->when($transaction_id, function ($query) use ($transaction_id) {
+                $query->where('transaction_id', $transaction_id);
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->first();
+    }
+
+    static function getUnpaidList($customerid)
+    {
+        return DB::table('orders')
+            ->where('orders.customerid', $customerid)
+//            ->where('createtime', '>', (time()-Order::TimeOut*60))
+            ->where('orders.status', Order::Unpaid)
+            ->select('*')
+            ->orderBy('createtime', 'DESC')
+            ->paginate(self::NPP);
+    }
+
+
+    # 待支付订单详情信息
+    static function getUnpaidOrderDetail($id)
+    {
+        return DB::table('order_promotions as om')
+            ->where('orders.id', $id)
+            ->where('orders.status', Order::Unpaid)
+            ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
+            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.lpmid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
+                'om.id as oid', 'om.num', 'om.total',
+                'lm.leaderid', 'pm.price',
+                'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
+            ->get()
+            ->groupBy('leaderid');
+    }
+
 
     # 检查订单是否超时
     static function checkOrder($id)
@@ -33,15 +86,15 @@ class Order extends BaseModel
         return DB::table('orders')->where('id', $id)
             ->first();
     }
-    # 通过订单号查询订单
-    static function findOrderByTradeNo(string $trade_no)
+
+
+    # 通过总订单查找订单详情列表
+    static function getSubPromotions($id)
     {
-        return DB::table('orders')
-            ->where('trade_no', $trade_no)
-            ->first();
+        return DB::table('order_promotions')
+            ->where('order_id', $id)
+            ->get();
     }
-
-
 
     # 生成订单
     static function createOrder($data)
@@ -56,57 +109,19 @@ class Order extends BaseModel
             ->where('id', $id)
             ->update($data);
     }
+
     # 取消订单
     static function cancelCasecadeOrder($id)
     {
-
         DB::table('orders')->where('id', $id)
             ->update(['status' => Order::Cancel]);
         DB::table('order_promotions')
             ->where('orderid', $id)
             ->update(['status' => OrderPromotion::Expire]);
-
-    }
-
-    # 通过总订单查找订单详情列表
-    static function getSubPromotions($id)
-    {
-        return DB::table('order_promotions')
-            ->where('order_id', $id)
-            ->get();
     }
 
 
-    # 待支付订单详情信息
-    static function getOrderDetail($id)
-    {
-        return DB::table('order_promotions as om')
-                ->where('orders.id', $id)
-                ->where('orders.status', Order::Unpaid)
-                ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
-                ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
-                ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
-                ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-                ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
-                    'om.id as oid', 'om.num', 'om.total',
-                    'lm.leaderid', 'pm.price',
-                    'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
-                ->get()
-                ->groupBy('leaderid');
-    }
 
-    # 商品订单详情
-    static function getOrderPromotionDetail($id)
-    {
-        return DB::table('order_promotions as om')
-            ->where('om.id', $id)
-            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.promotionid')
-            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
-            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('om.id', 'om.price', 'om.num', 'om.total', 'om.checkCode', 'om.status',
-                'pm.expire', 'pm.deliveryday', 'pm.aftersale', '')
-            ->first();
-    }
 
 
 

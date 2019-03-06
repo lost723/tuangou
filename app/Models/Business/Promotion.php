@@ -64,15 +64,17 @@ class Promotion extends BaseModel
         $resutl = DB::table('promotions as pm')
             ->where('expire', '>', time())
             ->where('pm.status',  self::Ordering)
+
             ->wherein('distid', function ($query) use ($commid) {
                 $query->select('distid')
                     ->from(with(new DistrictItem)->getTable())
                     ->where('commid', $commid);
             })
-            ->whereNotIn('pm.id', function ($query) use ($leaderid) {
-                $query->select('promotionid')
-                    ->from('leader_promotions')
-                    ->where('leaderid', $leaderid);
+            ->whereNotExists( function ($query) use ($leaderid) {
+                $query->select('lpm.promotionid')
+                    ->from('leader_promotions as lpm')
+                    ->where('lpm.leaderid', $leaderid)
+                    ->whereRaw('lpm.promotionid = pm.id');
             })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
