@@ -2,10 +2,12 @@
 
 namespace App\Http\Resources\Customer;
 
+use App\Models\Common\Leader;
+use App\Models\Customer\OrderPromotion;
 use Illuminate\Http\Resources\Json\Resource;
 
-class OrderItem extends Resource
-{   # 子订单列表信息
+class SubOrderDetail extends Resource
+{
     /**
      * Transform the resource into an array.
      *
@@ -14,6 +16,7 @@ class OrderItem extends Resource
      */
     public function toArray($request)
     {
+        $leader = OrderPromotion::getLeaderInfo($this->id);
         return [
             'id'            =>  $this->id, # 子订单id
             'orderid'       =>  $this->orderid,
@@ -26,8 +29,11 @@ class OrderItem extends Resource
             'num'           =>  $this->num,
             'norm'          =>  $this->norm,
             'total'         =>  $this->total,
+            'status'        =>  $this->status,
+            'checkcode'     =>  $this->checkcode,
             'ordersn'       =>  $this->ordersn,
             'createtime'    =>  $this->createtime,
+            'leader'        =>  new LeaderResource($leader),
         ];
     }
 }

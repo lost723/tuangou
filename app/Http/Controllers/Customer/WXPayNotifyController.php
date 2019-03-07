@@ -7,6 +7,7 @@ use App\Http\Controllers\Weixin\Wxpay\WxPayNotify;
 use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\Order;
 use App\Models\Customer\OrderPromotion;
+use Illuminate\Http\Request;
 
 
 class WXPayNotifyController extends WxPayNotify
@@ -26,7 +27,9 @@ class WXPayNotifyController extends WxPayNotify
        }
        $data = $objData->GetValues();
        # 更新订单数据 更新团长活动销量 更新商户活动销量
-       $order = Order::findOrderByTradeNo($data['out_trade_no']);
+       $request = new Request();
+       $request->offsetSet('trade_no', $data['out_trade_no']);
+       $order = Order::getOrder($request);
        if(!empty($order) && ($order['status'] == Order::Unpaid ) && ($data['total'] / 100 == $order['total'])) {
             $record = [];
             $record['transaction_id'] = $data['transaction_id'];

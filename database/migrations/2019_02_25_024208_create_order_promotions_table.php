@@ -17,12 +17,14 @@ class CreateOrderPromotionsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('customerid')->comment('消费者id');
             $table->unsignedInteger('orderid')->comment('订单id') ;
-            $table->unsignedInteger('promotionid')->comment('leader_promotions表的id');
+            $table->unsignedInteger('lpmid')->comment('leader_promotions表的id团长的活动id');
+            # 添加商户发布的id 方便核销
+            $table->unsignedBigInteger('promotionid')->comment('商家发布的活动id');
             $table->string('ordersn')->comment('当前活动的订单号');
             $table->unsignedInteger('num')->comment('购买数量');
             $table->decimal('price',8,2)->comment('购买时活动单价');
             $table->decimal('total',8,2)->comment('总价格');
-            $table->string('checkCode')->comment('核销码');
+            $table->string('checkcode')->default('')->comment('核销码');
 //            $table->string('checkUrl')->comment('核销url');
             $table->tinyInteger('status')->comment('订单状态 0:超时异常 1:未支付 2:已退款 3:已支付待收货 4:订单完成');
             $table->string('note')->comment('订单备注');

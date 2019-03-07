@@ -8,14 +8,7 @@ use Illuminate\Http\Request;
 class QiNiuUploadController extends Controller
 {
     # 七牛云图片存储
-
     private $allowedImgExt = ['jpg', 'png', 'jpeg', 'bmp'];
-
-    public function __construct()
-    {
-        # todo 生产环境 需添加验证
-        $this->middleware('auth', ['except' => ['uploadPublicImg', 'uploadPrivateImg']]);
-    }
 
     /**
      * 从数据库中解析相应json字符串 如果为私有存储并生成临时访问路径

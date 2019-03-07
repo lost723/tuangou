@@ -40,7 +40,7 @@ class Promotions extends Resource
                 'picture'   =>  $this->picture,
             ],
             "cate"      =>  [
-                'id'        =>  $this->cid,
+                'id'        =>  $this->catid,
                 'title'     =>  $this->ctitle,
                 'parentid'  =>  $this->parentid,
                 'level'     =>  $this->level,
