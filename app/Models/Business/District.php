@@ -4,8 +4,9 @@ namespace App\Models\Business;
 
 use App\Models\BaseModel;
 use App\Models\Common\Community;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Qiniu\Auth;
+
 
 class District extends BaseModel
 {
