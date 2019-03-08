@@ -23,6 +23,7 @@ class CreateLeaderPromotionsTable extends Migration
             $table->string('check')->default('')->comment('核销码');
             $table->string('status')->default(1)->comment('0:异常结束 1:进行中 2:配送中 3:已签收');
             $table->string('note')->default('')->comment('订单异常备注');
+            $table->unsignedBigInteger('checktime')->default(0)->comment('验收时间');
             $table->timestamps();
         });
     }

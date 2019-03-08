@@ -38,7 +38,12 @@ class CustomerController extends Controller
     {
         try{
             $id = $request->post('id');
-            return new PromotionDetail(Promotion::getPromotion($id));
+            $promotion = Promotion::getPromotion($id);
+            if($promotion) {
+                return new PromotionDetail($promotion);
+            }
+            return $this->ok(['data'=>[]]);
+
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

@@ -3,6 +3,7 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
+use App\Models\Customer\LeaderPromotion;
 use App\Models\LeaderOrder;
 use function foo\func;
 use http\Env\Request;
@@ -58,9 +59,11 @@ class Promotion extends BaseModel
      * @param $leaderid 团长id
      * @return mixed
      */
-    static function getLeaderChoiceList($commid, $leaderid)
+    static function getLeaderChoiceList($commid, $request)
     {
         # todo 把团长已经挑选的，剔除掉
+        $leaderid = $request->get('leaderid');
+        $filter   = $request->get('filter');
         $resutl = DB::table('promotions as pm')
             ->where('expire', '>', time())
             ->where('pm.status',  self::Ordering)
@@ -70,10 +73,17 @@ class Promotion extends BaseModel
                     ->from(with(new DistrictItem)->getTable())
                     ->where('commid', $commid);
             })
+            ->when($filter, function ($query) use ($filter) {
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orwhere('pd.title', 'like', "%$filter%");
+                    $qr->orwhere('bs.title', 'like', "%$filter%");
+                });
+            })
             ->whereNotExists( function ($query) use ($leaderid) {
                 $query->select('lpm.promotionid')
                     ->from('leader_promotions as lpm')
                     ->where('lpm.leaderid', $leaderid)
+                    ->where('lpm.status', LeaderPromotion::Odering)
                     ->whereRaw('lpm.promotionid = pm.id');
             })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class QiNiuUploadController extends Controller
 {
@@ -20,12 +21,12 @@ class QiNiuUploadController extends Controller
         if(!empty($jsonString)) {
             $result = json_decode($jsonString);
             if('private' == $result['access']) {
-                $disk = \Storage::disk('qiniu_private');
-                if(!empty($result['savePath'])) {
-                    $result['access_url'] = $disk->$disk->downloadUrl($result['savePath']);
-                }
+                $disk = Storage::disk('qiniu_private');
             }
-            return $result['access_url'];
+            else {
+                $disk = Storage::disk('qiniu_public');
+            }
+            return $disk->downloadUrl($result['savePath']);
         }
         return "";
     }

@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Weixin\WXLoginController;
-use App\Http\Resources\CustomerResource;
+use App\Http\Resources\Customer\CustomerResource;
 use App\Models\Auth\Customer;
 use App\Http\Controllers\Controller;
-use App\Models\Community;
+use EasyWeChat\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class CustomerController extends Controller
 {
-    protected  $wxLogin;
+    public  $miniprogram;
+    protected $config;
     public function __construct()
     {
-        $this->wxLogin = new WXLoginController;
+        $this->config = config('wechat.mini_program.default');
+        $this->miniprogram = Factory::miniProgram($this->config);
         $this->middleware('auth', ['except' => ['login', 'register', ]]);
     }
 
@@ -29,20 +31,21 @@ class CustomerController extends Controller
             $request->validate([
                 'code'  =>  'string|required'
             ]);
-            $customer = $this->wxLogin->code2SessionKey($request->get('code'));
-            if(empty($customer)) {
+            $sessionArr = $this->miniprogram->auth->session($request->get('code'));
+            if(!array_key_exists('openid', $sessionArr)) {
                 throw new \Exception('code 已过期');
             }
             # 检测用户是否已注册
-            $result = Customer::where(['openid' => $customer['openid']])->first();
+            $result = Customer::where(['openid' => $sessionArr['openid']])->first();
             if(!empty($result)) {
                 $token = auth()->login($result);
                 return $this->respondWithToken($token);
             }
             else {
+                Redis::setex('openid:'.$sessionArr['openid'].':sessionKey', 7200, $sessionArr['session_key']);
                 # 用户未注册
                 $message = [
-                    'openid'    =>  $customer['openid'],
+                    'openid'    =>  $sessionArr['openid'],
                     'message'   =>  '用户未注册'
                 ];
                 return $this->ok($message);
@@ -60,27 +63,25 @@ class CustomerController extends Controller
      */
     public function register(Request $request)
     {
-
-        $request->validate([
-            'iv'            =>  'string|required',
-            'openid'        =>  'string|required|max:32',
-            'encryptedData' =>  'string|required'
-        ]);
-
         try {
-            # 注册用户信息
-            $data = $this->wxLogin->ParseUserinfo($request->all());
-            $this->created($data);
+            $request->validate([
+                'iv'            =>  'string|required',
+                'openid'        =>  'string|required|max:32',
+                'encryptedData' =>  'string|required'
+            ]);
+            $all = $request->all();
+            $session = Redis::get('openid:'.$all['openid'].':sessionKey');
+            $data = $this->miniprogram->encryptor->decryptData($session, $all['iv'], $all['encryptedData']);
+            $customer = $this->create($data);
             # 自动登录
-            $customer = Customer::where('openid',$request->query('openid'))->first();
             if(empty($customer)) {
                 throw new \Exception('用户注册失败!');
             }
             $token = auth()->login($customer);
             return $this->respondWithToken($token);
         }
-        catch (\Exception $e) {
-            return $this->warning('用户注册失败!');
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
         }
     }
 
@@ -139,10 +140,12 @@ class CustomerController extends Controller
     {
         return Customer::firstOrCreate(
             [
-                'openid' => $userinfo['openId']
-            ],
+                'openid' => $userinfo['openId'],
+
+            ]
+            ,
             [
-                'unionid'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
+//                'unionid'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
                 'avatar'   => $userinfo['avatarUrl'],
                 'nickname' => $userinfo['nickName'],
                 'country'  => $userinfo['country'],

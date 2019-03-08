@@ -22,6 +22,7 @@ class PromotionDetail extends Resource
                 'price'     =>  $this->price,
                 'expire'    =>  $this->expire,
                 'stock'     =>  $this->stock,
+                'status'    =>  $this->status,
             ],
             "bussiness" =>  $this->btitle,
             "leader"    =>  [

@@ -28,10 +28,12 @@ class Road extends BaseModel
                 $query->where('id', $id);
             })
             ->when($filter, function ($query) use ($filter) {
-                $query->orWhere('name', 'like',  "%$filter%");
-                $query->orWhere('province', 'like',  "%$filter%");
-                $query->orWhere('city', 'like',  "%$filter%");
-                $query->orWhere('district', 'like',  "%$filter%");
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orWhere('name', 'like',  "%$filter%");
+                    $qr->orWhere('province', 'like',  "%$filter%");
+                    $qr->orWhere('city', 'like',  "%$filter%");
+                    $qr->orWhere('district', 'like',  "%$filter%");
+                });
             })
             ->orderBy('abbr', 'ASC')
             ->paginate(self::NPP);

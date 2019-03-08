@@ -10,6 +10,7 @@ use App\Http\Resources\Customer\SubOrder;
 use App\Http\Resources\Customer\SubOrderDetail;
 use App\Models\Auth\Customer;
 use App\Models\Common\Leader;
+use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
 use App\Models\Customer\Order;
@@ -28,7 +29,7 @@ class OrderController extends Controller
     # todo 未设置库存处理
     # 消费者用户 订单相关接口处理
 
-    # 订单超时检测 并更新订单状态
+    # todo 订单超时检测 并更新订单状态
     public function checkOrderTimeout()
     {
 
@@ -149,11 +150,6 @@ class OrderController extends Controller
 
 
 
-
-
-
-
-
     # 待支付订单
     public function listOrder()
     {
@@ -167,7 +163,7 @@ class OrderController extends Controller
     }
 
     /**
-     * 支付订单详情
+     * 未支付订单详情
      * @param $id  支付订单id
      * @return \Illuminate\Http\JsonResponse
      */
@@ -175,22 +171,31 @@ class OrderController extends Controller
     {
         try{
             $id = $request->post('id');
+            $order = Order::getOrder($request);
             $data = Order::getUnpaidOrderDetail($id);
-            $first = $data->first()->first();
-            $result = [];
-            # 数据整理
-            $result['total']  = $first->ttotal;
-            $result['paytime']  = $first->paytime;
-            $result['status']  = $first->status;
-            $result['trade_no']  = $first->trade_no;
-            $result['orders'] = [];
-            $orders = [];
-            foreach($data as $key =>  $val) {
-                $leader = Leader::find($key);
-                $orders['leader'] = json_decode(json_encode(new LeaderResource($leader)));
-                $orders['items'] = json_decode(json_encode(OrderItem::collection($val)),true);
-                array_push($result['orders'], $orders);
-                unset($orders);
+            $count = $data->count();
+            $data = $data->groupBy('leaderid');
+            $result['id'] = $order->id;
+            $result['createtime'] = $order->createtime;
+            $result['total'] = $order->total;
+            $result['trade_no'] = $order->trade_no;
+            $result['count'] = $count;
+            $result['status'] = $order->status;
+            $result['order'] = [];
+            foreach ($data as $key => $val) {
+                $tmp = [];
+                foreach ($val as $k => $v) {
+                    if(!array_key_exists('leader', $tmp)) {
+                        $tmp['leader'] = [];
+                        $leader = new LeaderResource(Leader::find($v->leaderid));
+                        array_push($tmp['leader'], $leader);
+                    }
+                    if(!array_key_exists('items', $tmp)) {
+                        $tmp['items'] = [];
+                    }
+                    array_push($tmp['items'], new OrderItem($v));
+                }
+                array_push($result['order'], $tmp);
             }
             return $this->ok(['data'=>$result]);
         }

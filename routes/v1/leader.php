@@ -10,22 +10,26 @@ Route::post('leader/register', 'Common\LeaderController@register');
 Route::resource('leader', 'Common\LeaderController');
 
 
-
-
 # 团长活动
 Route::get('leader/promotion/ownlist', 'Customer\LeaderPromotionController@getOwnPromotions');
 Route::get('leader/promotion/choicelist', 'Customer\LeaderPromotionController@getChoicePromotions');
-Route::get('leader/promotion/detail', 'Customer\LeaderPromotionController@getPromotiondetail');
+Route::get('leader/promotion/detail', 'Customer\LeaderPromotionController@getPromotionDetail');
+Route::get('leader/promotion/owndetail', 'Customer\LeaderPromotionController@getLeaderPromDetail');
 Route::post('leader/promotion/add', 'Customer\LeaderPromotionController@addPromotions');
+Route::post('leader/promotion/cancel', 'Customer\LeaderPromotionController@cancelPromotions');
 
 
 
-# 团长签收记录(记录列表/单个记录详情)
-#Route::get('leader/promotion/records', 'Customer\LeaderPromotionController@getReceivedPromotions');
-#Route::get('leader/promotion/records/detail', 'Customer\LeaderPromotionController@getReceivedPromotions');
-# 团长活动相关路由
-//Route::resource('leader/promotion', 'Customer\LeaderPromotionController');
+# 团长验收
+Route::get('leader/promotion/check/list', 'Customer\LeaderPromotionController@getCheckList');
+Route::get('leader/promotion/check/detail', 'Customer\LeaderPromotionController@getcheckDetail');
+Route::post('leader/promotion/check', 'Customer\LeaderPromotionController@doCheck');
 
+
+# 团长核销
+Route::get('leader/promotion/verify/list', 'Customer\LeaderPromotionController@getVerifyList');
+Route::get('leader/promotion/verify/detail', 'Customer\LeaderPromotionController@getVerifyDetail');
+Route::post('leader/promotion/verify', 'Customer\LeaderPromotionController@doVerify');
 
 
 

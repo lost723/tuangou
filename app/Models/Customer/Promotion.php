@@ -4,13 +4,13 @@ namespace App\Models\Customer;
 
 use App\Models\BaseModel;
 use App\Models\Business\Product;
+use App\Models\Common\Leader;
 use App\Models\Business\Promotion as BPromotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class Promotion extends BaseModel
 {
-    const SKIP = 8;
 
     # 获取用户所选小区内所有团长的商品列表
     static function getPromotions(Request $request)
@@ -25,6 +25,7 @@ class Promotion extends BaseModel
                     ->where('commid',$commid);
             })
             ->where('ld.status', Leader::NORMAL)
+            ->where('lm.status', LeaderPromotion::Odering)
             ->where('pm.status', BPromotion::Ordering)
             ->where('pm.expire', '>', time())
             ->when($catid, function ($query) use ($catid) {
@@ -48,6 +49,7 @@ class Promotion extends BaseModel
     {
         return DB::table('leader_promotions as lm')
             ->where('lm.id', $id)
+//            ->where('lm.status', LeaderPromotion::Odering)
             ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('categories as cg', 'cg.id', '=', 'pd.catid')

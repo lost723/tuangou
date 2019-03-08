@@ -74,6 +74,25 @@ class OrderPromotion extends BaseModel
                 ->first();
     }
 
+    # 获取子订单信息
+    static function getOrderPromotion($request)
+    {
+        $id = $request->post('id');
+        $checkcode = $request->post('checkcode');
+        $status = $request->post('status');
+        return DB::table('order_promotions as om')
+            ->when($id, function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($checkcode, function ($query) use ($checkcode) {
+                $query->where('checkcode', $checkcode);
+            })
+            ->first();
+    }
+
     static function findOrderById($id)
     {
         return DB::table('order_promotions')->find($id);
@@ -101,8 +120,8 @@ class OrderPromotion extends BaseModel
     static function getLeaderInfo($id)
     {
         return DB::table('leaders')
-            ->leftjoin('leader_promotions as lm', 'lm.leaderid', '=', 'leaders.id')
-            ->leftjoin('order_promotions as om', 'om.lpmid', '=', 'lm.id')
+            ->leftjoin('leader_promotions as lpm', 'lpm.leaderid', '=', 'leaders.id')
+            ->leftjoin('order_promotions as om', 'om.lpmid', '=', 'lpm.id')
             ->where('om.id', $id)
             ->select('leaders.*')
             ->first();

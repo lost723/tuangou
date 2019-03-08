@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use EasyWeChat\Factory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Weixin\Wxpay\WxPayApi;
@@ -12,6 +13,19 @@ use App\Http\Controllers\Weixin\WXPayController;
 
 class PaymentController extends Controller
 {
+    public $payment;
+    public $config;
+    public function __construct()
+    {
+        $this->config = config('wechat.payment.default');
+        $this->payment = Factory::payment($this->config);
+    }
+
+    # 支付订单
+    public function Pay()
+    {
+        # todo 添加 profit_sharing  字段 值'Y'
+    }
 
     #  支付订单 生成预支付参数
     public function payOrder($id)

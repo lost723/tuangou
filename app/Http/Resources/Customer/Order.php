@@ -6,7 +6,7 @@ use App\Models\Customer\OrderPromotion;
 use Illuminate\Http\Resources\Json\Resource;
 
 class Order extends Resource
-{   # 主订单列表信息
+{   # 未支付订单列表信息
     /**
      * Transform the resource into an array.
      *

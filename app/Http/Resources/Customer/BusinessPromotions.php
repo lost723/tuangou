@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
-
+use App\Models\Business\Business;
 class BusinessPromotions extends Resource
 {
     /**
@@ -25,7 +25,7 @@ class BusinessPromotions extends Resource
             'stock'     =>  $this->stock,
             'sales'     =>  $this->sales,
             'expire'    =>  $this->expire,                  # 商品过期时间
-            'bussiness' =>  new Business(\App\Models\Business\Business::find($this->orgid)),
+            'bussiness' =>  new Business(Business::find($this->orgid)),
         ];
     }
 }

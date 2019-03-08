@@ -16,9 +16,7 @@ class OrderItem extends Resource
     {
         return [
             'id'            =>  $this->id, # 子订单id
-            'orderid'       =>  $this->orderid,
             'lpmid'         =>  $this->lpmid,
-            'promotionid'   =>  $this->promotionid,
             'title'         =>  $this->title,
             'picture'       =>  $this->picture,
             'price'         =>  $this->price,
@@ -27,7 +25,7 @@ class OrderItem extends Resource
             'norm'          =>  $this->norm,
             'total'         =>  $this->total,
             'ordersn'       =>  $this->ordersn,
-            'createtime'    =>  $this->createtime,
+            'status'         =>  $this->status,
         ];
     }
 }

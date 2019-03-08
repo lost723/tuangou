@@ -57,17 +57,14 @@ class Order extends BaseModel
     {
         return DB::table('order_promotions as om')
             ->where('orders.id', $id)
-            ->where('orders.status', Order::Unpaid)
             ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
-            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.lpmid')
-            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->leftjoin('leader_promotions as lpm', 'lpm.id', '=', 'om.lpmid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
-                'om.id as oid', 'om.num', 'om.total',
-                'lm.leaderid', 'pm.price',
+            ->select('om.id', 'om.lpmid', 'om.promotionid', 'om.price', 'om.num', 'om.total', 'om.ordersn', 'om.status',
+                'lpm.leaderid',
                 'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
-            ->get()
-            ->groupBy('leaderid');
+            ->get();
     }
 
 

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Customer extends Authenticatable implements JWTSubject
 {
     use Notifiable;
-    protected $fillable = ['openId', 'unionId', 'nickName', 'mobile',
+    protected $fillable = ['email', 'password', 'openid', 'unionid', 'nickname', 'mobile',
         'commid', 'avatar', 'country', 'province', 'city', 'gender'];
 
     public function leader()

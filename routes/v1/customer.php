@@ -21,7 +21,8 @@ Route::post('customer/promotions/record', 'Customer\CustomerController@record');
 
 # 订单相关路由
 Route::post('customer/order/add','Customer\OrderController@createOrder');
-Route::post('customer/order/pay', 'Customer\OrderController@payOrder');
+Route::post('customer/order/pay', 'Customer\PaymentController@Pay');
+Route::post('customer/order/refund', 'Customer\RefundController@Refund');
 Route::post('customer/order/cancel', 'Customer\OrderController@cancelOrder');
 
 # 订单列表 详情
