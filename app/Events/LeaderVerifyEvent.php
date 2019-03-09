@@ -13,7 +13,6 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class LeaderVerifyEvent extends Event
 {   # 团长核销事件
 
-
     public $obj;
     /**
      * Create a new event instance.

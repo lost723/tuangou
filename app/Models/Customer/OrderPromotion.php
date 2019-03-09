@@ -135,5 +135,13 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
+    # 通过总订单id 查询 所有子订单
+    static function getOrderPromotionsByOrderid($id)
+    {
+        return DB::table('order_promotions as om')
+            ->where('orderid',$id)
+            ->get();
+    }
+
 
 }

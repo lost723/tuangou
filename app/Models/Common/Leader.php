@@ -12,7 +12,7 @@ class Leader extends BaseModel
     const CREATE = 2;  # 审核中
     const NORMAL = 3;  # 正常
 
-    protected $fillable = ['customerid', 'commid', 'name', 'mobile', 'idcard', 'idcard_front_url',
+    protected $fillable = ['customerid', 'commid', 'leaderno', 'name', 'mobile', 'idcard', 'idcard_front_url',
         'idcard_back_url', 'address', 'commission', 'status'];
 
 

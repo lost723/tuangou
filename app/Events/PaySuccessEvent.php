@@ -12,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class PaySuccessEvent extends Event
 {
+    # 用户支付成功事件
     public $id;
     /**
      * Create a new event instance.

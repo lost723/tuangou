@@ -40,6 +40,7 @@ class Order extends BaseModel
             ->first();
     }
 
+    # 获取待支付订单列表
     static function getUnpaidList($customerid)
     {
         return DB::table('orders')
@@ -89,7 +90,7 @@ class Order extends BaseModel
     static function getSubPromotions($id)
     {
         return DB::table('order_promotions')
-            ->where('order_id', $id)
+            ->where('orderid', $id)
             ->get();
     }
 

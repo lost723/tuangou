@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class RefundSuccessEvent extends Event
 {
-
+    # 某活动商品退款成功
     /**
      * Create a new event instance.
      *
