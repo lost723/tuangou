@@ -90,8 +90,11 @@ class CustomerController extends Controller
      * @return CustomerResource
      */
     public function me()
-    {
-        return new CustomerResource(auth()->user());
+    {   # todo test interface
+        $user = Customer::find(1);
+//        return new CustomerResource(auth()->user());
+        return $this->ok(new CustomerResource($user));
+//                return  new CustomerResource($user);
     }
 
     /**
@@ -141,7 +144,6 @@ class CustomerController extends Controller
         return Customer::firstOrCreate(
             [
                 'openid' => $userinfo['openId'],
-
             ]
             ,
             [

@@ -14,6 +14,7 @@ trait Reporter
         return response()->json($result, 200);
     }
 
+
     /**
      *
      * @param null $message
@@ -86,5 +87,8 @@ trait Reporter
     {
         return response()->json(['message' => $message], $code);
     }
+
+
+//    protected function data
 
 }

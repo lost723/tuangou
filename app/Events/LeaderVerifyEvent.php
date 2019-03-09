@@ -13,16 +13,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class LeaderVerifyEvent extends Event
 {   # 团长核销事件
 
-    public $obj;
+    public $id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($obj)
+    public function __construct($id)
     {
         $this->action = 'LeaderVerify';
-        $this->obj = $obj;
+        $this->id = $id;
     }
 
     /**

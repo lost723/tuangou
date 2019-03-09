@@ -147,7 +147,7 @@ class LeaderPromotionController extends Controller
     /**
      * 待验收列表
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function getCheckList(Request $request)
     {
@@ -239,7 +239,7 @@ class LeaderPromotionController extends Controller
              $order->save(['status' => OrderPromotion::Finished]);
              DB::commit();
              # todo 触发核销事件
-             event(new LeaderVerifyEvent($order));
+             event(new LeaderVerifyEvent($order->id));
              return $this->ok();
          }
          catch (\Exception $exception) {

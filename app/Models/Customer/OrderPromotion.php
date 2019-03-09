@@ -57,7 +57,7 @@ class OrderPromotion extends BaseModel
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
             ->select('om.id', 'om.orderid', 'om.lpmid', 'om.promotionid', 'om.num', 'om.ordersn', 'om.price',
                 'om.total', 'om.status', 'om.checkcode',
-                'orders.createtime',
+                'orders.transaction_id', 'orders.createtime',
                 'pd.title', 'pd.norm', 'pd.picture', 'pd.quotation')
             ->first();
     }

@@ -39,7 +39,7 @@ class LeaderPromotion extends BaseModel
         $id = $request->get('id');
         return DB::table('leader_promotions as lpm')
             ->where('lpm.id', $id)
-            ->whereIn('lpm.status', [2,3])
+//            ->whereIn('lpm.status', [2,3])
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('lpm.*',
