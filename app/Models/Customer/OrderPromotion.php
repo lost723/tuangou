@@ -4,6 +4,7 @@ namespace App\Models\Customer;
 
 use App\Models\BaseModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Business\Promotion as BusinessPromotion;
 
 class OrderPromotion extends BaseModel
 {
@@ -11,10 +12,12 @@ class OrderPromotion extends BaseModel
     const Expire = 0; # 订单超时异常 或 取消
     const Unpaid = 1; # 未支付
     const Refunding = 2; # 退款中
-    const Refund = 3; # 已退款
-    const UnReceived = 4; # 已支付未发货
-    const Dispatched = 5; # 已发货
-    const Finished = 6; # 已完成
+    const Refund = 3; # 退款成功
+    const CHANGE = 4; # 退款异常
+    const REFUNDCLOSE = 5; # 退款关闭
+    const UnReceived = 6; # 已支付未发货
+    const Dispatched = 7; # 已发货
+    const Finished = 8; # 已完成
 
     protected $fillable = ['customerid', 'orderid', 'lpmid', 'promotionid', 'ordersn', 'num', 'price', 'total',
         'checkcode', 'status', 'note'];
@@ -60,17 +63,18 @@ class OrderPromotion extends BaseModel
     }
 
 
-    # 查询订单状态且 该活动未结束 *
-    static function checkOrderPromotions($id)
+    # 查询订单状态 是否可退款 *
+    static function checkOrderPromotionsEnableRefund($id)
     {
         return DB::table('order_promotions as om')
                 ->where('om.id', $id)
-//                ->where('om.status', OrderPromotion::Finished)
-                ->leftjoin('leader_promotions as lpm', 'lpm.id', '=', 'om.lpmid')
-                ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
+                ->where('om.status', OrderPromotion::Finished)
+                ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+                ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
                 ->where('pm.expire', '>', time())
-                ->where('pm.status', '=', \App\Models\Business\Promotion::Ordering)
-                ->select('*')
+                ->where('pm.status', '=', BusinessPromotion::Ordering)
+                ->select('om.*',
+                    'orders.trade_no', 'orders.transaction_id', 'orders.total as ototal')
                 ->first();
     }
 
@@ -79,10 +83,14 @@ class OrderPromotion extends BaseModel
     {
         $id = $request->post('id');
         $checkcode = $request->post('checkcode');
+        $ordersn = $request->post('ordersn');
         $status = $request->post('status');
         return DB::table('order_promotions as om')
             ->when($id, function ($query) use ($id) {
                 $query->where('id', $id);
+            })
+            ->when($ordersn, function ($query) use ($ordersn) {
+                $query->where('ordersn', $ordersn);
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);

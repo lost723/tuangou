@@ -14,7 +14,7 @@ class Order extends BaseModel
     const Finished = 2; # 已支付
     const TimeOut = 15;
 
-    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
+    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 
 
     # 查询订单

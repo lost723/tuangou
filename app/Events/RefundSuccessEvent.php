@@ -10,10 +10,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class Event
+class RefundSuccessEvent extends Event
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $action;
+
     /**
      * Create a new event instance.
      *
@@ -21,7 +20,7 @@ class Event
      */
     public function __construct()
     {
-        $this->action = "event";
+        $this->action = 'RefundSuccess';
     }
 
     /**

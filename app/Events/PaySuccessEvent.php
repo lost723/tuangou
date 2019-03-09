@@ -10,18 +10,18 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class Event
+class PaySuccessEvent extends Event
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $action;
+    public $id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($id)
     {
-        $this->action = "event";
+        $this->action = 'PaySuccess';
+        $this->id = $id;
     }
 
     /**

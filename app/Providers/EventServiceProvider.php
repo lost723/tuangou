@@ -19,6 +19,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\LeaderVerifyEvent' => [
             'App\Listeners\ProfitShareListener',
         ],
+        'App\Events\PaySuccessEvent' => [
+            'App\Listeners\UpdateSalesListener'
+        ],
     ];
 
     /**

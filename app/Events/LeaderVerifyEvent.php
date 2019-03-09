@@ -10,9 +10,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class LeaderVerifyEvent
+class LeaderVerifyEvent extends Event
 {   # 团长核销事件
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+
 
     public $obj;
     /**
@@ -22,6 +22,7 @@ class LeaderVerifyEvent
      */
     public function __construct($obj)
     {
+        $this->action = 'LeaderVerify';
         $this->obj = $obj;
     }
 

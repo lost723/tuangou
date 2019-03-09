@@ -94,8 +94,8 @@ return [
      */
      'mini_program' => [
          'default' => [
-             'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wxea3046e782289b03'),
-             'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', '06e3de7d51d59cab60dcaaf6ea406e1e'),
+             'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wxae22a8c2d9459196'),
+             'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', '4018e1c8aed338cd5548e9d88ae770ee'),
              'token'   => env('WECHAT_MINI_PROGRAM_TOKEN', ''),
              'aes_key' => env('WECHAT_MINI_PROGRAM_AES_KEY', ''),
          ],
@@ -104,20 +104,21 @@ return [
     /*
      * 微信支付
      */
-    // 'payment' => [
-    //     'default' => [
+     'payment' => [
+         'default' => [
     //         'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
-    //         'app_id'             => env('WECHAT_PAYMENT_APPID', ''),
-                'sub_mch_id'        => env('WECHAT_PAYMENT_SUB_MCH_ID', ''),
-                'sub_appid'        => env('WECHAT_PAYMENT_SUB_APPID', ''),
-    //         'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', 'your-mch-id'),
-    //         'key'                => env('WECHAT_PAYMENT_KEY', 'key-for-signature'),
-    //         'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
-    //         'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
-    //         'notify_url'         => 'http://example.com/payments/wechat-notify',                           // 默认支付结果通知地址
-    //     ],
-    //     // ...
-    // ],
+                 'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx8bc33962b0a8ecef'),
+                 'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
+                 'sub_appid'          => env('WECHAT_PAYMENT_SUB_APPID', 'wxae22a8c2d9459196'),
+                 'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1510350531'),
+
+                 'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
+                 'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
+                 'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
+                 'notify_url'         => 'http://tg.hlbapp.com/payments/wechat-notify',                           // 默认支付结果通知地址
+         ],
+
+     ],
 
     /*
      * 企业微信

@@ -2,73 +2,92 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Events\PaySuccessEvent;
+use App\Models\Customer\Order;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Weixin\Wxpay\WxPayApi;
-use App\Http\Controllers\Weixin\Wxpay\WxPayRefund;
-use App\Http\Controllers\Weixin\Wxpay\WxPayUnifiedOrder;
-use App\Http\Controllers\Weixin\WXPayConfigController;
-use App\Http\Controllers\Weixin\WXPayController;
+use App\Http\Controllers\BasePaymentController;
+use Illuminate\Support\Facades\DB;
 
-class PaymentController extends Controller
+
+class PaymentController extends BasePaymentController
 {
-    public $payment;
-    public $config;
     public function __construct()
     {
-        $this->config = config('wechat.payment.default');
-        $this->payment = Factory::payment($this->config);
+        parent::__construct();
+        $this->middleware('auth', ['except' =>  ['notify']]);
+    }
+
+    # 检测订单是否超时
+    # 超时更新订单状态
+    public function checkTimeOut($id)
+    {
+        if(!($order = Order::checkOrder($id))) {
+            try{
+                DB::beginTransaction();
+                Order::cancelCasecadeOrder($id); # 更新订单状态
+                DB::commit();
+            }
+            catch (\Exception $exception) {
+                DB::rollback();
+                return $this->warning($exception->getMessage());
+            }
+            throw new \Exception('订单不存在或已超时！');
+        }
+        return $order;
     }
 
     # 支付订单
-    public function Pay()
+    # todo 添加 profit_sharing  字段 值'Y'
+    public function Pay(Request $request)
     {
-        # todo 添加 profit_sharing  字段 值'Y'
-    }
-
-    #  支付订单 生成预支付参数
-    public function payOrder($id)
-    {
-        # 检查订单是否异常超时
-        # 超时更新订单状态
         try{
-            if(!($order = Order::checkOrder($id))) {
-                try{
-                    DB::beginTransaction();
-                    Order::cancelCasecadeOrder($id); # 更新订单状态
-                    DB::commit();
-                }
-                catch (\Exception $exception) {
-                    DB::rollback();
-                    return $this->warning($exception->getMessage());
-                }
-                throw new \Exception('订单不存在或已超时！');
+            $id = $request->post('id');
+            $order = $this->checkTimeOut($id);
+            $customer = auth()->user();
+            $data = [];
+            $data['body']               = '团购';
+            $data['out_trade_no']       = $order['trade_no'];
+            $data['total_fee']          = $order['total']*100;
+            $data['sub_openid']         = $customer->openid;
+            $data['trade_type']         = 'JSAPI';
+            $data['profit_sharing']     = 'Y';
+            $result = $this->payment->order->unify($data);
+            if($result['result_code'] <> 'SUCCESS') {
+                throw new \Exception('支付发起失败');
             }
-            $parameters = $this->prePayOrder($order);
-            $this->ok($parameters);
+            return $this->ok($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
     }
 
-    # 准备支付参数
-    public function prePayOrder($order)
-    {   # todo customer 授权默认用户
-//        $customer = auth()->user();
-        $customer = Customer::find(1);
-        # 启动微信支付 所需参数
-        $jspay  = new WXPayController();
-        $config = new WXPayConfigController(); # 支付配置参数
-        $input  = new WxPayUnifiedOrder(); #  支付统一下单实例
-        $input->SetBody($order['trade_no']);
-        $input->SetOut_trade_no($order['trade_no']);
-        $input->SetTotal_fee(($order['total']*100));
-        $input->SetTrade_type("JSAPI");
-        $input->SetOpenid($customer['openid']);
-        $wxorder = WxPayApi::unifiedOrder($config, $input); # 执行统一下单
-        $parameters = $jspay->GetJsApiParameters($wxorder);
-        return $parameters;
+    public function notify(Request $request)
+    {   # 支付成功
+        $response  = $this->payment->handlePaidNotify(function ($message, $fail) use ($request) {
+            if ($message['return_code'] === 'SUCCESS') {
+                $request->offsetSet('trade_no', $message['out_trade_no']);
+                $order = Order::getOrder($request);
+                # 订单已支付
+                if(!$order || $order->status == Order::Finished) {
+                    return true;
+                }
+                if (array_get($message, 'result_code') === 'SUCCESS') {
+                    $order->paytime = time(); // 更新支付时间为当前时间
+                    $order->transaction_id = $message['transaction_id'];
+                    $order->status = Order::Finished;
+                } elseif (array_get($message, 'result_code') === 'FAIL') {
+                    $order->status = Order::Cancel;
+                    $order->note   = '订单支付失败';
+                }
+            } else {
+                return $fail('通信失败，请稍后再通知我');
+            }
+            $order->save();
+            event(new PaySuccessEvent($order->id));
+            return true;
+        });
+        return $response;
     }
 }
