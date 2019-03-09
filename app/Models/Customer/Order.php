@@ -100,13 +100,13 @@ class Order extends BaseModel
         return DB::table('orders')->insertGetId($data);
     }
 
-    # 更新订单信息
-    static function updateOrder($data, $id)
-    {
-        return DB::table('orders')
-            ->where('id', $id)
-            ->update($data);
-    }
+//    # 更新订单信息
+//    static function updateOrder($data, $id)
+//    {
+//        return DB::table('orders')
+//            ->where('id', $id)
+//            ->update($data);
+//    }
 
     # 取消订单
     static function cancelCasecadeOrder($id)

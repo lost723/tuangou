@@ -157,7 +157,7 @@ class RoadController extends Controller
     {
         try {
             # 获取当前城市
-            $location = WXLocationController::getLocation();
+            $location = $this->getLocation();
             if(empty($location)) {
                 throw new \Exception('暂时无法获取当前位置信息');
             }

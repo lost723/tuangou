@@ -64,6 +64,7 @@ class OrderPromotion extends BaseModel
 
 
     # 查询订单状态 是否可退款 *
+    # 只有已支付状态 且 活动未结束
     static function checkOrderPromotionsEnableRefund($id)
     {
         return DB::table('order_promotions as om')
@@ -101,11 +102,11 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
-    static function findOrderById($id)
-    {
-        return DB::table('order_promotions')->find($id);
-
-    }
+//    static function findOrderById($id)
+//    {
+//        return DB::table('order_promotions')->find($id);
+//
+//    }
 
     # 创建 批量订单 *
     static function createOrderPromotions($data)
@@ -135,13 +136,13 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
-    # 通过总订单id 查询 所有子订单
-    static function getOrderPromotionsByOrderid($id)
-    {
-        return DB::table('order_promotions as om')
-            ->where('orderid',$id)
-            ->get();
-    }
+//    # 通过总订单id 查询 所有子订单
+//    static function getOrderPromotionsByOrderid($id)
+//    {
+//        return DB::table('order_promotions as om')
+//            ->where('orderid',$id)
+//            ->get();
+//    }
 
 
 }

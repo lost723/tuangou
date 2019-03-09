@@ -37,7 +37,7 @@ Route::post('customer/order/refund', 'Customer\RefundController@Refund');
 
 #通知
 Route::post('notify/pay', 'Customer\PaymentController@notify');
-Route::post('notify/refund', 'Customer\NotifyController@notify');
+Route::post('notify/refund', 'Customer\RefundController@notify');
 
 
 
