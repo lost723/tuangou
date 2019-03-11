@@ -15,8 +15,6 @@ class BaseModel extends Model
         $result['pagination']['pageSize'] = $dat->perPage();
         $result['pagination']['current'] = $dat->currentPage();
         $result['pagination']['defaultPageSize'] = self::NPP;
-
-
         return $result;
     }
 }
