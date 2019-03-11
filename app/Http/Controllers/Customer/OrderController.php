@@ -22,9 +22,8 @@ class OrderController extends Controller
 {
     protected  $customer;
     public function __construct()
-    {   # todo 默认第一个用户
-        # $this->customer = auth()->user();
-        $this->customer = Customer::find(1);
+    {
+        $this->customer = auth()->user();
     }
     # todo 未设置库存处理
     # 消费者用户 订单相关接口处理

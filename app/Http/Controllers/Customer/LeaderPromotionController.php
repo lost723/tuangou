@@ -27,9 +27,7 @@ class LeaderPromotionController extends Controller
     protected $leader;
     public function __construct()
     {
-        # todo 默认第一个用户
-//        $this->leader = auth()->user()->leader;
-        $this->leader = Leader::find(1);
+        $this->leader = auth()->user()->leader;
     }
 
     /**
@@ -254,7 +252,6 @@ class LeaderPromotionController extends Controller
              DB::beginTransaction();
              $order->save(['status' => OrderPromotion::Finished]);
              DB::commit();
-             # todo 触发核销事件
              event(new LeaderVerifyEvent($order->id));
              return $this->okWithResource([], '核销成功');
          }

@@ -38,7 +38,7 @@ class PaymentController extends BasePaymentController
     }
 
     # 支付订单
-    # todo 添加 profit_sharing  字段 值'Y'
+    # profit_sharing  字段 值'Y' 分账字段
     public function Pay(Request $request)
     {
         try{

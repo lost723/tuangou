@@ -151,7 +151,6 @@ class CommunityController extends Controller
     {
         try {
             $customer = auth()->user();
-            $customer = Customer::find(1);# todo 默认用户
             $community = Community::find($customer->commid);
             if(empty($community)) {
                 throw new \Exception('该用户还未绑定小区');
@@ -187,7 +186,6 @@ class CommunityController extends Controller
             $commid  = request()->post('commid')?:0;
             if(0 < $commid) {
                 $customer = auth()->user();
-                $customer = Customer::find(1);# todo  默认用户
                 $customer->commid = $commid;
                 $customer->save();
                 return $this->okWithResource([], '关联成功');

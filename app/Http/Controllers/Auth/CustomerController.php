@@ -91,10 +91,9 @@ class CustomerController extends Controller
      * @return CustomerResource
      */
     public function me()
-    {   # todo test interface
+    {
         try{
-            //        $user = auth()->user();
-            $user = Customer::find(1);
+            $user = auth()->user();
             $resource = new CustomerResource($user);
             return $this->okWithResource($resource);
         }
