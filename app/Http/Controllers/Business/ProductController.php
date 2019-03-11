@@ -40,7 +40,6 @@ class ProductController extends Controller
     {
         try{
             $user = Auth::user();
-//            return $this->ok($user);
             $all = $request->all();
             $all['optid'] = $user->id;
             $all['orgid'] = $user->orgid;
@@ -64,7 +63,25 @@ class ProductController extends Controller
     {
         try{
             $item = Product::find($id);
-            $this->checkProductOwnShip($id);
+            $item->distid = [$item->distid];
+
+            #  处理图片
+            $pictures = [];
+            $contents = [];
+            $pics = json_decode($item->picture,true);
+            if(is_array($pics)){
+                foreach ($pics as $i=>$obj){
+                    $pictures[] = ['uid'=>++$i, 'name'=>$obj, 'status'=>'done', 'url'=>$obj, 'thumbUrl'=>$obj];
+                }
+            }
+            $conts = json_decode($item->content,true);
+            if(is_array($conts)){
+                foreach ($conts as $i=>$obj){
+                    $contents[] = ['uid'=>-++$i, 'name'=>$obj, 'status'=>'done', 'url'=>$obj, 'thumbUrl'=>$obj];
+                }
+            }
+            $item->picture = $pictures;
+            $item->content = $contents;
             return $this->ok($item);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
@@ -84,13 +101,44 @@ class ProductController extends Controller
         try{
             $all = $request->all();
             $item = Product::find($id);
-            $this->checkProductionOwnShip($id);
+            $this->checkProductOwnShip($item->orgid);
+            $all['thumb'] = $all['picture'][0];
+            $all['picture'] = json_encode($all['picture']);
+            $all['content'] = json_encode($all['content']);
             $item->update($all);
             return $this->ok($item);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
         }
     }
+
+
+    public function disable(Request $request, $id)
+    {
+        try{
+            $item = Product::find($id);
+            $this->checkProductOwnShip($item->orgid);
+            $item->status = Product::Disable;
+            $item->save();
+            return $this->ok($item);
+        }catch (\Exception $e){
+            return $this->warning($e->getMessage());
+        }
+    }
+
+    public function active(Request $request, $id)
+    {
+        try{
+            $item = Product::find($id);
+            $this->checkProductOwnShip($item->orgid);
+            $item->status = Product::Active;
+            $item->save();
+            return $this->ok($item);
+        }catch (\Exception $e){
+            return $this->warning($e->getMessage());
+        }
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -102,7 +150,7 @@ class ProductController extends Controller
     {
         try{
             $item = Product::find($id);
-            $this->checkProductOwnShip() ($item->id);
+            $this->checkProductOwnShip($item->id);
             # 如果还有没结束的活动，不能删除
             if (Promotion::countUnfinished($item->id) >0){
                 throw new \Exception('删除失败：此商品下面有尚未完成的活动。');
@@ -121,9 +169,9 @@ class ProductController extends Controller
      * @param $item
      * @throws BusinessException
      */
-    protected  function checkProductOwnShip($item)
+    protected  function checkProductOwnShip($orgid)
     {
-        if($item->orgid <> Auth::user()->orgid){
+        if($orgid <> Auth::user()->orgid){
             throw new BusinessException('无权操作：非产品所有人！');
         }
     }
