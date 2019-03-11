@@ -4,10 +4,11 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class LeaderPromotions extends Resource
+class CheckPromotinoDetail extends Resource
 {
     /**
-     * 用户首页 团长活动列表页
+     * Transform the resource into an array.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
@@ -26,6 +27,8 @@ class LeaderPromotions extends Resource
             'rate'          =>  $this->rate,
             'norm'          =>  $this->norm,
             'num'           =>  $this->num,
+            'sales'         =>  $this->sales,
+            'note'          =>  $this->note,
             'status'        =>  $this->status,
             'quotation'     =>  $this->quotation,
             'expire'        =>  $this->expire,
@@ -34,6 +37,7 @@ class LeaderPromotions extends Resource
             'intro'         =>  $this->intro,
             'picture'       =>  $this->picture,
             'ordersn'       =>  $this->ordersn,
+            'checktime'     =>  $this->checktime,
         ];
     }
 }

@@ -168,7 +168,7 @@ class CommunityController extends Controller
     public function searchCommunity()
     {
         try {
-            $item = WXLocationController::Search('小区');
+            $item = $this->Search('小区');
             if(!empty($item))
             {
                 return $this->ok(['data' => $item]);

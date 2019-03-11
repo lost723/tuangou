@@ -18,6 +18,7 @@ class CreateLeadersTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('customerid')->comment('团长关联消费用户id');
             $table->unsignedInteger('commid')->comment('团长关联小区id');
+            $table->string('leaderno')->comment('团长编号');
             $table->string('name', 32)->comment('团长真实姓名');
             $table->string('mobile',20)->comment('团长手机号码');
             $table->string('idcard',20)->comment('团长身份证件号码');

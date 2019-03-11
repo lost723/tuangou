@@ -14,7 +14,7 @@ class Order extends BaseModel
     const Finished = 2; # 已支付
     const TimeOut = 15;
 
-    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'paytime', 'status', 'note'];
+    protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 
 
     # 查询订单
@@ -40,6 +40,7 @@ class Order extends BaseModel
             ->first();
     }
 
+    # 获取待支付订单列表
     static function getUnpaidList($customerid)
     {
         return DB::table('orders')
@@ -57,17 +58,14 @@ class Order extends BaseModel
     {
         return DB::table('order_promotions as om')
             ->where('orders.id', $id)
-            ->where('orders.status', Order::Unpaid)
             ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
-            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.lpmid')
-            ->leftjoin('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->leftjoin('leader_promotions as lpm', 'lpm.id', '=', 'om.lpmid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('orders.id', 'orders.paytime', 'orders.status', 'orders.total as ttotal', 'orders.trade_no',
-                'om.id as oid', 'om.num', 'om.total',
-                'lm.leaderid', 'pm.price',
+            ->select('om.id', 'om.lpmid', 'om.promotionid', 'om.price', 'om.num', 'om.total', 'om.ordersn', 'om.status',
+                'lpm.leaderid',
                 'pd.title' ,'pd.quotation', 'pd.picture', 'pd.norm')
-            ->get()
-            ->groupBy('leaderid');
+            ->get();
     }
 
 
@@ -92,7 +90,7 @@ class Order extends BaseModel
     static function getSubPromotions($id)
     {
         return DB::table('order_promotions')
-            ->where('order_id', $id)
+            ->where('orderid', $id)
             ->get();
     }
 
@@ -102,13 +100,13 @@ class Order extends BaseModel
         return DB::table('orders')->insertGetId($data);
     }
 
-    # 更新订单信息
-    static function updateOrder($data, $id)
-    {
-        return DB::table('orders')
-            ->where('id', $id)
-            ->update($data);
-    }
+//    # 更新订单信息
+//    static function updateOrder($data, $id)
+//    {
+//        return DB::table('orders')
+//            ->where('id', $id)
+//            ->update($data);
+//    }
 
     # 取消订单
     static function cancelCasecadeOrder($id)

@@ -14,11 +14,10 @@ class CustomerResource extends Resource
      */
     public function toArray($request)
     {
-//        return parent::toArray($request);
         return [
-            'openid'    => $this->openId,
+            'openid'    => $this->openid,
             'mobile'    => $this->mobile,
-            'nickname'  => $this->nickName,
+            'nickname'  => $this->nickname,
             'avatar'    => $this->avatar,
             'country'   => $this->country,
             'province'  => $this->province,

@@ -21,7 +21,13 @@ class AutoRefreshAuthenticate extends BaseMiddleware
      * @throws JWTException
      */
     public function handle($request, Closure $next)
+
     {
+        # todo 小程序端屏蔽token校验
+//        if(Auth::getDefaultDriver() == 'customer') {
+//            return $next($request);
+//        }
+
         // 检查此次请求中是否带有 token，如果没有则抛出异常。
         $this->checkForToken($request);
 
@@ -47,6 +53,9 @@ class AutoRefreshAuthenticate extends BaseMiddleware
 
         // 在响应头中返回新的 token
         return $this->setAuthenticationHeader($next($request), $token);
+<<<<<<< HEAD
         return $next($request);
+=======
+>>>>>>> 29220fc746feb6d2b3a69c0c8d484c4a0e7bc466
     }
 }

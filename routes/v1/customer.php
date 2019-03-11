@@ -21,7 +21,6 @@ Route::post('customer/promotions/record', 'Customer\CustomerController@record');
 
 # 订单相关路由
 Route::post('customer/order/add','Customer\OrderController@createOrder');
-Route::post('customer/order/pay', 'Customer\OrderController@payOrder');
 Route::post('customer/order/cancel', 'Customer\OrderController@cancelOrder');
 
 # 订单列表 详情
@@ -29,13 +28,16 @@ Route::get('customer/order/list', 'Customer\OrderController@listOrder');
 Route::get('customer/order/sublist', 'Customer\OrderController@subOrder');
 Route::post('customer/order/detail', 'Customer\OrderController@orderDetail');
 Route::post('customer/order/sub/detail', 'Customer\OrderController@subOrderDetail');
-Route::post('customer/order/pay', 'Customer\OrderController@refundOrder');
-Route::post('customer/order/refund', 'Customer\OrderController@refundOrder');
+
+# 订单支付 退款
+Route::post('customer/order/pay', 'Customer\PaymentController@Pay');
+Route::post('customer/order/refund', 'Customer\RefundController@Refund');
+
 
 
 #通知
-Route::post('customer/order/notify/pay', 'Customer\NotifyController@payResult');
-Route::post('customer/order/notify/refund', 'Customer\NotifyController@refundResult');
+Route::post('notify/pay', 'Customer\PaymentController@notify');
+Route::post('notify/refund', 'Customer\RefundController@notify');
 
 
 

@@ -18,22 +18,30 @@ class SubOrderDetail extends Resource
     {
         $leader = OrderPromotion::getLeaderInfo($this->id);
         return [
-            'id'            =>  $this->id, # 子订单id
-            'orderid'       =>  $this->orderid,
-            'lpmid'         =>  $this->lpmid,
-            'promotionid'   =>  $this->promotionid,
-            'title'         =>  $this->title,
-            'picture'       =>  $this->picture,
-            'price'         =>  $this->price,
-            'quotation'     =>  $this->quotation,
-            'num'           =>  $this->num,
-            'norm'          =>  $this->norm,
-            'total'         =>  $this->total,
-            'status'        =>  $this->status,
-            'checkcode'     =>  $this->checkcode,
-            'ordersn'       =>  $this->ordersn,
-            'createtime'    =>  $this->createtime,
-            'leader'        =>  new LeaderResource($leader),
+            'id'            =>  $this->orderid, # 总订单id
+
+            'order'         =>  [[
+                'leader'        =>  new LeaderResource($leader),
+                'items'          =>  [ [
+                                'id'            =>  $this->id,
+                                'lpmid'         =>  $this->lpmid,
+                                'promotionid'   =>  $this->promotionid,
+                                'title'         =>  $this->title,
+                                'picture'       =>  $this->picture,
+                                'price'         =>  $this->price,
+                                'quotation'     =>  $this->quotation,
+                                'num'           =>  $this->num,
+                                'norm'          =>  $this->norm,
+                                'total'         =>  $this->total,
+                                'status'        =>  $this->status,
+                                'checkcode'     =>  $this->checkcode,
+                                'ordersn'       =>  $this->ordersn,
+                                'createtime'    =>  $this->createtime,
+                ],
+
+                ],
+            ],
+            ]
         ];
     }
 }

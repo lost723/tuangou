@@ -4,16 +4,16 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class LeaderPromotions extends Resource
+class CheckPromotion extends Resource
 {
     /**
-     * 用户首页 团长活动列表页
+     * Transform the resource into an array.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        # todo picture 字段解析
         return [
             'id'            =>  $this->id,
             'leaderid'      =>  $this->leaderid,
@@ -26,7 +26,9 @@ class LeaderPromotions extends Resource
             'rate'          =>  $this->rate,
             'norm'          =>  $this->norm,
             'num'           =>  $this->num,
+            'sales'         =>  $this->sales,
             'status'        =>  $this->status,
+            'checktime'     =>  $this->checktime,
             'quotation'     =>  $this->quotation,
             'expire'        =>  $this->expire,
             'deliveryday'   =>  $this->deliveryday,

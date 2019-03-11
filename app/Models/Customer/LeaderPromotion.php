@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class LeaderPromotion extends BaseModel
 {
     const LeaderPrefix = '300'; # 团长订单号前缀
-    const Terminated = 0;   # 异常结束
+    const Terminated = 0;   # 异常结束 已取消
     const Odering = 1;      # 进行中
     const Dispatching = 2;  # 配送中
     const Received = 3;     # 已签收
@@ -23,7 +23,7 @@ class LeaderPromotion extends BaseModel
      * @return mixed
      */
     static function getPromotion($id)
-    {   # todo 该货物是否属于团长 状态标识
+    {
         $result = DB::table('promotions as pm')
             ->where('pm.id', $id)
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
@@ -32,21 +32,49 @@ class LeaderPromotion extends BaseModel
         return $result;
     }
 
+    # 获取团长商品详情
+    static function getLeaderPromotion($request)
+    {
+        # todo 测试数据 屏蔽进行中的订单
+        $id = $request->get('id');
+        return DB::table('leader_promotions as lpm')
+            ->where('lpm.id', $id)
+//            ->whereIn('lpm.status', [2,3])
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('lpm.*',
+                'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
+                'pm.status',
+                'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->first();
+    }
+
     /**
      * 获取团长的 活动列表
      * 2019/2/28 晚测试
      * @param $leaderid
      * @return mixed
      */
-    static function getSelectedPromotions($leaderid)
+    static function getSelectedPromotions($leaderid, $request)
     {
+        $filter = $request->get('filter');
         $result = DB::table('leader_promotions as lpm')
                 ->where('pm.expire', '>', time())
                 ->where('lpm.leaderid', $leaderid)
+                ->when($filter, function ($query) use ($filter) {
+                    $query->where(function ($qr) use ($filter) {
+                       $qr->orWhere('pd.title', 'like', "%$filter%");
+                       $qr->orWhere('bs.title', 'like', "%$filter%");
+                    });
+                })
                 ->where('pm.status', BPromotion::Ordering)
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-                ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
+                ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
+                ->select('lpm.*',
+                    'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
+                    'pm.status',
+                    'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
                 ->Paginate(self::NPP);
         return $result;
     }
@@ -62,43 +90,65 @@ class LeaderPromotion extends BaseModel
             ->insert($data);
     }
 
-    /**
-     * 获取验收记录
-     * @param $lid
-     * @return mixed
-     */
-    static function getReceivedPromotions($lid)
-    {
-        # todo 获取佣金数据 需集合用户订单
-       $result = DB::table(with(new LeaderPromotion)->getTable().' as lpm')
-           ->where('lpm.status',LeaderPromotion::Received)
-           ->where('lpm.leaderid', $lid)
-           ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
-           ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-           ->select('lpm.*', 'pm.*', 'pd.title','pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture')
-           ->Paginate(self::NPP);
-       return $result;
-    }
 
-    /**
-     * 获取指定id 单个验收活动记录
-     * @param $lid  团长id
-     * @param $id   活动id
-     * @return mixed
-     */
-    static function getReceivedPromotion($lid, $id)
+    # 获取验收列表|验收记录
+    static function getCheckList($request)
     {
-        # todo 获取佣金数据 需集合用户订单
-        $result = DB::table(with(new LeaderPromotion)->getTable().' as lpm')
-            ->where('lpm.status',LeaderPromotion::Received)
-            ->where('lpm.leaderid', $lid)
-            ->where('lpm.id', $id)
+        $filter = $request->get('filter');
+        $status = $request->get('status');
+        return DB::table('leader_promotions as lpm')
+            ->where('lpm.status', $status)
+            ->when($filter, function ($query) use ($filter) {
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orWhere('pd.title', 'like', "%$filter%");
+                    $qr->orWhere('bs.title', 'like', "%$filter%");
+                });
+            })
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('lpm.*', 'pm.*', 'pd.title','pd.norm', 'pd.quotation', 'pd.intro', 'pd.picture')
-            ->first();
-        return $result;
+            ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
+            ->select('lpm.*',
+                'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
+                'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
+            ->paginate(self::NPP);
     }
+
+
+    # 获取待核销订单列表
+    static function getVerifyList($leaderid, $request)
+    {
+        $filter = $request->get('filter');
+        return DB::table('leader_promotions as lm')
+            ->where('lm.status', LeaderPromotion::Received)
+            ->where('lm.leaderid', $leaderid)
+            ->where('om.status', OrderPromotion::Dispatched)
+            ->when($filter, function ($query) use ($filter) {
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orWhere('pd.title', 'like', "%$filter%");
+                });
+            })
+            ->leftjoin('order_promotions as om', 'om.lpmid', 'lm.id')
+            ->join('promotions as pm', 'pm.id', '=', 'lm.promotionid')
+            ->join('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('lm.*',
+                'pd.title', 'pd.picture', 'pd.norm')
+            ->paginate(self::NPP);
+    }
+
+    # 待核销订单详情
+    static function getVerifyDetail($request)
+    {
+        $id = $request->post('id');
+        return DB::table('order_promotions as om')
+            ->where('om.id', $id)
+            ->where('om.status', OrderPromotion::Dispatched)
+            ->leftjoin('customers as cms', 'cms.id', '=', 'om.customerid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->select('cms.avatar', 'cms.nickname', 'cms.mobile','om.num')
+            ->paginate(self::NPP);
+    }
+
 
 
     /**
@@ -149,3 +199,4 @@ class LeaderPromotion extends BaseModel
 
 
 }
+

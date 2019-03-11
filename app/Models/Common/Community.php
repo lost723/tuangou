@@ -28,8 +28,10 @@ class Community extends BaseModel
                 $query->where('id', $id);
             })
             ->when($filter, function ($query) use ($filter) {
-                $query->orWhere('name', 'like', "%$filter%");
-                $query->orWhere('address', 'like', "%$filter%");
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orWhere('name', 'like', "%$filter%");
+                    $qr->orWhere('address', 'like', "%$filter%");
+                });
             })
             ->when($rid, function ($query) use ($rid) {
                 $query->where('road_id', $rid);

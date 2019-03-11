@@ -13,6 +13,27 @@ class LeaderPromotionDetial extends Resource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        # todo picture 字段解析
+        return [
+            'leaderid'      =>  $this->leaderid,
+            'promotionid'   =>  $this->promotionid,
+            'productid'     =>  $this->productid,
+            'orgid'         =>  $this->orgid,
+            'optid'         =>  $this->optid,
+            'title'         =>  $this->title,
+            'price'         =>  $this->price,
+            'rate'          =>  $this->rate,
+            'norm'          =>  $this->norm,
+            'num'           =>  $this->num,
+            'status'        =>  $this->status,
+            'quotation'     =>  $this->quotation,
+            'expire'        =>  $this->expire,
+            'deliveryday'   =>  $this->deliveryday,
+            'aftersale'     =>  $this->aftersale,
+            'intro'         =>  $this->intro,
+            'picture'       =>  $this->picture,
+            'ordersn'       =>  $this->ordersn,
+            'content'       =>  $this->content,
+        ];
     }
 }

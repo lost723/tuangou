@@ -21,10 +21,13 @@ class CreateOrderPromotionsTable extends Migration
             # 添加商户发布的id 方便核销
             $table->unsignedBigInteger('promotionid')->comment('商家发布的活动id');
             $table->string('ordersn')->comment('当前活动的订单号');
+            $table->string('refund_id')->comment('微信退款单号');
             $table->unsignedInteger('num')->comment('购买数量');
             $table->decimal('price',8,2)->comment('购买时活动单价');
             $table->decimal('total',8,2)->comment('总价格');
             $table->string('checkcode')->default('')->comment('核销码');
+            $table->unsignedInteger('checktime')->default(0)->comment('核销时间');
+            $table->unsignedInteger('refundtime')->default(0)->comment('退款时间');
 //            $table->string('checkUrl')->comment('核销url');
             $table->tinyInteger('status')->comment('订单状态 0:超时异常 1:未支付 2:已退款 3:已支付待收货 4:订单完成');
             $table->string('note')->comment('订单备注');
