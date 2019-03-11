@@ -12,7 +12,7 @@ class Order extends BaseModel
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
-    const TimeOut = 15;
+    const TimeOut = 60;
 
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 

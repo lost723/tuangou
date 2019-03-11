@@ -163,9 +163,10 @@ class RoadController extends Controller
             }
             $item = Road::where('name', $location['city'])->first();
             if(empty($item)) {
-                return $this->ok(['data' => []]);
+                throw new \Exception('暂时无法获取当前位置信息');
             }
-            return new RoadResource($item);
+            $result = new RoadResource($item);
+            return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -191,7 +192,7 @@ class RoadController extends Controller
                 unset($tmp);
             }
             unset($city);
-            return $this->ok($list);
+            return $this->okWithResource($list);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

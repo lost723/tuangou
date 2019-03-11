@@ -8,6 +8,7 @@ use App\Http\Resources\Customer\PurchaseRecord;
 use App\Models\Customer\Promotion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -23,8 +24,8 @@ class CustomerController extends Controller
     {
         try{
             $promotions = Promotion::getPromotions($request);
-            return PromotionResource::collection(($promotions));
-//            $list = PromotionResource::collection(($promotions));
+            $list = PromotionResource::collection(($promotions));
+            return $this->okWithResourcePaginate($list);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -43,10 +44,10 @@ class CustomerController extends Controller
             $id = $request->post('id');
             $promotion = Promotion::getPromotion($id);
             if($promotion) {
-                return new PromotionDetail($promotion);
+                throw new \Exception('商品走丢了');
             }
-            return $this->ok(['data'=>[]]);
-
+            $resouce = new PromotionDetail($promotion);
+            return $this->okWithResource($resouce);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -62,7 +63,9 @@ class CustomerController extends Controller
     public function record(Request $request)
     {
         try{
-            return Promotion::getPurchaseRecord($request);
+            $list =  Promotion::getPurchaseRecord($request);
+            $result = Resource::collection($list);
+            return $this->okWithResourcePaginate($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

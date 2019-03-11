@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers\Common;
 
+use App\Models\Auth\Customer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Customer\CommunityResource;
 use App\Models\Common\Community;
 use App\Models\Common\Road;
+use PhpParser\Node\Expr\ClosureUse;
 
 class CommunityController extends Controller
 {
@@ -150,14 +152,13 @@ class CommunityController extends Controller
     {
         try {
             $customer = auth()->user();
-            if(0 < $customer['commid']) {
-                $community = Community::find($customer['commid']);
-                if(!empty($community)) {
-                    return new CommunityResource($community);
-                }
-                return $this->ok(['data' => []]);
+            $customer = Customer::find(1);
+            $community = Community::find($customer->commid);
+            if(empty($community)) {
+                throw new \Exception('该用户还未绑定小区');
             }
-            throw new \Exception('该用户还未绑定小区');
+            $resource = new CommunityResource($community);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -169,16 +170,11 @@ class CommunityController extends Controller
     {
         try {
             $item = $this->Search('小区');
-            if(!empty($item))
-            {
-                return $this->ok(['data' => $item]);
-            }
-            return $this->ok(['data' => []]);
+            return $this->okWithResource($item);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }
-
     }
 
     /**
@@ -194,7 +190,7 @@ class CommunityController extends Controller
                 $customer = auth()->user();
                 $customer->commid = $commid;
                 $customer->save();
-                return $this->ok();
+                return $this->okWithResource([], '关联成功');
              }
             throw new \Exception('传入参数异常');
         }
@@ -222,12 +218,8 @@ class CommunityController extends Controller
                 $rids = Road::getRoadsByCityId($cid);
             }
             $result = Community::getCommunityList($request, $rids);
-            if(empty($result)) {
-                return $this->ok(['data' => []]);
-            }
-            else {
-                return  CommunityResource::collection($result);
-            }
+            $resouce =  CommunityResource::collection($result);
+            return $this->okWithResourcePaginate($resouce);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

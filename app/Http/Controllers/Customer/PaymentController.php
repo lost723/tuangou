@@ -30,7 +30,7 @@ class PaymentController extends BasePaymentController
             }
             catch (\Exception $exception) {
                 DB::rollback();
-                return $this->warning($exception->getMessage());
+                throw new \Exception($exception->getMessage());
             }
             throw new \Exception('订单不存在或已超时！');
         }
@@ -56,7 +56,7 @@ class PaymentController extends BasePaymentController
             if($result['result_code'] <> 'SUCCESS') {
                 throw new \Exception('支付发起失败');
             }
-            return $this->ok($result);
+            return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

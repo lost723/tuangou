@@ -93,7 +93,8 @@ class CategoryController extends Controller
     {
         try{
             $cates = Category::getTopLevelCategory();
-            return CategroyResource::collection($cates);
+            $resoucelist = CategroyResource::collection($cates);
+            return $this->okWithResource($resoucelist);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

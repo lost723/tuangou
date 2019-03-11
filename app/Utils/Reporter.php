@@ -89,6 +89,27 @@ trait Reporter
     }
 
 
-//    protected function data
+    protected function okWithResource($data= [], $message = '请求成功', $code = 1)
+    {
+        return response()->json([
+            'data'  =>  $data,
+            'msg'   =>  $message,
+            'code'  =>  $code,
+        ], 200);
+    }
+
+    protected function okWithResourcePaginate($data= [], $message = '请求成功', $code = 1)
+    {
+        return response()->json(['data' => [
+            'data'  =>  $data,
+            'msg'   =>  $message,
+            'code'  =>  $code,
+        ],
+            'link'=> [
+                'total'     =>  $data->total(),
+                'pageSize'  =>  $data->perPage(),
+                'current'   =>  $data->currentPage(),
+            ]], 200);
+    }
 
 }

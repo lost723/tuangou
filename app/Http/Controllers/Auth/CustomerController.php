@@ -39,16 +39,16 @@ class CustomerController extends Controller
             $result = Customer::where(['openid' => $sessionArr['openid']])->first();
             if(!empty($result)) {
                 $token = auth()->login($result);
-                return $this->respondWithToken($token);
+                $result =  $this->getToken($token);
+                return $this->okWithResource($result, 'token正常返回', 1);
             }
             else {
                 Redis::setex('openid:'.$sessionArr['openid'].':sessionKey', 7200, $sessionArr['session_key']);
                 # 用户未注册
-                $message = [
+                $result = [
                     'openid'    =>  $sessionArr['openid'],
-                    'message'   =>  '用户未注册'
                 ];
-                return $this->ok($message);
+                return $this->okWithResource($result, '用户未注册', 2);
             }
         }
         catch (\Exception $exception) {
@@ -78,7 +78,8 @@ class CustomerController extends Controller
                 throw new \Exception('用户注册失败!');
             }
             $token = auth()->login($customer);
-            return $this->respondWithToken($token);
+            $result = $this->getToken($token);
+            return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -91,10 +92,15 @@ class CustomerController extends Controller
      */
     public function me()
     {   # todo test interface
-        $user = Customer::find(1);
-//        return new CustomerResource(auth()->user());
-        return $this->ok(new CustomerResource($user));
-//                return  new CustomerResource($user);
+        try{
+            //        $user = auth()->user();
+            $user = Customer::find(1);
+            $resource = new CustomerResource($user);
+            return $this->okWithResource($resource);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
     }
 
     /**
@@ -115,13 +121,14 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+    protected function getToken($token)
     {
-        return $this->ok([
+        return ['token' => [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        ]
+        ];
     }
 
     /**

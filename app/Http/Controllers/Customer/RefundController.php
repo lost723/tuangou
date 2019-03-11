@@ -43,7 +43,7 @@ class RefundController extends BasePaymentController
             }
             # 更新订单状态为退款中
             OrderPromotion::updatePromotionStatus(OrderPromotion::Refunding, $order->id);
-            return $this->ok();
+            return $this->okWithResource([], '发起退款成功');
         } catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
         }

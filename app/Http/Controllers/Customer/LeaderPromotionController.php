@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Events\LeaderCheckEvent;
 use App\Events\LeaderVerifyEvent;
 use App\Http\Resources\Customer\BusinessPromotionDetail;
 use App\Http\Resources\Customer\BusinessPromotions;
@@ -9,7 +10,6 @@ use App\Http\Resources\Customer\CheckPromotinoDetail;
 use App\Http\Resources\Customer\CheckPromotion;
 use App\Http\Resources\Customer\LeaderPromotionDetial;
 use App\Http\Resources\Customer\LeaderPromotions;
-use App\Http\Resources\Customer\Order;
 use App\Http\Resources\Customer\VerifyPromotion;
 use App\Models\Business\Promotion;
 use App\Models\Common\Leader;
@@ -39,7 +39,8 @@ class LeaderPromotionController extends Controller
         try{
             $request->offsetSet('leaderid', $this->leader->id);
             $list = Promotion::getLeaderChoiceList($this->leader->commid, $request);
-            return BusinessPromotions::collection($list);
+            $result =  BusinessPromotions::collection($list);
+            return $this->okWithResourcePaginate($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -54,7 +55,8 @@ class LeaderPromotionController extends Controller
     {
         try{
             $list = LeaderPromotion::getSelectedPromotions($this->leader->id, $request);
-            return LeaderPromotions::collection($list);
+            $result =  LeaderPromotions::collection($list);
+            return $this->okWithResourcePaginate($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -70,7 +72,11 @@ class LeaderPromotionController extends Controller
     {
         try{
             $item = LeaderPromotion::getPromotion($request->post('id'));
-            return new BusinessPromotionDetail($item);
+            if(empty($item)) {
+                throw new \Exception('商品走丢了');
+            }
+            $resource = new BusinessPromotionDetail($item);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -86,7 +92,11 @@ class LeaderPromotionController extends Controller
     {
         try{
             $item = LeaderPromotion::getLeaderPromotion($request);
-            return new LeaderPromotionDetial($item);
+            if(empty($item)) {
+                throw new \Exception('商品走丢了');
+            }
+            $resource = new LeaderPromotionDetial($item);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -116,7 +126,7 @@ class LeaderPromotionController extends Controller
             DB::beginTransaction();
             LeaderPromotion::addPromotions($promotions);
             DB::commit();
-            return $this->ok();
+            return $this->okWithResource([], '添加成功');
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -137,7 +147,7 @@ class LeaderPromotionController extends Controller
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update(['status'=>LeaderPromotion::Terminated]);
-            return $this->ok();
+            return $this->okWithResource([],'取消成功');
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -153,7 +163,8 @@ class LeaderPromotionController extends Controller
     {
         try{
             $list = LeaderPromotion::getCheckList($request);
-            return CheckPromotion::collection($list);
+            $resouce =  CheckPromotion::collection($list);
+            return $this->okWithResourcePaginate($resouce);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -166,9 +177,10 @@ class LeaderPromotionController extends Controller
         try{
             $item = LeaderPromotion::getLeaderPromotion($request);
             if(empty($item)) {
-                return $this->ok(['data'=>[]]);
+                throw new \Exception('商品走丢了');
             }
-            return new CheckPromotinoDetail($item);
+            $resource = new CheckPromotinoDetail($item);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -183,12 +195,13 @@ class LeaderPromotionController extends Controller
             $update['note']       = $request->post('note');
             $update['checktime']  = time(); #  验收时间
             $id = $request->post('id');
-            DB::beginTransaction();
+            DB::beginTransaction(); # 更新订单状态为已签收 todo 更新用户订单状态且生成 提货码
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update($update);
             DB::commit();
-            return $this->ok();
+            event(new LeaderCheckEvent($id));
+            return $this->okWithResource([], '签收成功');
         }
         catch (\Exception $exception)
         {
@@ -201,9 +214,10 @@ class LeaderPromotionController extends Controller
     public function getVerifyList(Request $request)
     {
         try{
-            $list = LeaderPromotion::getVerifyList($this->leader->id, $request);//dump($list);
+            $list = LeaderPromotion::getVerifyList($this->leader->id, $request);
 //            return VerifyPromotion::collection($list);
-            return $this->ok($list);
+//            return $this->ok($list);
+            return $this->okWithResourcePaginate($list);
         }
         catch (\Exception $exception)
         {
@@ -219,7 +233,8 @@ class LeaderPromotionController extends Controller
             if(empty($list)) {
                 throw new \Exception('请检查该订单是否已核销!');
             }
-            return new VerifyPromotion($list);
+            $resource =   VerifyPromotion::collection($list);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -240,7 +255,7 @@ class LeaderPromotionController extends Controller
              DB::commit();
              # todo 触发核销事件
              event(new LeaderVerifyEvent($order->id));
-             return $this->ok();
+             return $this->okWithResource([], '核销成功');
          }
          catch (\Exception $exception) {
              DB::rollback();
