@@ -11,12 +11,14 @@ use App\Http\Resources\Customer\CheckPromotion;
 use App\Http\Resources\Customer\LeaderPromotionDetial;
 use App\Http\Resources\Customer\LeaderPromotions;
 use App\Http\Resources\Customer\VerifyPromotion;
+use App\Http\Resources\Customer\VerifyPromotionDetail;
 use App\Models\Business\Promotion;
 use App\Models\Common\Leader;
 use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Facades\DB;
 
 class LeaderPromotionController extends Controller
@@ -192,10 +194,10 @@ class LeaderPromotionController extends Controller
         # todo  货物签收 为order_promotions 生成 checkcode 更新用户订单为 待提货
         try{
             $update['status']     = LeaderPromotion::Received;
-            $update['note']       = $request->post('note');
+            $update['note']       = strval($request->post('note'));
             $update['checktime']  = time(); #  验收时间
             $id = $request->post('id');
-            DB::beginTransaction(); # 更新订单状态为已签收 todo 更新用户订单状态且生成 提货码
+            DB::beginTransaction(); # 更新订单状态为已签收
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update($update);
@@ -215,9 +217,8 @@ class LeaderPromotionController extends Controller
     {
         try{
             $list = LeaderPromotion::getVerifyList($this->leader->id, $request);
-//            return VerifyPromotion::collection($list);
-//            return $this->ok($list);
-            return $this->okWithResourcePaginate($list);
+            $resource = VerifyPromotion::collection($list);
+            return $this->okWithResourcePaginate($resource);
         }
         catch (\Exception $exception)
         {
@@ -233,8 +234,8 @@ class LeaderPromotionController extends Controller
             if(empty($list)) {
                 throw new \Exception('请检查该订单是否已核销!');
             }
-            $resource =   VerifyPromotion::collection($list);
-            return $this->okWithResource($resource);
+            $resource =   VerifyPromotionDetail::collection($list);
+            return $this->okWithResourcePaginate($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

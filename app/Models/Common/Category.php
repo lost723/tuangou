@@ -14,7 +14,7 @@ class Category extends Model
     static function getTopLevelCategory()
     {
         return DB::table('categories')
-            ->where('parentid', 2)
+            ->where('parentid', 0)
             ->get();
     }
 }

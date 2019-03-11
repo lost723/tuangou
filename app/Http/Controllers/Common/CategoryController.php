@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Common;
 
+use App\Events\LeaderCheckEvent;
 use App\Http\Resources\Customer\Category as CategroyResource;
 use App\Models\Common\Category;
 use Illuminate\Http\Request;

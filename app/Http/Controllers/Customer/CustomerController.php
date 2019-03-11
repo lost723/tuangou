@@ -9,8 +9,6 @@ use App\Models\Customer\Promotion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\Resource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class CustomerController extends Controller
 {
@@ -43,7 +41,7 @@ class CustomerController extends Controller
         try{
             $id = $request->post('id');
             $promotion = Promotion::getPromotion($id);
-            if($promotion) {
+            if(!$promotion) {
                 throw new \Exception('商品走丢了');
             }
             $resouce = new PromotionDetail($promotion);
@@ -64,7 +62,7 @@ class CustomerController extends Controller
     {
         try{
             $list =  Promotion::getPurchaseRecord($request);
-            $result = Resource::collection($list);
+            $result = PurchaseRecord::collection($list);
             return $this->okWithResourcePaginate($result);
         }
         catch (\Exception $exception) {

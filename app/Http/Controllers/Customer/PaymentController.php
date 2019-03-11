@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Events\PaySuccessEvent;
+use App\Models\Auth\Customer;
 use App\Models\Customer\Order;
-use EasyWeChat\Factory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
@@ -53,8 +53,8 @@ class PaymentController extends BasePaymentController
             $data['trade_type']         = 'JSAPI';
             $data['profit_sharing']     = 'Y';
             $result = $this->payment->order->unify($data);
-            if($result['result_code'] <> 'SUCCESS') {
-                throw new \Exception('支付发起失败');
+            if($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
+                throw new \Exception($result['return_msg']);
             }
             return $this->okWithResource($result);
         }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Customer;
 
 use App\Events\RefundSuccessEvent;
 use App\Http\Controllers\BasePaymentController;
-use App\Models\Customer\Order;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\RefundOrder;
 use Illuminate\Http\Request;
@@ -38,7 +37,7 @@ class RefundController extends BasePaymentController
             $order = $this->checkTimeOut($id);
             $result = $this->payment->refund->byTransactionId($order['transaction_id'], $order['ordersn'],
                 $order['ototal'], $order['total']);
-            if ($result['result_code'] <> 'SUCCESS') {
+            if ($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
                 throw new \Exception('退款发起失败');
             }
             # 更新订单状态为退款中

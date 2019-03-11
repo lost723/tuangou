@@ -4,7 +4,7 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class PurchaseRecord extends Resource
+class VerifyPromotionDetail extends Resource
 {
     /**
      * Transform the resource into an array.
@@ -15,11 +15,10 @@ class PurchaseRecord extends Resource
     public function toArray($request)
     {
         return [
-            'id'            => $this->id,
-            'avatar'        => $this->avatar,
-            'nickname'      => $this->nickname,
-            'num'           => $this->num,
-            'created_at'    => $this->created_at,
+            'avatar'    =>  $this->avatar,
+            'nickname'  =>  $this->nickname,
+            'mobile'    =>  $this->mobile,
+            'num'       =>  $this->num,
         ];
     }
 }

@@ -66,7 +66,7 @@ class Promotion extends BaseModel
     # 获取团长某活动 的历史订单
     static function getPurchaseRecord($request)
     {
-        $id     =   $request->post('id');
+        $id     = $request->post('id');
         $skip   = $request->post('skip');
         $result = DB::table('order_promotions as om')
             ->where('om.lpmid', $id)
@@ -75,7 +75,7 @@ class Promotion extends BaseModel
                 $query->skip($skip);
             })
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.id', 'customer.avatar', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
             ->orderBy('om.created_at', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;

@@ -131,4 +131,8 @@ return [
     //          //...
     //      ],
     // ],
+    # 腾讯位置定位接口
+    'lbsqq'     =>  [
+      'key' =>  'BAXBZ-UD7E4-WPIUP-DY3VW-T2W62-WVF2E',
+    ],
 ];

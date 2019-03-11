@@ -22,7 +22,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedInteger('createtime')->comment('下单时间');
             $table->unsignedInteger('paytime')->comment('支付时间');
             $table->tinyInteger('status')->comment('订单状态 0:取消 1:未支付 2:已支付');
-            $table->string('note')->comment('订单备注');
+            $table->string('note')->default('')->comment('订单备注');
             $table->timestamps();
         });
     }

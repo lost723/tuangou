@@ -42,7 +42,7 @@ class OrderController extends Controller
         $price = 0.0;
         foreach ($data as $key => $val) {
                 $item = (array)Promotion::getPromotion($val['id']);
-                #检测商品列表中是否有商品不属于当前小区
+                # 检测商品列表中是否有商品不属于当前小区
                 if(empty($item)) {
                     throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
                 }
@@ -140,7 +140,6 @@ class OrderController extends Controller
             }
             catch (\Exception $exception) {
                 DB::rollback();
-                return $this->warning($exception->getMessage());
             }
         }
         catch (\Exception $exception) {
@@ -225,7 +224,7 @@ class OrderController extends Controller
         try{
             $id = $request->post('id');
             $subOrder = OrderPromotion::getOrderPromotionDetail($id);
-            $resource = SubOrderDetail($subOrder);
+            $resource = new SubOrderDetail($subOrder);
             return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {

@@ -31,6 +31,8 @@ class LeaderCheckListener
      */
     public function handle($event)
     {
-        //
+        $id = $event->id;
+        # todo 更新用户订单状态且生成 提货码
+        echo "执行团长签收";
     }
 }
