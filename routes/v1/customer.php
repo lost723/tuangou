@@ -40,4 +40,8 @@ Route::post('notify/pay', 'Customer\PaymentController@notify');
 Route::post('notify/refund', 'Customer\RefundController@notify');
 
 
+# 小程序接口相关
+Route::get('system/qr', 'Customer\SystemController@QRcode');
+
+
 

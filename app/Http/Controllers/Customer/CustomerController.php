@@ -15,7 +15,7 @@ class CustomerController extends Controller
     # 用户首页 + 详情页 所需接口数据
 
     /**
-     * 获取该小区内的所有的商品活动
+     * 获取该小区内的所有的商品活动 =》 修改为 以团长为中心的活动
      * @param $id  小区id
      */
     public function getCommPromotions(Request $request)

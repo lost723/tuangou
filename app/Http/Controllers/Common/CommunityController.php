@@ -199,7 +199,7 @@ class CommunityController extends Controller
 
     # 通过地理位置定位附近的小区
     /**
-     * 通过城市id 获取小区列表
+     * 通过城市id 获取小区列表 => 变更为 获取附近团长社区列表
      * @param $id 城市id
      * @param $filter 小区名称或地址名
      * @param $longitude 经度
@@ -215,7 +215,7 @@ class CommunityController extends Controller
             if(!empty($cid)) {
                 $rids = Road::getRoadsByCityId($cid);
             }
-            $result = Community::getCommunityList($request, $rids);
+            $result = Community::getCommunityLeaderList($request, $rids);
             $resouce =  CommunityResource::collection($result);
             return $this->okWithResourcePaginate($resouce);
         }

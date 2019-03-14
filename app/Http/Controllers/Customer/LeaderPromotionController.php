@@ -13,12 +13,10 @@ use App\Http\Resources\Customer\LeaderPromotions;
 use App\Http\Resources\Customer\VerifyPromotion;
 use App\Http\Resources\Customer\VerifyPromotionDetail;
 use App\Models\Business\Promotion;
-use App\Models\Common\Leader;
 use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Facades\DB;
 
 class LeaderPromotionController extends Controller
@@ -26,8 +24,11 @@ class LeaderPromotionController extends Controller
     # 小程序端 团长活动管理
     protected $leader;
     public function __construct()
-    {
-        $this->leader = auth()->user()->leader;
+    {   # todo 问题
+        $customer = auth()->user();
+        if($customer) {
+            $this->leader = $customer->leader;
+        }
     }
 
     /**

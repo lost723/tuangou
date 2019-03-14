@@ -103,19 +103,19 @@ return [
 
     /*
      * 微信支付
-     */
+     */# todo 修改证书路径 绝对路径
      'payment' => [
          'default' => [
     //         'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
                  'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx8bc33962b0a8ecef'),
                  'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
                  'sub_appid'          => env('WECHAT_PAYMENT_SUB_APPID', 'wx68f2dc67c99f4b05'),
-                 'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1510350531'),
+                 'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1528321701'),
 
                  'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
                  'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
                  'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
-                 'notify_url'         => 'http://tg.hlbapp.com/payments/wechat-notify',                           // 默认支付结果通知地址
+                 'notify_url'         => 'http://tg.hlbapp.com/notify/pay',                           // 默认支付结果通知地址
          ],
 
      ],

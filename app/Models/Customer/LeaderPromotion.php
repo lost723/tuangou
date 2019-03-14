@@ -10,9 +10,9 @@ class LeaderPromotion extends BaseModel
 {
     const LeaderPrefix = '300'; # 团长订单号前缀
     const Terminated = 0;   # 异常结束 已取消
-    const Odering = 1;      # 进行中
-    const Dispatching = 2;  # 配送中
-    const Received = 3;     # 已签收
+//    const Odering = 1;      # 进行中
+    const Dispatching = 1;  # 待送中
+    const Received = 2;     # 已签收
 
     protected $table = 'leader_promotions';
     protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'status'];
@@ -39,7 +39,6 @@ class LeaderPromotion extends BaseModel
         $id = $request->get('id');
         return DB::table('leader_promotions as lpm')
             ->where('lpm.id', $id)
-//            ->whereIn('lpm.status', [2,3])
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('lpm.*',
@@ -61,7 +60,7 @@ class LeaderPromotion extends BaseModel
         $result = DB::table('leader_promotions as lpm')
                 ->where('pm.expire', '>', time())
                 ->where('lpm.leaderid', $leaderid)
-                ->where('lpm.status', LeaderPromotion::Odering)
+                ->where('lpm.status', LeaderPromotion::Dispatching)
                 ->when($filter, function ($query) use ($filter) {
                     $query->where(function ($qr) use ($filter) {
                        $qr->orWhere('pd.title', 'like', "%$filter%");
@@ -69,6 +68,8 @@ class LeaderPromotion extends BaseModel
                     });
                 })
                 ->where('pm.status', BPromotion::Ordering)
+                ->where('pm.expire', '>', time())
+                ->where('pm.stock', '>', 0)
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
                 ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')

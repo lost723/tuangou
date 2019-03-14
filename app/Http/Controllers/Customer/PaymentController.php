@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Events\PaySuccessEvent;
 use App\Models\Auth\Customer;
 use App\Models\Customer\Order;
+use function EasyWeChat\Kernel\Support\generate_sign;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
@@ -23,16 +24,16 @@ class PaymentController extends BasePaymentController
     public function checkTimeOut($id)
     {
         if(!($order = Order::checkOrder($id))) {
-            try{
-                DB::beginTransaction();
-                Order::cancelCasecadeOrder($id); # 更新订单状态
-                DB::commit();
-            }
-            catch (\Exception $exception) {
-                DB::rollback();
-                throw new \Exception($exception->getMessage());
-            }
-            throw new \Exception('订单不存在或已超时！');
+//            try{
+//                DB::beginTransaction();
+//                Order::cancelCasecadeOrder($id); # 更新订单状态
+//                DB::commit();
+//            }
+//            catch (\Exception $exception) {
+//                DB::rollback();
+//                throw new \Exception($exception->getMessage());
+//            }
+//            throw new \Exception('订单不存在或已超时！');
         }
         return $order;
     }
@@ -40,23 +41,32 @@ class PaymentController extends BasePaymentController
     # 支付订单
     # profit_sharing  字段 值'Y' 分账字段
     public function Pay(Request $request)
-    {
+    {   # todo 暂时没有分账权限
         try{
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
-            $customer = auth()->user();
+            # $customer = auth()->user();
+            $customer = Customer::find(17);
             $data = [];
             $data['body']               = '团购';
-            $data['out_trade_no']       = $order['trade_no'];
-            $data['total_fee']          = $order['total']*100;
+            $data['out_trade_no']       = $order->trade_no;
+            $data['total_fee']          = $order->total*100;
             $data['sub_openid']         = $customer->openid;
             $data['trade_type']         = 'JSAPI';
-            $data['profit_sharing']     = 'Y';
+//            $data['profit_sharing']     = 'Y';
             $result = $this->payment->order->unify($data);
             if($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
                 throw new \Exception($result['return_msg']);
             }
-            return $this->okWithResource($result);
+            $response = [
+                'appId'     =>  $this->config['sub_appid'],
+                'timeStamp' =>  ''.time(),
+                'nonceStr'  =>  $result['nonce_str'],
+                'signType'  =>  'MD5',
+                'package'   =>  'prepay_id='.$result['prepay_id'],
+            ];
+            $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
+            return $this->okWithResource($response);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

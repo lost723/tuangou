@@ -22,8 +22,6 @@ class Community extends BaseModel
         $id     = $request->get('id');
         $rid    = $request->get('rid');
         $filter = $request->get('filter');
-        $longitude = request()->get('longitude');
-        $latitude  = request()->get('latitude');
         $list = self::when($id, function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -39,10 +37,36 @@ class Community extends BaseModel
             ->when($road_ids, function ($query) use ($road_ids) {
                 $query->whereIn('road_id', $road_ids);
             })
-            ->when($latitude, function ($query) use ($latitude, $longitude) {
-                $query->select(DB::raw("*, st_distance(point(longitude, latitude), 
-                point($longitude, $latitude))/0.0111 as distance"))->orderBy('distance', 'asc');
+            ->select('*')
+            ->orderBy('id', 'ASC')
+            ->paginate(self::NPP);
+        return $list;
+    }
+
+    # 获取团长社区列表
+    static function getCommunityLeaderList(Request $request, $road_ids = [])
+    {
+        $id        = $request->get('id');
+        $filter    = $request->get('filter');
+        $longitude = $request->get('longitude');
+        $latitude  = $request->get('latitude');
+        $list = self::when($id, function ($query) use ($id) {
+                $query->where('id', $id);
             })
+            ->when($filter, function ($query) use ($filter) {
+                $query->where(function ($qr) use ($filter) {
+                    $qr->orWhere('name', 'like', "%$filter%");
+                    $qr->orWhere('address', 'like', "%$filter%");
+                });
+            })
+            ->when($road_ids, function ($query) use ($road_ids) {
+                $query->whereIn('road_id', $road_ids);
+            })
+            ->leftjoin('leaders', 'leaders.commid', '=', 'communities.id')
+            ->where('leaders.commid', '>', 0)
+            ->select(DB::raw("communities.*, leaders.id as leaderid, leaders.name as lname, leaders.address as laddress, st_distance(point(longitude, latitude), 
+                point($longitude, $latitude))/0.0111 as distance"))
+            ->orderBy('distance', 'asc')
             ->orderBy('id', 'ASC')
             ->paginate(self::NPP);
         return $list;

@@ -32,7 +32,6 @@ class PaySuccessListener
             ->update(['status' => OrderPromotion::UnReceived]);
         # 获取支付订单下的所有商品订单
         $suborders = Order::getSubPromotions($id);
-
         foreach ($suborders as $key => $val) {
             # 更新团长销量 和 商户销量及库存
             DB::table('leader_promotions')
@@ -42,5 +41,6 @@ class PaySuccessListener
                 ->where('id', $val['promotionid'])
                 ->increment('sales', $val['num']);
         }
+
     }
 }

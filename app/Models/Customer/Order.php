@@ -74,7 +74,7 @@ class Order extends BaseModel
     {   #todo 该活动还在进行中
         return DB::table('orders')->where('id', $id)
             ->where('status', Order::Unpaid)
-            ->where('paytime','>',(time()-Order::TimeOut*60))
+//            ->where('paytime','>',(time()-Order::TimeOut*60))
             ->first();
     }
 

@@ -17,17 +17,16 @@ class Promotion extends BaseModel
     {
         # 获取该小区的所有团长下的活动
         $catid = $request->post('cid'); # 商品分类id
-        $commid = $request->post('commid');
+        $leaderid = $request->post('leaderid');
+        $filter = $request->post('filter');
         return DB::table('leader_promotions as lm')
-            ->whereIn('lm.leaderid', function ($query) use ($commid) {
-                $query->select('id')
-                    ->from('leaders')
-                    ->where('commid',$commid);
-            })
+            ->where('lm.leaderid', $leaderid)
             ->where('ld.status', Leader::NORMAL)
-            ->where('lm.status', LeaderPromotion::Odering)
             ->where('pm.status', BPromotion::Ordering)
             ->where('pm.expire', '>', time())
+            ->when($filter, function ($query) use ($filter) {
+                $query->where('pd.title', 'like', "%$filter%");
+            })
             ->when($catid, function ($query) use ($catid) {
                 $query->where('pd.catid', $catid);
             })
