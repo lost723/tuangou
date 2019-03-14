@@ -108,7 +108,14 @@ class CustomerController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        try{
+            $token = $this->getToken(auth()->refresh());
+            return $this->okWithResource($token, 'token正常已刷新', 1);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+
     }
 
 

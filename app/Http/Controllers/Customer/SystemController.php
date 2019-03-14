@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class SystemController extends Controller
 {
-    # 小程序相关系统相关信息 如获取小程序码 
+    # 小程序相关系统相关信息 如获取小程序码
     protected $minProgram;
     protected $appcode;
     public function __construct()

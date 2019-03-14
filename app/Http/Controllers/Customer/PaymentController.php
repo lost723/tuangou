@@ -24,16 +24,16 @@ class PaymentController extends BasePaymentController
     public function checkTimeOut($id)
     {
         if(!($order = Order::checkOrder($id))) {
-//            try{
-//                DB::beginTransaction();
-//                Order::cancelCasecadeOrder($id); # 更新订单状态
-//                DB::commit();
-//            }
-//            catch (\Exception $exception) {
-//                DB::rollback();
-//                throw new \Exception($exception->getMessage());
-//            }
-//            throw new \Exception('订单不存在或已超时！');
+            try{
+                DB::beginTransaction();
+                Order::cancelCasecadeOrder($id); # 更新订单状态
+                DB::commit();
+            }
+            catch (\Exception $exception) {
+                DB::rollback();
+                throw new \Exception($exception->getMessage());
+            }
+            throw new \Exception('订单不存在或已超时！');
         }
         return $order;
     }
@@ -45,8 +45,7 @@ class PaymentController extends BasePaymentController
         try{
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
-            # $customer = auth()->user();
-            $customer = Customer::find(17);
+            $customer = auth()->user();
             $data = [];
             $data['body']               = '团购';
             $data['out_trade_no']       = $order->trade_no;

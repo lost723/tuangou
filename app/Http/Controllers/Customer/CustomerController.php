@@ -20,9 +20,9 @@ class CustomerController extends Controller
      */
     public function getCommPromotions(Request $request)
     {
-        try{
+        try{ $timestart = microtime();
             $promotions = Promotion::getPromotions($request);
-            $list = PromotionResource::collection(($promotions));
+            $list = PromotionResource::collection(($promotions));echo  $timestart.'=='.microtime();die;
             return $this->okWithResourcePaginate($list);
         }
         catch (\Exception $exception) {
