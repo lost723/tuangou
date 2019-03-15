@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Common;
 
+use App\Events\LeaderCheckEvent;
 use App\Http\Resources\Customer\Category as CategroyResource;
 use App\Models\Common\Category;
 use Illuminate\Http\Request;
@@ -93,7 +94,8 @@ class CategoryController extends Controller
     {
         try{
             $cates = Category::getTopLevelCategory();
-            return CategroyResource::collection($cates);
+            $resoucelist = CategroyResource::collection($cates);
+            return $this->okWithResource($resoucelist);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

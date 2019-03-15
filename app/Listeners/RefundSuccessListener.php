@@ -2,10 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Models\Customer\OrderPromotion;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DecSalesListener
+class RefundSuccessListener
 {
     /**
      * Create the event listener.
@@ -18,7 +19,7 @@ class DecSalesListener
     }
 
     /**
-     * 退款修改 商户活动销量库存 + 团长活动销量
+     * Handle the event.
      *
      * @param  object  $event
      * @return void
@@ -26,8 +27,15 @@ class DecSalesListener
     public function handle($event)
     {
         $id = $event->id;
+        DB::table('order_promotions')
+            ->where('orderid', $id)
+            ->update(['status' => OrderPromotion::UnReceived]);
         # 查询子订单
         $order = DB::table('order_promotions')->where('id', $id)->first();
+        # 更新子订单状态为 已退款
+        $order->status = OrderPromotion::Refund;
+        $order->save();
+        # 更新商户 和 团长活动销量
         DB::table('leader_promotions')
             ->where('id', $order['lpmid'])
             ->decrement('sales', $order['num']);

@@ -30,7 +30,7 @@ class CreateOrderPromotionsTable extends Migration
             $table->unsignedInteger('refundtime')->default(0)->comment('退款时间');
 //            $table->string('checkUrl')->comment('核销url');
             $table->tinyInteger('status')->comment('订单状态 0:超时异常 1:未支付 2:已退款 3:已支付待收货 4:订单完成');
-            $table->string('note')->comment('订单备注');
+            $table->string('note')->default('')->comment('订单备注');
             $table->timestamps();
         });
     }

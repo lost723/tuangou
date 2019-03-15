@@ -23,10 +23,6 @@ class AutoRefreshAuthenticate extends BaseMiddleware
     public function handle($request, Closure $next)
 
     {
-        # todo 小程序端屏蔽token校验
-//        if(Auth::getDefaultDriver() == 'customer') {
-//            return $next($request);
-//        }
 
         # 检查此次请求中是否带有 token，如果没有则抛出异常。
         $this->checkForToken($request);

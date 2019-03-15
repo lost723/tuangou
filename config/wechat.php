@@ -94,8 +94,8 @@ return [
      */
      'mini_program' => [
          'default' => [
-             'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wxae22a8c2d9459196'),
-             'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', '4018e1c8aed338cd5548e9d88ae770ee'),
+             'app_id'  => env('WECHAT_MINI_PROGRAM_APPID', 'wx68f2dc67c99f4b05'),
+             'secret'  => env('WECHAT_MINI_PROGRAM_SECRET', 'a5be48748215affac4fb2054e3c08f20'),
              'token'   => env('WECHAT_MINI_PROGRAM_TOKEN', ''),
              'aes_key' => env('WECHAT_MINI_PROGRAM_AES_KEY', ''),
          ],
@@ -109,7 +109,7 @@ return [
     //         'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
                  'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx8bc33962b0a8ecef'),
                  'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
-                 'sub_appid'          => env('WECHAT_PAYMENT_SUB_APPID', 'wxae22a8c2d9459196'),
+                 'sub_appid'          => env('WECHAT_PAYMENT_SUB_APPID', 'wx68f2dc67c99f4b05'),
                  'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1510350531'),
 
                  'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
@@ -131,4 +131,8 @@ return [
     //          //...
     //      ],
     // ],
+    # 腾讯位置定位接口
+    'lbsqq'     =>  [
+      'key' =>  'BAXBZ-UD7E4-WPIUP-DY3VW-T2W62-WVF2E',
+    ],
 ];

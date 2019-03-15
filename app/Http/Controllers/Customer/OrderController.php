@@ -22,9 +22,8 @@ class OrderController extends Controller
 {
     protected  $customer;
     public function __construct()
-    {   # todo 默认第一个用户
-        # $this->customer = auth()->user();
-        $this->customer = Customer::find(1);
+    {
+        $this->customer = auth()->user();
     }
     # todo 未设置库存处理
     # 消费者用户 订单相关接口处理
@@ -42,7 +41,7 @@ class OrderController extends Controller
         $price = 0.0;
         foreach ($data as $key => $val) {
                 $item = (array)Promotion::getPromotion($val['id']);
-                #检测商品列表中是否有商品不属于当前小区
+                # 检测商品列表中是否有商品不属于当前小区
                 if(empty($item)) {
                     throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
                 }
@@ -113,7 +112,7 @@ class OrderController extends Controller
             $this->createSubOrder($data, $orderid, $items);
             DB::commit();
             $order = Order::findOrder($orderid);
-            return $this->ok($order);
+            return $this->okWithResource($order, '成功生成订单');
         }
         catch (\Exception $exception) {
             DB::rollback();
@@ -136,11 +135,10 @@ class OrderController extends Controller
                 DB::beginTransaction();
                 Order::cancelCasecadeOrder($order->id);
                 DB::commit();
-                return $this->ok();
+                return $this->okWithResource([], '成功取消订单');
             }
             catch (\Exception $exception) {
                 DB::rollback();
-                return $this->warning($exception->getMessage());
             }
         }
         catch (\Exception $exception) {
@@ -155,7 +153,8 @@ class OrderController extends Controller
     {
         try{
             $list = Order::getUnpaidList($this->customer->id);
-            return OrderResource::collection($list);
+            $resource =  OrderResource::collection($list);
+            return $this->okWithResourcePaginate($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -197,7 +196,7 @@ class OrderController extends Controller
                 }
                 array_push($result['order'], $tmp);
             }
-            return $this->ok(['data'=>$result]);
+            return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -210,7 +209,8 @@ class OrderController extends Controller
     {
         try{
             $list = OrderPromotion::getOrderPromotions($request);
-            return SubOrder::collection($list);
+            $resource =  SubOrder::collection($list);
+            return $this->okWithResourcePaginate($resource);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -223,7 +223,8 @@ class OrderController extends Controller
         try{
             $id = $request->post('id');
             $subOrder = OrderPromotion::getOrderPromotionDetail($id);
-            return new SubOrderDetail($subOrder);
+            $resource = new SubOrderDetail($subOrder);
+            return $this->okWithResource($resource);
         }
         catch (\Exception $exception) {
             $this->warning($exception->getMessage());

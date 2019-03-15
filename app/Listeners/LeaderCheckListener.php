@@ -2,12 +2,17 @@
 
 namespace App\Listeners;
 
+use App\Common\ProfitShare;
+use App\Http\Controllers\Customer\LeaderPromotionController;
+use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
+use EasyWeChat\Factory;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UpdateSubOrderStatusListener
+class LeaderCheckListener
 {
+    # 团长签收
     /**
      * Create the event listener.
      *
@@ -15,20 +20,19 @@ class UpdateSubOrderStatusListener
      */
     public function __construct()
     {
-        //
+
     }
 
     /**
-     * 更新子订单状态 为 已支付
+     * Handle the event.
+     *
      * @param  object  $event
      * @return void
      */
     public function handle($event)
     {
-        # 总订单id
         $id = $event->id;
-        DB::table('order_promotions')
-            ->where('orderid', $id)
-            ->update(['status' => OrderPromotion::UnReceived]);
+        # todo 更新用户订单状态且生成 提货码
+        echo "执行团长签收";
     }
 }

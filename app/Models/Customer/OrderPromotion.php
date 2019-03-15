@@ -39,7 +39,7 @@ class OrderPromotion extends BaseModel
             ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
-            ->orderBy('om.status', 'ASC')
+            ->orderBy('om.status', 'DESC')
             ->orderBy('om.id', 'DESC')
             ->select('om.id', 'om.orderid', 'om.lpmid', 'om.promotionid', 'om.num', 'om.ordersn', 'om.price', 'om.total'
                 , 'om.status','orders.createtime',

@@ -99,7 +99,7 @@ class Promotion extends BaseModel
             ->join('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
             ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
-            ->simplePaginate(self::NPP);
+            ->Paginate(self::NPP);
         return $resutl;
     }
 

@@ -2,20 +2,17 @@
 
 namespace App\Listeners;
 
-use App\Common\ProfitShare;
-use App\Http\Controllers\Customer\LeaderPromotionController;
-use App\Models\Customer\LeaderPromotion;
-use App\Models\Customer\OrderPromotion;
-use EasyWeChat\Factory;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ProfitShareListener
+class LeaderVerifyListener
 {
+    # 团长核销
     public $payment;
     public $sharing;
     /**
-     * 引用分账句柄
+     * Create the event listener.
+     *
      * @return void
      */
     public function __construct()
@@ -26,7 +23,7 @@ class ProfitShareListener
     }
 
     /**
-     * 核销 某商品订单 执行分账
+     * Handle the event.
      *
      * @param  object  $event
      * @return void

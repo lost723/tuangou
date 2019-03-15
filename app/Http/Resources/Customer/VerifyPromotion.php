@@ -17,9 +17,10 @@ class VerifyPromotion extends Resource
     {
         return [
             'id'    =>  $this->id,
-            'customer'  =>  $this->when($this->customerid, function () {
-                           return new CustomerResource(Customer::find($this->customerid));
-                        }),
+            'picture'   =>  $this->picture,
+            'title' =>  $this->title,
+            'norm'  =>  $this->norm,
+            'price' =>  $this->price,
 
         ];
     }

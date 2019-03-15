@@ -2,11 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Models\Customer\Order;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class IncSalesListener
+class PaySuccessListener
 {
     /**
      * Create the event listener.
@@ -28,6 +27,9 @@ class IncSalesListener
     {
         # 总订单id
         $id = $event->id;
+        DB::table('order_promotions')
+            ->where('orderid', $id)
+            ->update(['status' => OrderPromotion::UnReceived]);
         # 获取支付订单下的所有商品订单
         $suborders = Order::getSubPromotions($id);
 
@@ -40,6 +42,5 @@ class IncSalesListener
                 ->where('id', $val['promotionid'])
                 ->increment('sales', $val['num']);
         }
-
     }
 }

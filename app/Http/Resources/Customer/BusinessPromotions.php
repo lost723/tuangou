@@ -25,7 +25,7 @@ class BusinessPromotions extends Resource
             'stock'     =>  $this->stock,
             'sales'     =>  $this->sales,
             'expire'    =>  $this->expire,                  # 商品过期时间
-            'bussiness' =>  new Business(Business::find($this->orgid)),
+            'bussiness' =>  new Business(Business::find($this->orgid)->toArray()),
         ];
     }
 }

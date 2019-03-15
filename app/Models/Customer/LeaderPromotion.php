@@ -61,6 +61,7 @@ class LeaderPromotion extends BaseModel
         $result = DB::table('leader_promotions as lpm')
                 ->where('pm.expire', '>', time())
                 ->where('lpm.leaderid', $leaderid)
+                ->where('lpm.status', LeaderPromotion::Odering)
                 ->when($filter, function ($query) use ($filter) {
                     $query->where(function ($qr) use ($filter) {
                        $qr->orWhere('pd.title', 'like', "%$filter%");
@@ -131,6 +132,7 @@ class LeaderPromotion extends BaseModel
             ->join('promotions as pm', 'pm.id', '=', 'lm.promotionid')
             ->join('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('lm.*',
+                'pm.price',
                 'pd.title', 'pd.picture', 'pd.norm')
             ->paginate(self::NPP);
     }
@@ -138,9 +140,10 @@ class LeaderPromotion extends BaseModel
     # 待核销订单详情
     static function getVerifyDetail($request)
     {
+        # 团长待核销活动id
         $id = $request->post('id');
         return DB::table('order_promotions as om')
-            ->where('om.id', $id)
+            ->where('om.lpmid', $id)
             ->where('om.status', OrderPromotion::Dispatched)
             ->leftjoin('customers as cms', 'cms.id', '=', 'om.customerid')
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')

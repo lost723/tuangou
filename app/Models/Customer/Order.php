@@ -12,7 +12,7 @@ class Order extends BaseModel
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
-    const TimeOut = 15;
+    const TimeOut = 60;
 
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 
@@ -57,10 +57,10 @@ class Order extends BaseModel
     static function getUnpaidOrderDetail($id)
     {
         return DB::table('order_promotions as om')
-            ->where('orders.id', $id)
+            ->where('om.orderid', $id)
             ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
             ->leftjoin('leader_promotions as lpm', 'lpm.id', '=', 'om.lpmid')
-            ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('om.id', 'om.lpmid', 'om.promotionid', 'om.price', 'om.num', 'om.total', 'om.ordersn', 'om.status',
                 'lpm.leaderid',

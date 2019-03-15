@@ -100,17 +100,13 @@ class LeaderController extends Controller
                 'mobile'        =>  'required|string|telphone',
                 'name'          =>  'required|string',
                 'address'       =>  'required|string',
-                'idcard_front'  =>  'required',
-                'idcard_back'   =>  'required',
                 'formid'        =>  'required'
             ]);
             Redis::set('openid:'.$customer['openid'].':registerformid',$request->post('formid'));
             $all = $request->all();
-            $all['idcard_front_url']    = json_encode($all['idcard_front_url']);
-            $all['idcard_back_url']     = json_encode($all['idcard_back_url']);
             $all['status']          = Leader::CREATE;
             Leader::create($all);
-            return $this->ok();
+            return $this->okWithResource([], '提交成功');
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
