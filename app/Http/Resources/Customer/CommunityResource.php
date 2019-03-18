@@ -26,13 +26,6 @@ class CommunityResource extends Resource
             'distance'  =>  $this->when(!empty($this->distance),function() {
                 return number_format($this->distance,1);
             }),
-            'leader'    =>  [
-                'id'    =>  $this->leaderid,
-                'name'  =>  $this->lname,
-                'address'=> $this->laddress,
-            ],
-            'road'      =>  new RoadResource($this->road),
-            'city'      =>  new RoadResource(Road::getCityByRoadId($this->road->id)),
         ];
     }
 }

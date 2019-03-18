@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Events\PaySuccessEvent;
+use App\Http\Controllers\Log\PayLog;
 use App\Models\Auth\Customer;
 use App\Models\Customer\Order;
 use function EasyWeChat\Kernel\Support\generate_sign;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class PaymentController extends BasePaymentController
@@ -19,8 +21,7 @@ class PaymentController extends BasePaymentController
         $this->middleware('auth', ['except' =>  ['notify']]);
     }
 
-    # 检测订单是否超时
-    # 超时更新订单状态
+    # 检测订单是否超时 超时更新订单状态
     public function checkTimeOut($id)
     {
         if(!($order = Order::checkOrder($id))) {
@@ -41,7 +42,7 @@ class PaymentController extends BasePaymentController
     # 支付订单
     # profit_sharing  字段 值'Y' 分账字段
     public function Pay(Request $request)
-    {   # todo 暂时没有分账权限
+    {   # todo 暂时没有分账权限 日志格式待整理
         try{
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
@@ -54,8 +55,14 @@ class PaymentController extends BasePaymentController
             $data['trade_type']         = 'JSAPI';
 //            $data['profit_sharing']     = 'Y';
             $result = $this->payment->order->unify($data);
+            # 日志上下文
+            $context = [
+                'action'    =>  'pay',
+                'orderid'   =>  $order->id,
+                'trade_type'=>  'JSAPI',
+            ];
             if($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
-                throw new \Exception($result['return_msg']);
+                throw new \Exception($result['err_code_des']);
             }
             $response = [
                 'appId'     =>  $this->config['sub_appid'],
@@ -64,10 +71,16 @@ class PaymentController extends BasePaymentController
                 'signType'  =>  'MD5',
                 'package'   =>  'prepay_id='.$result['prepay_id'],
             ];
+            # 日志消息
+            $message = '支付成功';
+            PayLog::note($message, $context);
             $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
             return $this->okWithResource($response);
         }
         catch (\Exception $exception) {
+            # 日志消息
+            $message = $exception->getMessage();
+            PayLog::warnning($message, $context);
             return $this->warning($exception->getMessage());
         }
     }

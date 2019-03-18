@@ -9,10 +9,13 @@ use Illuminate\Support\Facades\DB;
 class LeaderPromotion extends BaseModel
 {
     const LeaderPrefix = '300'; # 团长订单号前缀
-    const Terminated = 0;   # 异常结束 已取消
-//    const Odering = 1;      # 进行中
-    const Dispatching = 1;  # 待送中
-    const Received = 2;     # 已签收
+    const Unactive = 0;   # 取消挑选该活动
+    const Active = 1;     # 挑选该活动
+
+    const UnReceived = 0; # 未签收
+    const Received = 1;   # 已签收
+    const Finished = 2;   # 已完成
+
 
     protected $table = 'leader_promotions';
     protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'status'];
@@ -58,23 +61,23 @@ class LeaderPromotion extends BaseModel
     {
         $filter = $request->get('filter');
         $result = DB::table('leader_promotions as lpm')
-                ->where('pm.expire', '>', time())
                 ->where('lpm.leaderid', $leaderid)
-                ->where('lpm.status', LeaderPromotion::Dispatching)
+                ->where('lpm.active', LeaderPromotion::Active)
+//                ->where('lpm.status', LeaderPromotion::UnReceived)
                 ->when($filter, function ($query) use ($filter) {
                     $query->where(function ($qr) use ($filter) {
                        $qr->orWhere('pd.title', 'like', "%$filter%");
                        $qr->orWhere('bs.title', 'like', "%$filter%");
                     });
                 })
-                ->where('pm.status', BPromotion::Ordering)
-                ->where('pm.expire', '>', time())
-                ->where('pm.stock', '>', 0)
+//                ->where('pm.status', BPromotion::Ordering)
+//                ->where('pm.expire', '>', time())
+//                ->where('pm.stock', '>', 0)
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
                 ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
                 ->select('lpm.*',
-                    'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
+                    'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
                     'pm.status',
                     'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
                 ->Paginate(self::NPP);
@@ -88,18 +91,26 @@ class LeaderPromotion extends BaseModel
      * @return mixed
      */
     static function addPromotions($data) {
-        return  DB::table(with(new LeaderPromotion)->getTable())
+        return  DB::table('leader_promotions')
             ->insert($data);
     }
 
 
-    # 获取验收列表|验收记录
+    #
+
+    /**
+     * 检索 已激活的 未签收 且 活动在配送中的团长活动
+     * 获取验收列表|验收记录
+     * @param $request
+     * @return mixed
+     */
     static function getCheckList($request)
     {
         $filter = $request->get('filter');
-        $status = $request->get('status');
         return DB::table('leader_promotions as lpm')
-            ->where('lpm.status', $status)
+            ->where('lpm.active', LeaderPromotion::Active)
+            ->where('lpm.status', LeaderPromotion::UnReceived)
+            ->where('pm.status', BPromotion::Dispatching)
             ->when($filter, function ($query) use ($filter) {
                 $query->where(function ($qr) use ($filter) {
                     $qr->orWhere('pd.title', 'like', "%$filter%");
@@ -112,24 +123,29 @@ class LeaderPromotion extends BaseModel
             ->select('lpm.*',
                 'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
                 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
+            ->orderBy('lpm.status')
             ->paginate(self::NPP);
     }
 
 
-    # 获取待核销订单列表
+    /**
+     * 获取团长已签收 未完成的活动列表
+     * 获取待核销订单列表
+     * @param $leaderid
+     * @param $request
+     * @return mixed
+     */
     static function getVerifyList($leaderid, $request)
     {
         $filter = $request->get('filter');
         return DB::table('leader_promotions as lm')
             ->where('lm.status', LeaderPromotion::Received)
             ->where('lm.leaderid', $leaderid)
-            ->where('om.status', OrderPromotion::Dispatched)
             ->when($filter, function ($query) use ($filter) {
                 $query->where(function ($qr) use ($filter) {
                     $qr->orWhere('pd.title', 'like', "%$filter%");
                 });
             })
-            ->leftjoin('order_promotions as om', 'om.lpmid', 'lm.id')
             ->join('promotions as pm', 'pm.id', '=', 'lm.promotionid')
             ->join('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('lm.*',
@@ -138,7 +154,13 @@ class LeaderPromotion extends BaseModel
             ->paginate(self::NPP);
     }
 
-    # 待核销订单详情
+    /**
+     *
+     * 待核销订单详情
+     * todo 同一活动合并订单
+     * @param $request
+     * @return mixed
+     */
     static function getVerifyDetail($request)
     {
         # 团长待核销活动id
@@ -150,21 +172,10 @@ class LeaderPromotion extends BaseModel
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('cms.avatar', 'cms.nickname', 'cms.mobile','om.num')
+//            ->select(DB::raw("distinct cms.id, cms.avatar, cms.nickname, cms.mobile, om.num"))
             ->paginate(self::NPP);
     }
 
-
-
-    /**
-     * 更新团长活动的状态
-     * @param $id       活动id
-     * @param $status   订单状态
-     * @return mixed
-     */
-    static function updatePromotionStatus($id, $status)
-    {
-        return self::find($id)->update(['status' => $status]);
-    }
 
     # 更新团长活动销量
     static function incPromotionSales($id, $num = 1)

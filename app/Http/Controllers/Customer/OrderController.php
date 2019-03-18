@@ -8,32 +8,38 @@ use App\Http\Resources\Customer\LeaderResource;
 use App\Http\Resources\Customer\Order as OrderResource;
 use App\Http\Resources\Customer\SubOrder;
 use App\Http\Resources\Customer\SubOrderDetail;
-use App\Models\Auth\Customer;
 use App\Models\Common\Leader;
-use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
 use App\Models\Customer\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use mysql_xdevapi\Exception;
 
 class OrderController extends Controller
 {
+    # 消费者用户 订单相关接口处理
     protected  $customer;
+
     public function __construct()
     {
         $this->customer = auth()->user();
     }
-    # todo 未设置库存处理
-    # 消费者用户 订单相关接口处理
+
 
     # todo 订单超时检测 并更新订单状态
     public function checkOrderTimeout()
     {
-
+        # 检测我的未支付订单中 是否有超时订单
+//        $orders = Order::where('customerid', $this->customer->id)
+//            ->where('status', Order::Unpaid)
+//            ->every(function ($item, $key) {
+//                if($item['createtime'] >= (time()-Order::TimeOut*60)) {
+//                    return false;
+//                }
+//            });
     }
-
 
     # 计算商品价格
     public function calculate($data, $total, &$items=[])
@@ -47,6 +53,13 @@ class OrderController extends Controller
                 }
                 if($item['commid'] != $this->customer->commid) {
                     throw new \Exception("请选择已绑定小区附近的商家，方便您提货!");
+                }
+                # 库存 订单检测
+                if($item['stock'] > $val['num']) {
+                    throw new \Exception('库存不足');
+                }
+                if($item['expire'] < time()) {
+                    throw new Exception('活动已下架');
                 }
                 $items[$val['id']] = $item;
                 $price += $item['price'] * $val['num'] ;
@@ -67,6 +80,7 @@ class OrderController extends Controller
         $order['total']      = $this->calculate($data, $total, $items);
         $order['createtime'] = time();
         $order['status']     = Order::Unpaid;
+        # todo 收货人 手机号
         $order['note']       = '';
         if($order['total'] <= 0) {
             throw new \Exception('订单总价格异常');
@@ -110,6 +124,7 @@ class OrderController extends Controller
             DB::beginTransaction();
             $orderid = $this->createMasterOrder($data, $total, $items);
             $this->createSubOrder($data, $orderid, $items);
+            # todo 更新库存 和销量
             DB::commit();
             $order = Order::findOrder($orderid);
             return $this->okWithResource($order, '成功生成订单');
@@ -134,6 +149,8 @@ class OrderController extends Controller
             try{
                 DB::beginTransaction();
                 Order::cancelCasecadeOrder($order->id);
+                # todo 取消订单 或者退款 返还库存
+
                 DB::commit();
                 return $this->okWithResource([], '成功取消订单');
             }

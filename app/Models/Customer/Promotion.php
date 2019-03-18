@@ -12,7 +12,13 @@ use Illuminate\Support\Facades\DB;
 class Promotion extends BaseModel
 {
 
-    # 获取用户所选小区内所有团长的商品列表
+    #
+    /**
+     * 只展示激活状态的活动 并且 活动处于 进行中
+     * 获取用户所选小区内所有团长的商品列表
+     * @param Request $request
+     * @return mixed
+     */
     static function getPromotions(Request $request)
     {
         # 获取该小区的所有团长下的活动
@@ -22,6 +28,7 @@ class Promotion extends BaseModel
         return DB::table('leader_promotions as lm')
             ->where('lm.leaderid', $leaderid)
             ->where('ld.status', Leader::NORMAL)
+            ->where('lm.active', LeaderPromotion::Active)
             ->where('pm.status', BPromotion::Ordering)
             ->where('pm.expire', '>', time())
             ->when($filter, function ($query) use ($filter) {
@@ -48,7 +55,8 @@ class Promotion extends BaseModel
     {
         return DB::table('leader_promotions as lm')
             ->where('lm.id', $id)
-//            ->where('lm.status', LeaderPromotion::Odering)
+            ->where('lm.active', LeaderPromotion::Active)
+            ->where('pm.status', BPromotion::Ordering)
             ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('categories as cg', 'cg.id', '=', 'pd.catid')
@@ -74,7 +82,7 @@ class Promotion extends BaseModel
                 $query->skip($skip);
             })
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
             ->orderBy('om.created_at', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;

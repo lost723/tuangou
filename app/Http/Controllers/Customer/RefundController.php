@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Events\RefundSuccessEvent;
 use App\Http\Controllers\BasePaymentController;
+use App\Http\Controllers\Log\RefundLog;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\RefundOrder;
 use Illuminate\Http\Request;
@@ -31,21 +32,25 @@ class RefundController extends BasePaymentController
      * @return \Illuminate\Http\JsonResponse
      */
     public function Refund(Request $request)
-    {
+    {   # todo 日志数据格式待整理
         try {
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
-            $result = $this->payment->refund->byTransactionId($order['transaction_id'], $order['ordersn'],
-                $order['ototal'], $order['total']);
+//            $result = $this->payment->refund->byTransactionId($order->transaction_id, $order->ordersn,
+//                $order->ototal*100, $order->total*100);dump($order);die;
+            $result = $this->payment->refund->byOutTradeNumber($order->trade_no, $order->ordersn,
+                $order->ototal*100, $order->total*100);
             if ($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
-                throw new \Exception('退款发起失败');
+                throw new \Exception($result['err_code_des']);
             }
             # 更新订单状态为退款中
             OrderPromotion::updatePromotionStatus(OrderPromotion::Refunding, $order->id);
             return $this->okWithResource([], '发起退款成功');
         } catch (\Exception $exception) {
+            $messsage= $exception->getMessage();
             return $this->warning($exception->getMessage());
         }
+
     }
 
     /**

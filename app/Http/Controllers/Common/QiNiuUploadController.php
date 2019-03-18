@@ -26,7 +26,7 @@ class QiNiuUploadController extends Controller
             else {
                 $disk = Storage::disk('qiniu_public');
             }
-            return $disk->downloadUrl($result['savePath']);
+            return $disk->imagePreviewUrl($result['savePath']);
         }
         return "";
     }
@@ -76,7 +76,7 @@ class QiNiuUploadController extends Controller
             $result['filename'] = $filename;
             $result['savePath'] = $savePath;
             $result['access_url'] = $disk->downloadUrl($savePath);
-        }
+         }
         return $result;
 
     }

@@ -8,7 +8,6 @@ use App\Http\Resources\Customer\PurchaseRecord;
 use App\Models\Customer\Promotion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 
 class CustomerController extends Controller
 {
@@ -20,9 +19,9 @@ class CustomerController extends Controller
      */
     public function getCommPromotions(Request $request)
     {
-        try{ $timestart = microtime();
+        try{
             $promotions = Promotion::getPromotions($request);
-            $list = PromotionResource::collection(($promotions));echo  $timestart.'=='.microtime();die;
+            $list = PromotionResource::collection(($promotions));
             return $this->okWithResourcePaginate($list);
         }
         catch (\Exception $exception) {
@@ -54,6 +53,7 @@ class CustomerController extends Controller
 
 
     /**
+     * #todo 应该是以商品为单位 且在该团长下的购买记录 而不是以活动
      * 商品的购买记录
      * @param $id 团长活动id
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection

@@ -69,7 +69,7 @@ class OrderPromotion extends BaseModel
     {
         return DB::table('order_promotions as om')
                 ->where('om.id', $id)
-                ->where('om.status', OrderPromotion::Finished)
+//                ->where('om.status', OrderPromotion::Finished)
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
                 ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
                 ->where('pm.expire', '>', time())
@@ -120,7 +120,7 @@ class OrderPromotion extends BaseModel
     {
         return DB::table('order_promotions')
             ->where('id', $id)
-            ->update('status', $status);
+            ->update(['status'=>$status]);
     }
 
 

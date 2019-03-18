@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\Customer\OrderPromotion;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -30,6 +31,7 @@ class PaySuccessListener
         DB::table('order_promotions')
             ->where('orderid', $id)
             ->update(['status' => OrderPromotion::UnReceived]);
+
         # 获取支付订单下的所有商品订单
         $suborders = Order::getSubPromotions($id);
         foreach ($suborders as $key => $val) {

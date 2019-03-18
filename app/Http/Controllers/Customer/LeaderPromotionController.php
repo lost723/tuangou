@@ -24,11 +24,8 @@ class LeaderPromotionController extends Controller
     # 小程序端 团长活动管理
     protected $leader;
     public function __construct()
-    {   # todo 问题
-        $customer = auth()->user();
-        if($customer) {
-            $this->leader = $customer->leader;
-        }
+    {
+            $this->leader = auth()->user()->leader;
     }
 
     /**
@@ -105,13 +102,12 @@ class LeaderPromotionController extends Controller
     }
 
     /**
-     * 添加数据至团长活动列表
+     * 添加货物至团长活动
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function addPromotions(Request $request)
     {
-        # todo 检查活动库存 挑货校验（活动是否在团长所在小区 提交活动数据是否合法）
         try {
             # 整理上传数据
             $data = $request->post('data');
@@ -120,7 +116,8 @@ class LeaderPromotionController extends Controller
             foreach ($data as $key => $val) {
                 $val['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
                 $val['leaderid']    = $this->leader->id;
-                $val['status']      = LeaderPromotion::Dispatching; # 待配送
+                $val['active']      = LeaderPromotion::Active;
+                $val['status']      = LeaderPromotion::UnReceived;
                 array_push($promotions, $val);
                 unset($val);
             }
@@ -135,19 +132,26 @@ class LeaderPromotionController extends Controller
     }
 
     # cancelPromotions
+
+    /**
+     * 团长取消挑选的货物
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function cancelPromotions(Request $request)
     {
         try{
             $id = $request->post('id');
             $count = DB::table('order_promotions')
                 ->where('lpmid', $id)
+                ->where('status', '>', OrderPromotion::Expire)
                 ->count();
             if($count >= 1) {
                 throw new \Exception('已有用户购买该活动，禁止取消');
             }
             DB::table('leader_promotions')
                 ->where('id', $id)
-                ->update(['status'=>LeaderPromotion::Terminated]);
+                ->update(['active'=>LeaderPromotion::Unactive]);
             return $this->okWithResource([],'取消成功');
         }
         catch (\Exception $exception) {
@@ -156,7 +160,7 @@ class LeaderPromotionController extends Controller
     }
 
     /**
-     * 待验收列表
+     * 获取团长待签收列表
      * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
@@ -172,7 +176,11 @@ class LeaderPromotionController extends Controller
         }
     }
 
-    # 待验收详情
+    /**
+     * 获取团长待签收货物详情
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getcheckDetail(Request $request)
     {
         try{
@@ -188,19 +196,26 @@ class LeaderPromotionController extends Controller
         }
     }
 
+    /**
+     * 团长签收供应商货物
+     * 更新团长订单状态，触发签收事件
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function doCheck(Request $request)
     {
         # todo  货物签收 为order_promotions 生成 checkcode 更新用户订单为 待提货
+        # 核销需检测团长订单是否已完成
         try{
             $update['status']     = LeaderPromotion::Received;
             $update['note']       = strval($request->post('note'));
             $update['checktime']  = time(); #  验收时间
             $id = $request->post('id');
-            DB::beginTransaction(); # 更新订单状态为已签收
+            # 更新订单状态为已签收
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update($update);
-            DB::commit();
+             # 触发团长签收事件
             event(new LeaderCheckEvent($id));
             return $this->okWithResource([], '签收成功');
         }

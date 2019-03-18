@@ -83,7 +83,7 @@ class Promotion extends BaseModel
                 $query->select('lpm.promotionid')
                     ->from('leader_promotions as lpm')
                     ->where('lpm.leaderid', $leaderid)
-                    ->where('lpm.status', LeaderPromotion::Odering)
+                    ->where('lpm.active', LeaderPromotion::Active)
                     ->whereRaw('lpm.promotionid = pm.id');
             })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')

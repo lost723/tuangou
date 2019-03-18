@@ -20,6 +20,7 @@ class CreateOrderPromotionsTable extends Migration
             $table->unsignedInteger('lpmid')->comment('leader_promotions表的id团长的活动id');
             # 添加商户发布的id 方便核销
             $table->unsignedBigInteger('promotionid')->comment('商家发布的活动id');
+            # todo 添加商品id 便于检索用户购买记录
             $table->string('ordersn')->comment('当前活动的订单号');
             $table->string('refund_id')->comment('微信退款单号');
             $table->unsignedInteger('num')->comment('购买数量');
@@ -31,7 +32,6 @@ class CreateOrderPromotionsTable extends Migration
 //            $table->string('checkUrl')->comment('核销url');
             $table->tinyInteger('status')->comment('订单状态 0:超时异常 1:未支付 2:已退款 3:已支付待收货 4:订单完成');
             $table->string('note')->default('')->comment('订单备注');
-            $table->timestamps();
         });
     }
 

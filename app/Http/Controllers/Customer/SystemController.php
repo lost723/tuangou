@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Controllers\Controller;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
 
