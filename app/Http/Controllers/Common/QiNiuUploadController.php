@@ -30,6 +30,7 @@ class QiNiuUploadController extends Controller
         }
         return "";
     }
+
     //  定义PictureStyle
     static function getUrl($jsonString = '', $option)
     {

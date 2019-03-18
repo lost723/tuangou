@@ -22,11 +22,6 @@ use Illuminate\Support\Facades\DB;
 class LeaderPromotionController extends Controller
 {
     # 小程序端 团长活动管理
-    protected $leader;
-    public function __construct()
-    {
-            $this->leader = auth()->user()->leader;
-    }
 
     /**
      * 获取团长可选活动列表
@@ -35,8 +30,9 @@ class LeaderPromotionController extends Controller
     public function getChoicePromotions(Request $request)
     {
         try{
-            $request->offsetSet('leaderid', $this->leader->id);
-            $list = Promotion::getLeaderChoiceList($this->leader->commid, $request);
+            $leader = auth()->user->leader;
+            $request->offsetSet('leaderid', $leader->id);
+            $list = Promotion::getLeaderChoiceList($leader->commid, $request);
             $result =  BusinessPromotions::collection($list);
             return $this->okWithResourcePaginate($result);
         }
@@ -52,7 +48,8 @@ class LeaderPromotionController extends Controller
     public function getOwnPromotions(Request $request)
     {
         try{
-            $list = LeaderPromotion::getSelectedPromotions($this->leader->id, $request);
+            $leader = auth()->user->leader;
+            $list = LeaderPromotion::getSelectedPromotions($leader->id, $request);
             $result =  LeaderPromotions::collection($list);
             return $this->okWithResourcePaginate($result);
         }
@@ -110,12 +107,13 @@ class LeaderPromotionController extends Controller
     {
         try {
             # 整理上传数据
+            $leader = auth()->user->leader;
             $data = $request->post('data');
             $this->checkAddPromotions($data);
             $promotions = [];
             foreach ($data as $key => $val) {
                 $val['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
-                $val['leaderid']    = $this->leader->id;
+                $val['leaderid']    = $leader->id;
                 $val['active']      = LeaderPromotion::Active;
                 $val['status']      = LeaderPromotion::UnReceived;
                 array_push($promotions, $val);
@@ -230,7 +228,8 @@ class LeaderPromotionController extends Controller
     public function getVerifyList(Request $request)
     {
         try{
-            $list = LeaderPromotion::getVerifyList($this->leader->id, $request);
+            $leader = auth()->user->leader;
+            $list = LeaderPromotion::getVerifyList($leader->id, $request);
             $resource = VerifyPromotion::collection($list);
             return $this->okWithResourcePaginate($resource);
         }
