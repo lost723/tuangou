@@ -35,6 +35,7 @@ class CustomerController extends Controller
             if(!array_key_exists('openid', $sessionArr)) {
                 throw new \Exception('code 已过期');
             }
+            Redis::setex('openid:'.$sessionArr['openid'].':sessionKey', 7200, $sessionArr['session_key']);
             # 检测用户是否已注册
             $result = Customer::where(['openid' => $sessionArr['openid']])->first();
             if(!empty($result)) {
@@ -43,7 +44,6 @@ class CustomerController extends Controller
                 return $this->okWithResource($result, 'token正常返回', 1);
             }
             else {
-                Redis::setex('openid:'.$sessionArr['openid'].':sessionKey', 7200, $sessionArr['session_key']);
                 # 用户未注册
                 $result = [
                     'openid'    =>  $sessionArr['openid'],
@@ -108,7 +108,14 @@ class CustomerController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        try{
+            $token = $this->getToken(auth()->refresh());
+            return $this->okWithResource($token, 'token正常已刷新', 1);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+
     }
 
 
@@ -118,15 +125,16 @@ class CustomerController extends Controller
      *
      * @param  string $token
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
     protected function getToken($token)
     {
-        return ['token' => [
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]
+        return [
+                'token' => [
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ],
         ];
     }
 
@@ -138,6 +146,7 @@ class CustomerController extends Controller
         $user = auth()->user();
         try{
             $user->update(request()->all());
+            return $this->okWithResource([]);
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());
@@ -164,4 +173,32 @@ class CustomerController extends Controller
         );
     }
 
+
+    /**
+     * 解析小程序端手机号 并更新数据表0
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function parseMobile(Request $request)
+    {
+        try{
+            $request->validate([
+                'iv'            =>  'string|required',
+                'encryptedData' =>  'string|required'
+            ]);
+            $customer = auth()->user();
+            $all = $request->all();
+            $session = Redis::get('openid:'.$customer->openid.':sessionKey');
+            $data = $this->miniprogram->encryptor->decryptData($session, $all['iv'], $all['encryptedData']);
+            if($data['purePhoneNumber'] <> $customer->mobile) {
+                $customer->mobile = $data['purePhoneNumber'];
+                $customer->save();
+            }
+            unset($data['watermark']);
+            return $this->okWithResource($data);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
 }

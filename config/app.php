@@ -133,7 +133,7 @@ return [
     */
 
     'log' => env('APP_LOG', 'single'),
-
+    'log_channel' => env('LOG_CHANNEL', 'PinTuan'),
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
     /*

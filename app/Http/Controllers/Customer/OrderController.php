@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Customer;
 
 
+use App\Events\CancelOrderEvent;
+use App\Events\CreateOrderEvent;
 use App\Http\Resources\Customer\OrderItem;
 use App\Http\Resources\Customer\LeaderResource;
 use App\Http\Resources\Customer\Order as OrderResource;
 use App\Http\Resources\Customer\SubOrder;
 use App\Http\Resources\Customer\SubOrderDetail;
-use App\Models\Auth\Customer;
 use App\Models\Common\Leader;
-use App\Models\Customer\LeaderPromotion;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
 use App\Models\Customer\Order;
@@ -20,24 +20,25 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    # 消费者用户 订单相关接口处理
     protected  $customer;
+
     public function __construct()
     {
         $this->customer = auth()->user();
     }
-    # todo 未设置库存处理
-    # 消费者用户 订单相关接口处理
 
-    # todo 订单超时检测 并更新订单状态
+
+    # todo 检测当前我的订单是否有超时订单
     public function checkOrderTimeout()
     {
-
+        # 检测我的未支付订单中 是否有超时订单
+        Order::updateTimeoutOrder($this->customer->id);
     }
-
 
     # 计算商品价格
     public function calculate($data, $total, &$items=[])
-    {
+    {   # todo  修改stockable
         $price = 0.0;
         foreach ($data as $key => $val) {
                 $item = (array)Promotion::getPromotion($val['id']);
@@ -45,8 +46,15 @@ class OrderController extends Controller
                 if(empty($item)) {
                     throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
                 }
-                if($item['commid'] != $this->customer->commid) {
-                    throw new \Exception("请选择已绑定小区附近的商家，方便您提货!");
+                if($item['lid'] != $this->customer->leaderid) {
+                    throw new \Exception("请选择已在团长服务区域内商品，方便您提货!");
+                }
+                # 库存 订单检测
+                if($item['stock'] < $val['num']) {
+                    throw new \Exception('库存不足');
+                }
+                if($item['expire'] < time()) {
+                    throw new \Exception('活动已下架');
                 }
                 $items[$val['id']] = $item;
                 $price += $item['price'] * $val['num'] ;
@@ -67,6 +75,7 @@ class OrderController extends Controller
         $order['total']      = $this->calculate($data, $total, $items);
         $order['createtime'] = time();
         $order['status']     = Order::Unpaid;
+        # todo 收货人 手机号
         $order['note']       = '';
         if($order['total'] <= 0) {
             throw new \Exception('订单总价格异常');
@@ -102,7 +111,6 @@ class OrderController extends Controller
     #  生成订单
     public function createOrder(Request $request)
     {
-        #todo 更新库存数量
         try{
             $data =  $request->post('data');
             $total = $request->post('total');
@@ -111,6 +119,7 @@ class OrderController extends Controller
             $orderid = $this->createMasterOrder($data, $total, $items);
             $this->createSubOrder($data, $orderid, $items);
             DB::commit();
+            event(new CreateOrderEvent($orderid));
             $order = Order::findOrder($orderid);
             return $this->okWithResource($order, '成功生成订单');
         }
@@ -135,6 +144,7 @@ class OrderController extends Controller
                 DB::beginTransaction();
                 Order::cancelCasecadeOrder($order->id);
                 DB::commit();
+                event(new CancelOrderEvent($order->id));
                 return $this->okWithResource([], '成功取消订单');
             }
             catch (\Exception $exception) {

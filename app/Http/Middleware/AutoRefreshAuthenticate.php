@@ -21,10 +21,8 @@ class AutoRefreshAuthenticate extends BaseMiddleware
      * @throws JWTException
      */
     public function handle($request, Closure $next)
-
     {
 
-        # 检查此次请求中是否带有 token，如果没有则抛出异常。
         $this->checkForToken($request);
 
         # 使用 try 包裹，以捕捉 token 过期所抛出的 TokenExpiredException  异常

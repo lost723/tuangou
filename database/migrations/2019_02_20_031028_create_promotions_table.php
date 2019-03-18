@@ -28,6 +28,15 @@ class CreatePromotionsTable extends Migration
             $table->unsignedInteger('sales')->default(0)->comment('卖出去的数量');
             $table->unsignedInteger('leaders')->default(0)->comment('参与的团长数量');
             $table->unsignedTinyInteger('status')->default(0)->comment('0:未发布 1：进行中 2：备货中 3：配送中 4：已签收 9：结束');
+            # 统计字段
+            $table->unsignedInteger('checkcount')->default(0)->comment('实际签收数量');
+            $table->unsignedInteger('sharecount')->default(0)->comment('分享数量');
+            $table->unsignedInteger('viewcount')->default(0)->comment('浏览数量');
+            $table->unsignedInteger('paycount')->default(0)->comment('支付数量');
+            $table->unsignedInteger('cargoscount')->default(0)->comment('加入购物车数量');
+            $table->unsignedInteger('refundcount')->default(0)->comment('已退款数量');
+            $table->unsignedInteger('unpaycount')->default(0)->comment('未支付数量');
+            
             $table->timestamps();
         });
     }

@@ -32,7 +32,7 @@ class CreateCustomersTable extends Migration
             $table->string('province', 20);
             $table->string('city', 20);
 
-            $table->unsignedInteger('commid')->default(0);
+            $table->unsignedInteger('leaderid')->default(0)->comment('绑定团长id');
 
 
 

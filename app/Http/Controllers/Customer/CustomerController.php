@@ -8,14 +8,13 @@ use App\Http\Resources\Customer\PurchaseRecord;
 use App\Models\Customer\Promotion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 
 class CustomerController extends Controller
 {
     # 用户首页 + 详情页 所需接口数据
 
     /**
-     * 获取该小区内的所有的商品活动
+     * 获取该小区内的所有的商品活动 =》 修改为 以团长为中心的活动
      * @param $id  小区id
      */
     public function getCommPromotions(Request $request)
@@ -54,6 +53,7 @@ class CustomerController extends Controller
 
 
     /**
+     * #todo 应该是以商品为单位 且在该团长下的购买记录 而不是以活动
      * 商品的购买记录
      * @param $id 团长活动id
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection

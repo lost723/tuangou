@@ -21,7 +21,7 @@ Route::resource('road','Common\RoadController');
 Route::get('community/my', 'Common\CommunityController@myCommunity');
 Route::post('community/relate', 'Common\CommunityController@relateCommunity');
 Route::post('community/list', 'Common\CommunityController@CommunityList');
-Route::post('community/search', 'Common\CommunityController@searchCommunity');
+//Route::post('community/search', 'Common\CommunityController@searchCommunity'); # 作废
 Route::resource('community', 'Common\CommunityController');
 
 
@@ -29,5 +29,16 @@ Route::resource('community', 'Common\CommunityController');
 # 文件上传
 Route::post('upload/public/image','Common\QiNiuUploadController@uploadPublicImg');
 Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateImg');
+
+
+
+# 小程序接口相关
+# 手机号解析
+Route::post('system/parse/mobile', 'Auth\CustomerController@parseMobile');
+Route::get('system/qr', 'Customer\SystemController@QRcode');
+
+
+
+Route::get('log', 'Log\PayLog@test');
 
 
