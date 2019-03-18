@@ -39,14 +39,12 @@ class Promotion extends BaseModel
             })
             ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-            ->leftjoin('categories as cg', 'cg.id', '=', 'pd.catid')
             ->leftjoin('leaders as ld', 'ld.id', '=', 'lm.leaderid')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
             ->select('lm.*', 'ld.commid', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
-                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.stock', 'pm.status',
-                'pd.title', 'pd.catid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture',
-                'bs.title as btitle' ,
-                'cg.title as ctitle', 'cg.parentid', 'cg.level', 'cg.logo')
+                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.stockable', 'pm.stock', 'pm.status',
+                'pd.title', 'pd.catid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.thumb', 'pd.picture',
+                'bs.title as btitle')
             ->Paginate(BaseModel::NPP);
     }
 

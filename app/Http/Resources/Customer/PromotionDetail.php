@@ -25,13 +25,6 @@ class PromotionDetail extends Resource
                 'status'    =>  $this->status,
             ],
             "bussiness" =>  $this->btitle,
-            "leader"    =>  [
-                'id'        =>  $this->leaderid,
-                'commid'    =>  $this->commid,
-                'name'      =>  $this->name,
-                'mobile'    =>  $this->mobile,
-                'status'    =>  $this->lstatus,
-            ],
             "product"   =>  [
                 'title'     =>  $this->title,
                 'norm'      =>  $this->norm,
@@ -42,14 +35,6 @@ class PromotionDetail extends Resource
                 'content'   =>  $this->content,
 
             ],
-            "cate"      =>  [
-                'id'        =>  $this->catid,
-                'title'     =>  $this->ctitle,
-                'parentid'  =>  $this->parentid,
-                'level'     =>  $this->level,
-                'logo'      =>  $this->logo,
-            ]
-
         ];
     }
 }

@@ -13,6 +13,7 @@ class Order extends BaseModel
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
     const TimeOut = 60;
+    const LockTime = 2;# 超时未支付 锁定 LockTime后 进行状态更新时 防止超时数据更新不一致
 
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 
@@ -84,7 +85,6 @@ class Order extends BaseModel
     # 检查订单是否超时 未超时则返回订单信息
     static function checkOrder($id)
     {   #todo 该活动还在进行中
-
         return  DB::table('orders')->where('id', $id)
             ->where('status', Order::Unpaid)
             ->where('createtime','>',(time()- (Order::TimeOut*60)))

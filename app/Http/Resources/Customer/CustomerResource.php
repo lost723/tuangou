@@ -23,8 +23,6 @@ class CustomerResource extends Resource
             'province'  => $this->province,
             'city'      => $this->city,
             'gender'    => $this->gender,
-            'community' => new CommunityResource($this->community),
-            'leader'    => new LeaderResource($this->leader),
         ];
     }
 }

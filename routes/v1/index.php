@@ -38,7 +38,3 @@ Route::post('system/parse/mobile', 'Auth\CustomerController@parseMobile');
 Route::get('system/qr', 'Customer\SystemController@QRcode');
 
 
-
-Route::get('log', 'Log\PayLog@test');
-
-

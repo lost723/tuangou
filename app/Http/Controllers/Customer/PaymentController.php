@@ -42,7 +42,7 @@ class PaymentController extends BasePaymentController
     # 支付订单
     # profit_sharing  字段 值'Y' 分账字段
     public function Pay(Request $request)
-    {   # todo 暂时没有分账权限 日志格式待整理
+    {   # todo 暂时没有分账权限
         try{
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
