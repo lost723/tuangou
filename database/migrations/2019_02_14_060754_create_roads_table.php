@@ -17,7 +17,7 @@ class CreateRoadsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('parentid')->comment('上级id');
             $table->char('level')->comment('1:省 2:市 3:区 4:街道');
-            $table->char('life')->default(0)->comment('是否为最低等级元素 0:不是  1:是');
+            $table->tinyInteger('leaf')->default(0)->comment('是否为最低等级元素 0:不是  1:是');
             $table->string('name')->comment('名称');
             $table->string('province')->comment('省名称');
             $table->string('city')->default('')->comment('市名称');

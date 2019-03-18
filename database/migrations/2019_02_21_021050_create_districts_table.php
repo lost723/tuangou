@@ -18,7 +18,7 @@ class CreateDistrictsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('orgid')->comment('所属商户');
             $table->string('title')->comment('模版名称');
-            $table->unsignedInteger('totles')->comment('小区数量');
+            $table->unsignedInteger('totals')->comment('小区数量');
             $table->string('note')->comment('备注');
             $table->unsignedTinyInteger('status')->comment('0:禁用， 9:正常');
             $table->timestamps();
