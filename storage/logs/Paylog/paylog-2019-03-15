@@ -1,2 +1,0 @@
-{"message":"exception","context":{"username":"QiuYu"},"level":100,"level_name":"DEBUG","channel":"payLog","datetime":{"date":"2019-03-15 11:26:18.718233","timezone_type":3,"timezone":"UTC"},"extra":[]}
-{"message":"ok","context":{"username":"QiuYu"},"level":100,"level_name":"DEBUG","channel":"payLog","datetime":{"date":"2019-03-15 11:28:34.649292","timezone_type":3,"timezone":"UTC"},"extra":[]}
