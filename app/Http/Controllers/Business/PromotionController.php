@@ -20,8 +20,7 @@ class PromotionController extends Controller
     public function index(Request $request)
     {
         try{
-            $dat = Product::getBusinessOwnList($request);
-
+            $result = Promotion::getBusinessOwnList($request);
             return $this->ok($result);
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
@@ -43,7 +42,11 @@ class PromotionController extends Controller
             $all = $request->all();
             $all['optid'] = $user->id;
             $all['orgid'] = $user->orgid;
-
+            if(!$all['published']){
+                $all['status'] = Promotion::Unpublished;
+            }else{
+                $all['status'] = Promotion::Ordering;
+            }
             DB::beginTransaction();
             $pm = Promotion::create($all);
             # 活动期数减一

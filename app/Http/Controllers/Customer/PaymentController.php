@@ -55,12 +55,7 @@ class PaymentController extends BasePaymentController
             $data['trade_type']         = 'JSAPI';
 //            $data['profit_sharing']     = 'Y';
             $result = $this->payment->order->unify($data);
-            # 日志上下文
-            $context = [
-                'action'    =>  'pay',
-                'orderid'   =>  $order->id,
-                'trade_type'=>  'JSAPI',
-            ];
+
             if($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
                 throw new \Exception($result['err_code_des']);
             }
@@ -73,14 +68,12 @@ class PaymentController extends BasePaymentController
             ];
             # 日志消息
             $message = '支付成功';
-            PayLog::note($message, $context);
             $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
             return $this->okWithResource($response);
         }
         catch (\Exception $exception) {
             # 日志消息
             $message = $exception->getMessage();
-            PayLog::warnning($message, $context);
             return $this->warning($exception->getMessage());
         }
     }

@@ -68,11 +68,24 @@ class Order extends BaseModel
             ->get();
     }
 
+    /**
+     * 更新当前消费者用户的超时订单状态
+     * @param $customerid
+     * # @param
+     */
+    static function updateTimeoutOrder($customerid)
+    {
+        Order::where('customerid', $customerid)
+            ->where('status', Order::Unpaid)
+            ->where('createtime', '>', (time()-Order::TimeOut*60))
+            ->update(['status'  =>  Order::Cancel]);
+    }
 
-    # 检查订单是否超时
+    # 检查订单是否超时 未超时则返回订单信息
     static function checkOrder($id)
     {   #todo 该活动还在进行中
-        return DB::table('orders')->where('id', $id)
+
+        return  DB::table('orders')->where('id', $id)
             ->where('status', Order::Unpaid)
             ->where('createtime','>',(time()- (Order::TimeOut*60)))
             ->first();

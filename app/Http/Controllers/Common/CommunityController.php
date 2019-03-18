@@ -153,7 +153,7 @@ class CommunityController extends Controller
             if(empty($leader)) {
                 return $this->okWithResource([], '该用户还未绑定小区');
             }
-            $leader->logo = $customer->avatar;
+            $leader->logo = $leader->customer->avatar;
             $resource = new LeaderResource($leader);
             return $this->okWithResource($resource);
         }

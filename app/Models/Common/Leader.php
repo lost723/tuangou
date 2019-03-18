@@ -16,5 +16,9 @@ class Leader extends BaseModel
         'idcard_back_url', 'address', 'commission', 'status'];
 
 
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Auth\Customer', 'customerid', 'id');
+    }
 
 }

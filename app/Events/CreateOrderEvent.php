@@ -11,11 +11,11 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 /**
- * 取消订单事件 更新库存 销量
- * Class CancelOrderEvent
+ * 下单事件  更新库存 和 销量
+ * Class CreateOrderEvent
  * @package App\Events
  */
-class CancelOrderEvent
+class CreateOrderEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

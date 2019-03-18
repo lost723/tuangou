@@ -19,14 +19,16 @@ class CreatePromotionsTable extends Migration
             $table->unsignedBigInteger('optid')->comment('操作人id');
             $table->unsignedBigInteger('productid')->comment('产品id');
             $table->unsignedDecimal('price')->comment('活动售价');
+            $table->unsignedInteger('start')->comment('活动开始时间');
             $table->unsignedInteger('expire')->comment('活动截止时间');
             $table->unsignedInteger('deliveryday')->comment('配送日期，时间戳');
             $table->unsignedInteger('aftersale')->comment('售后截止日期,时间戳');
-            $table->unsignedInteger('stock')->default(0)->comment('库存量，默认是0：预定不关心库存。 确实有库存的，输入真实库存数量');
-            $table->unsignedDecimal('sales')->default(0)->comment('卖出去的数量');
-            $table->unsignedDecimal('leaders')->default(0)->comment('参与的团长数量');
+            $table->unsignedInteger('stock')->default(0)->comment('库存量，stockable=1时有效');
+            $table->unsignedInteger('stockable')->default(0)->comment('需要库存=1； 默认不需要库存=0');
+            $table->unsignedInteger('sales')->default(0)->comment('卖出去的数量');
+            $table->unsignedInteger('leaders')->default(0)->comment('参与的团长数量');
             $table->unsignedTinyInteger('status')->default(0)->comment('0:未发布 1：进行中 2：备货中 3：配送中 4：已签收 9：结束');
-
+            # 统计字段
             $table->unsignedInteger('checkcount')->default(0)->comment('实际签收数量');
             $table->unsignedInteger('sharecount')->default(0)->comment('分享数量');
             $table->unsignedInteger('viewcount')->default(0)->comment('浏览数量');
@@ -34,7 +36,7 @@ class CreatePromotionsTable extends Migration
             $table->unsignedInteger('cargoscount')->default(0)->comment('加入购物车数量');
             $table->unsignedInteger('refundcount')->default(0)->comment('已退款数量');
             $table->unsignedInteger('unpaycount')->default(0)->comment('未支付数量');
-
+            
             $table->timestamps();
         });
     }

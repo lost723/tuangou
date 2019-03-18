@@ -3,11 +3,11 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
-use App\Models\Customer\LeaderPromotion;
 use App\Models\LeaderOrder;
-use function foo\func;
-use http\Env\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Customer\LeaderPromotion;
+
 
 class Promotion extends BaseModel
 {
@@ -20,7 +20,10 @@ class Promotion extends BaseModel
     const Terminated = 8;   #活动异常结束，下架
     const Finished = 9;     #过了售后期，结束
 
-    protected $fillable = [];
+    protected $fillable = [
+        'orgid', 'optid', 'productid', 'price', 'quotation', 'expire', 'deliveryday',
+        'stock', 'stockable', 'aftersale', 'status'
+    ];
 
 
     /**
@@ -32,14 +35,19 @@ class Promotion extends BaseModel
     {
         $orgid = Auth::user()->orgid;
         $pid = $request->get('pid');
+        $date = $request->get('date');
         $status = $request->get('status');
         $filter = $request->get('filter');
 
         $result = DB::table('promotions as pm')
             ->where('pm.orgid', $orgid)
-            ->where('pm.status', '!=', self::Del)
+            ->where('pm.status', '!=', self::Deleted)
             ->when($pid, function ($query) use ($pid) {
                 $query->where('pm.productid', $pid);
+            })
+            ->when($date, function ($query) use ($date) {
+                $query->where('pm.expire','>=', (strtotime($date[0])))
+                    ->where('pm.expire','<', (strtotime($date[1])));
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('pm.status', $status);
@@ -48,8 +56,10 @@ class Promotion extends BaseModel
                 $query->where('pd.title', 'like', "%$filter%");
             })
             ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.intro') ->simplePaginate(self::NPP);
-        return $result;
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.thumb')
+            ->paginate(self::NPP);
+
+        return self::paginationFormater($result);
     }
 
 

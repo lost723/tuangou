@@ -63,16 +63,12 @@ class LeaderPromotion extends BaseModel
         $result = DB::table('leader_promotions as lpm')
                 ->where('lpm.leaderid', $leaderid)
                 ->where('lpm.active', LeaderPromotion::Active)
-//                ->where('lpm.status', LeaderPromotion::UnReceived)
                 ->when($filter, function ($query) use ($filter) {
                     $query->where(function ($qr) use ($filter) {
                        $qr->orWhere('pd.title', 'like', "%$filter%");
                        $qr->orWhere('bs.title', 'like', "%$filter%");
                     });
                 })
-//                ->where('pm.status', BPromotion::Ordering)
-//                ->where('pm.expire', '>', time())
-//                ->where('pm.stock', '>', 0)
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
                 ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
@@ -94,9 +90,6 @@ class LeaderPromotion extends BaseModel
         return  DB::table('leader_promotions')
             ->insert($data);
     }
-
-
-    #
 
     /**
      * 检索 已激活的 未签收 且 活动在配送中的团长活动

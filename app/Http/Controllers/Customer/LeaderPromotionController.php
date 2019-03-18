@@ -142,11 +142,11 @@ class LeaderPromotionController extends Controller
     {
         try{
             $id = $request->post('id');
-            $count = DB::table('order_promotions')
+            $orders = DB::table('order_promotions')
                 ->where('lpmid', $id)
                 ->where('status', '>', OrderPromotion::Expire)
-                ->count();
-            if($count >= 1) {
+                ->first();
+            if(!empty($orders)) {
                 throw new \Exception('已有用户购买该活动，禁止取消');
             }
             DB::table('leader_promotions')

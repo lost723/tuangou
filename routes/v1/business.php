@@ -15,5 +15,8 @@ Route::resource('promotion', 'Business\PromotionController');
 
 # 商品信息
 Route::resource('product', 'Business\ProductController');
+Route::put('product/active/{id}',  'Business\ProductController@active');
+Route::put('product/disable/{id}',  'Business\ProductController@disable');
+
 
 
