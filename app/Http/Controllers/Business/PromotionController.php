@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
+use App\Models\Business\District;
 use App\Models\Business\Product;
 use Illuminate\Http\Request;
 use App\Models\Business\Promotion;
@@ -69,6 +70,8 @@ class PromotionController extends Controller
     {
         try{
             $item = Promotion::find($id);
+            $item->product = Product::find($item->productid);
+            $item->district = District::find($item->product->distid);
             $this->checkBusinessOwnship($item->orgid);
             return $this->ok($item);
         }catch (\Exception $e){
