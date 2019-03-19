@@ -15,16 +15,16 @@ class CreateOrderPromotionsTable extends Migration
     {
         Schema::create('order_promotions', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('customerid')->comment('消费者id');
-            $table->unsignedInteger('orderid')->comment('订单id') ;
-            $table->unsignedInteger('lpmid')->comment('leader_promotions表的id团长的活动id');
+            $table->unsignedBigInteger('customerid')->comment('消费者id');
+            $table->unsignedBigInteger('orderid')->comment('订单id') ;
+            $table->unsignedBigInteger('lpmid')->comment('leader_promotions表的id团长的活动id');
             # 添加商户发布的id 方便核销
             $table->unsignedBigInteger('promotionid')->comment('商家发布的活动id');
             $table->string('ordersn')->comment('系统内部子订单号 可作为退款单号');
             $table->string('refund_id')->comment('微信退款单号');
-            $table->unsignedInteger('num')->comment('购买数量');
-            $table->decimal('price',8,2)->comment('购买时活动单价');
-            $table->decimal('total',8,2)->comment('总价格');
+            $table->unsignedBigInteger('num')->comment('购买数量');
+            $table->unsignedBigInteger('price')->comment('购买时活动单价单位分');
+            $table->unsignedBigInteger('total')->comment('总价格单位分');
             $table->string('checkcode')->default('')->comment('核销码');
             $table->unsignedInteger('checktime')->default(0)->comment('核销时间');
             $table->unsignedInteger('refundtime')->default(0)->comment('退款时间');

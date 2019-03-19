@@ -72,4 +72,7 @@ class CustomerController extends Controller
     }
 
 
+    # 邻居购买推荐
+//    public function Recommend
+
 }

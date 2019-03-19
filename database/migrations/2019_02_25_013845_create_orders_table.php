@@ -15,10 +15,10 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('customerid')->comment('消费者id');
+            $table->unsignedBigInteger('customerid')->comment('消费者id');
             $table->string('trade_no')->comment('系统内部订单号');
             $table->string('transaction_id')->default('')->comment('微信支付的交易订单号');
-            $table->decimal('total',8,2)->comment('支付总价格');
+            $table->unsignedBigInteger('total')->comment('支付总价格 单位分');
             $table->string('carrier')->comment('收货人');
             $table->string('mobile')->comment('手机号');
             $table->unsignedInteger('createtime')->comment('下单时间');

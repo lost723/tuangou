@@ -54,7 +54,7 @@ class OrderController extends Controller
                 $items[$val['id']] = $item;
                 $price += $item['price'] * $val['num'] ;
         }
-        if($price <> $total) {
+        if($price <> ($total*100)) {
             throw new \Exception('价格异常');
         }
         return $price;

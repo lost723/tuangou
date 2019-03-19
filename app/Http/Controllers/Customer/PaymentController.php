@@ -50,7 +50,7 @@ class PaymentController extends BasePaymentController
             $data = [];
             $data['body']               = '团购';
             $data['out_trade_no']       = $order->trade_no;
-            $data['total_fee']          = $order->total*100;
+            $data['total_fee']          = $order->total;
             $data['sub_openid']         = $customer->openid;
             $data['trade_type']         = 'JSAPI';
 //            $data['profit_sharing']     = 'Y';
@@ -66,14 +66,12 @@ class PaymentController extends BasePaymentController
                 'signType'  =>  'MD5',
                 'package'   =>  'prepay_id='.$result['prepay_id'],
             ];
-            # 日志消息
-            $message = '支付成功';
+            # 日志--发起支付
+
             $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
             return $this->okWithResource($response);
         }
         catch (\Exception $exception) {
-            # 日志消息
-            $message = $exception->getMessage();
             return $this->warning($exception->getMessage());
         }
     }
@@ -104,5 +102,15 @@ class PaymentController extends BasePaymentController
             return true;
         });
         return $response;
+    }
+
+    /**
+     * 创建或更新支付日志
+     * @param $data
+     * # @param
+     */
+    public function createLog($data)
+    {
+
     }
 }

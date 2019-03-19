@@ -18,7 +18,7 @@ class CreatePaylogsTable extends Migration
             $table->unsignedInteger('customerid')->comment('消费者id');
             $table->string('transaction_id')->comment('微信支付单号');
             $table->string('trade_no')->comment('系统内部单号');
-            $table->unsignedDecimal('fee',8,2)->comment('支付金额');
+            $table->unsignedBigInteger('fee')->comment('支付金额单位分');
             $table->unsignedTinyInteger('status')->default(0)->comment('订单状态0:已取消 1:未支付 2:已支付');
             $table->string('note')->comment('备注');
             $table->timestamps();

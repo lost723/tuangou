@@ -35,11 +35,11 @@ class RefundController extends BasePaymentController
     {   # todo 日志数据格式待整理
         try {
             $id = $request->post('id');
-            $order = $this->checkTimeOut($id);
+            $order = $this->checkTimeOut($id); //dump($order);die;
 //            $result = $this->payment->refund->byTransactionId($order->transaction_id, $order->ordersn,
 //                $order->ototal*100, $order->total*100);dump($order);die;
             $result = $this->payment->refund->byOutTradeNumber($order->trade_no, $order->ordersn,
-                $order->ototal*100, $order->total*100);
+                $order->ototal, $order->total);
             if ($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
                 throw new \Exception($result['err_code_des']);
             }

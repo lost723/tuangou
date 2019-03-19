@@ -16,24 +16,28 @@ class PromotionDetail extends Resource
     {
         return [
             "id"    =>  $this->id,
-            "sales" =>  $this->sales,
             "promotion" =>[
                 'id'        =>  $this->promotionid,
-                'price'     =>  $this->price,
+                'price'     =>  sprintf("%.2f",$this->price / 100),
                 'expire'    =>  $this->expire,
                 'stock'     =>  $this->stock,
+                'stockable' =>  $this->stockable,
+                "sales"     =>  $this->when(($this->stockable <> 0), function () {
+                    return $this->stock;
+                }, function(){
+                    return 1000000000;
+                }),
                 'status'    =>  $this->status,
             ],
             "bussiness" =>  $this->btitle,
             "product"   =>  [
                 'title'     =>  $this->title,
                 'norm'      =>  $this->norm,
-                'rate'      =>  $this->rate,
+                'rate'      =>  number_format($this->rate/100,2),
                 'quotation' =>  $this->quotation,
                 'intro'     =>  $this->intro,
-                'picture'   =>  $this->picture,
-                'content'   =>  $this->content,
-
+                'picture'   =>  json_decode($this->picture),
+                'content'   =>  json_decode($this->content),
             ],
         ];
     }
