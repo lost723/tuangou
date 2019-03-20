@@ -17,6 +17,7 @@ Route::post('customer/promotions', 'Customer\CustomerController@getCommPromotion
 Route::post('customer/promotions/detail', 'Customer\CustomerController@getPromotionDetail');
 # 已购买该商品的用户信息
 Route::post('customer/promotions/record', 'Customer\CustomerController@record');
+Route::post('customer/promotions/recommend', 'Customer\CustomerController@recommend');
 
 
 # 订单相关路由

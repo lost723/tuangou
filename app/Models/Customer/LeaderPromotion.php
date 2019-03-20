@@ -18,7 +18,7 @@ class LeaderPromotion extends BaseModel
 
 
     protected $table = 'leader_promotions';
-    protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'status'];
+    protected $fillable = ['leaderid', 'promotionid', 'num', 'sales', 'ordersn', 'check', 'expire', 'active', 'status'];
 
     /**
      * 获取活动详情
