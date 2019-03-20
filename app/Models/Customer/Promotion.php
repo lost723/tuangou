@@ -66,22 +66,29 @@ class Promotion extends BaseModel
             ->first();
     }
 
-    # 获取团长某活动 的历史订单
+    #
+
+    /**
+     * 获取团长某活动 的历史订单
+     * todo 测试使用 注释 订单完成状态
+     * @param $request
+     * @return mixed
+     */
     static function getPurchaseRecord($request)
     {
         $id     = $request->post('id');
         $skip   = $request->post('skip');
         $result = DB::table('order_promotions as om')
             ->where('om.lpmid', $id)
-            ->where('om.status', OrderPromotion::Finished)
-            ->whereIn('pm.id',function ($query) {
-//                $query->select('')
-            })
+//            ->where('om.status', OrderPromotion::Finished)
+//            ->whereIn('pm.id',function ($query) {
+////                $query->select('')
+//            })
             ->when($skip, function ($query) use ($skip) {
                 $query->skip($skip);
             })
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
             ->orderBy('om.created_at', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;

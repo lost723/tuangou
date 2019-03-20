@@ -63,7 +63,7 @@ class CustomerController extends Controller
     public function record(Request $request)
     {
         try{
-            $list =  Promotion::getPurchaseRecord($request);
+            $list =  Promotion::getPurchaseRecord($request); //dump($list);die;
             $result = PurchaseRecord::collection($list);
             return $this->okWithResourcePaginate($result);
         }
@@ -72,9 +72,12 @@ class CustomerController extends Controller
         }
     }
 
-
-    # 邻居购买推荐
-    # 待优化
+    /**
+     * 邻居购买推荐
+     * todo 数据查询连接过多 需后期优化
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
    public function recommend(Request $request)
    {
        try{
