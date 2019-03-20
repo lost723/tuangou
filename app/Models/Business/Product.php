@@ -37,8 +37,7 @@ class Product extends BaseModel
         $status = $request->get('status');
         $filter = $request->get('filter');
 
-        $result =
-            DB::table(with(new Product())->getTable().' as pd')
+        $result = DB::table(with(new Product())->getTable().' as pd')
                 ->where('pd.orgid', $orgid)
                 ->where('pd.status', '!=', self::Del)
                 ->when($date, function ($query) use ($date) {

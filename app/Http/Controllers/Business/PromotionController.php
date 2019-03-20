@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
+use App\Models\Business\District;
 use App\Models\Business\Product;
 use Illuminate\Http\Request;
 use App\Models\Business\Promotion;
@@ -25,9 +26,7 @@ class PromotionController extends Controller
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
         }
-
     }
-
 
     /**
      * 创建保存一个活动
@@ -69,6 +68,8 @@ class PromotionController extends Controller
     {
         try{
             $item = Promotion::find($id);
+            $item->product = Product::find($item->productid);
+            $item->district = District::find($item->product->distid);
             $this->checkBusinessOwnship($item->orgid);
             return $this->ok($item);
         }catch (\Exception $e){
@@ -119,5 +120,58 @@ class PromotionController extends Controller
         }
     }
 
+    /**
+     * 设置活动状态
+     * @param $id
+     * @param Request $request
+     */
+    public function setStatus($id, Request $request)
+    {
+        try{
+            $stat = $request->get('status');
+            $item = Promotion::find($id);
+            if(in_array($stat, Promotion::Status) and $stat>$item->status){
+                $item->status = $stat;
+                $item->save();
+                return $this->note();
+            }else{
+                return $this->warning('无效的状态');
+            }ok($result);
+        }catch (\Exception $e){
+            return $this->warning($e->getMessage());
+        }
+
+
+    }
+
+    /**
+     * 获取分销团长列表
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getLeaderList($id)
+    {
+        try{
+            $result = Promotion::getLeaderList($id);
+            return $this->ok($result);
+        }catch (\Exception $e){
+            return $this->warning($e->getMessage());
+        }
+    }
+
+    /**
+     * 统计团长分销量
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function summaryByLeaders($id)
+    {
+        try{
+            $result = Promotion::summaryByLeaders($id);
+            return $this->ok($result);
+        }catch (\Exception $e){
+            return $this->warning($e->getMessage());
+        }
+    }
 
 }
