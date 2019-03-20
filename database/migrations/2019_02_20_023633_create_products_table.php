@@ -28,8 +28,9 @@ class CreateProductsTable extends Migration
             $table->string('picture')->comment('商品详情头部大图片');
             $table->string('content')->comment('商品详情富文本');
             $table->unsignedInteger('rate')->comment('团长佣金返点');
-            $table->unsignedInteger('price')->comment('商品售价');
-            $table->unsignedInteger('quotation')->comment('商品市场价');
+            $table->unsignedBigInteger('price')->comment('商品售价单位分');
+            $table->unsignedBigInteger('quotation')->comment('商品市场价单位分');
+
             $table->tinyInteger('status')->default(9)->comment('默认9: 正常， 1:下架, 0:删除');
             $table->timestamps();
         });

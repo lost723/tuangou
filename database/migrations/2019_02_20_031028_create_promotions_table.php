@@ -18,8 +18,9 @@ class CreatePromotionsTable extends Migration
             $table->unsignedInteger('orgid')->comment('商户id');
             $table->unsignedBigInteger('optid')->comment('操作人id');
             $table->unsignedBigInteger('productid')->comment('产品id');
-            $table->unsignedInteger('price')->comment('活动售价');
-            $table->unsignedInteger('quotation')->comment('商品市场价');
+            $table->unsignedBigInteger('price')->comment('活动售价单位分');
+            $table->unsignedBigInteger('quotation')->comment('活动售价单位分');
+
             $table->unsignedInteger('start')->comment('活动开始时间');
             $table->unsignedInteger('expire')->comment('活动截止时间');
             $table->unsignedInteger('deliveryday')->comment('配送日期，时间戳');
