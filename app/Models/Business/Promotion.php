@@ -3,7 +3,9 @@
 namespace App\Models\Business;
 
 use App\Models\BaseModel;
+use App\Models\Common\Leader;
 use App\Models\LeaderOrder;
+use function foo\func;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer\LeaderPromotion;
@@ -19,6 +21,8 @@ class Promotion extends BaseModel
     const Received = 5;     #签收完成
     const Terminated = 8;   #活动异常结束，下架
     const Finished = 9;     #过了售后期，结束
+
+    const Status = [0, 1, 2, 3, 4, 5, 8, 9];
 
     protected $fillable = [
         'orgid', 'optid', 'productid', 'price', 'quotation', 'expire', 'deliveryday',
@@ -62,7 +66,6 @@ class Promotion extends BaseModel
         return self::paginationFormater($result);
     }
 
-
     /**
      * 获取团长的挑货列表
      * @param $commid   小区id
@@ -104,7 +107,6 @@ class Promotion extends BaseModel
     }
 
 
-
     /**
      * 获取还没有结束的活动
      * @param $id
@@ -129,7 +131,37 @@ class Promotion extends BaseModel
             ->leftJoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->where('pm.id', $id)
             ->get();
-
         return $item;
+    }
+
+    /**
+     * 获取某个活动的分销团长列表
+     * @param $id
+     */
+    static function getLeaderList($id)
+    {
+        $result = DB::table(with(new LeaderPromotion())->getTable().' as lp')
+                ->where('lp.promotionid', $id)
+                ->leftjoin(with(new Leader())->getTable().' as ld', 'ld.id', '=', 'lp.leaderid')
+                ->select('lp.*', 'ld.commtitle', 'ld.alias', 'ld.name')
+                ->Paginate(self::NPP);
+        return self::paginationFormater($result);
+    }
+
+    /**
+     * 获取销售数量，备货数量
+     * @param $id
+     * @return mixed
+     */
+    static function summaryByLeaders($id)
+    {
+            return DB::table(with(new LeaderPromotion())->getTable())
+                ->where('promotionid', $id)
+                ->first(
+                    array(
+                        \DB::raw('SUM(sales) as sales'),
+                        \DB::raw('SUM(paycount) as orders')
+                    )
+                );
     }
 }
