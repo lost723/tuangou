@@ -59,7 +59,9 @@ class Promotion extends BaseModel
             ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
+            ->leftjoin('leaders as ld', 'ld.id', '=', 'lm.leaderid')
             ->select('lm.*',
+                'ld.id as lid',
                 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.stockable', 'pm.stock',  'pm.status',
                 'pd.title', 'pd.catid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.thumb', 'pd.picture', 'pd.content',
                 'bs.title as btitle' )
@@ -88,7 +90,7 @@ class Promotion extends BaseModel
                 $query->skip($skip);
             })
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
-            ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
+            ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.createtime')
             ->orderBy('om.createtime', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;
