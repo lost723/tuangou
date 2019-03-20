@@ -16,8 +16,11 @@ class PayLog
 {
 
     public function test()
-    {
-       echo "test log";
+    {   #todo 测试
+
+       $id = 10;
+       $basenum = 100000;
+       echo sprintf("%06X",$basenum+$id);
     }
 
     /**

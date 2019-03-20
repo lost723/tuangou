@@ -43,6 +43,7 @@ class Promotion extends BaseModel
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
             ->select('lm.*', 'ld.commid', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
                 'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.quotation','pm.stockable', 'pm.stock', 'pm.status',
+                'pm.deliveryday',
                 'pd.title', 'pd.catid', 'pd.norm', 'pd.rate',  'pd.intro', 'pd.thumb', 'pd.picture',
                 'bs.title as btitle')
             ->Paginate(BaseModel::NPP);
@@ -61,8 +62,8 @@ class Promotion extends BaseModel
             ->leftjoin('leaders as ld', 'ld.id', '=', 'lm.leaderid')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
             ->select('lm.*', 'ld.id as lid', 'ld.commid', 'ld.name', 'ld.mobile', 'ld.status as lstatus',
-                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.stock',  'pm.status',
-                'pd.title', 'pd.catid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content',
+                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.stockable', 'pm.stock',  'pm.status',
+                'pd.title', 'pd.catid', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.thumb', 'pd.picture', 'pd.content',
                 'bs.title as btitle' ,
                 'cg.title as ctitle', 'cg.parentid', 'cg.level', 'cg.logo')
             ->first();

@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Events\PaySuccessEvent;
-use App\Http\Controllers\Log\PayLog;
-use App\Models\Auth\Customer;
 use App\Models\Customer\Order;
+use App\Models\Customer\PayLog;
 use function EasyWeChat\Kernel\Support\generate_sign;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 
 class PaymentController extends BasePaymentController
@@ -67,7 +65,15 @@ class PaymentController extends BasePaymentController
                 'package'   =>  'prepay_id='.$result['prepay_id'],
             ];
             # 日志--发起支付
-
+            $log = [
+                'customerid'    =>  $customer->id,
+                'trade_no'      =>  $order->trade_no,
+                'fee'           =>  $order->total,
+                'status'        =>  Order::Unpaid,
+                'note'          =>  '发起支付'
+            ];
+            PayLog::crateLog($log);
+            # ---end---
             $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
             return $this->okWithResource($response);
         }
@@ -104,13 +110,5 @@ class PaymentController extends BasePaymentController
         return $response;
     }
 
-    /**
-     * 创建或更新支付日志
-     * @param $data
-     * # @param
-     */
-    public function createLog($data)
-    {
 
-    }
 }
