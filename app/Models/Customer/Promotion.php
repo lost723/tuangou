@@ -89,7 +89,7 @@ class Promotion extends BaseModel
             })
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
             ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.created_at')
-            ->orderBy('om.created_at', 'DESC')
+            ->orderBy('om.createtime', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;
     }

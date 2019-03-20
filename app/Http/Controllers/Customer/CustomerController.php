@@ -63,7 +63,7 @@ class CustomerController extends Controller
     public function record(Request $request)
     {
         try{
-            $list =  Promotion::getPurchaseRecord($request); //dump($list);die;
+            $list =  Promotion::getPurchaseRecord($request);
             $result = PurchaseRecord::collection($list);
             return $this->okWithResourcePaginate($result);
         }

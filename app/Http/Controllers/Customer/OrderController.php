@@ -99,6 +99,7 @@ class OrderController extends Controller
             $insert['total']       =   $val['num']*$items[$val['id']]['price'];
             $insert['status']      =   OrderPromotion::Unpaid;
             $insert['note']        =   '';
+            $insert['createtime']  =   time();
             array_push($orderpromotion, $insert);
             unset($insert);
             unset($val);
