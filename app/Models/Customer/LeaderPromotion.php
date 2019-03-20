@@ -12,9 +12,9 @@ class LeaderPromotion extends BaseModel
     const Unactive = 0;   # 取消挑选该活动
     const Active = 1;     # 挑选该活动
 
-    const UnReceived = 0; # 未签收
-    const Received = 1;   # 已签收
-    const Finished = 2;   # 已完成
+    const UnReceived = 6; # 未签收
+    const Received = 7;   # 已签收
+    const Finished = 8;   # 已完成
 
 
     protected $table = 'leader_promotions';
@@ -45,7 +45,7 @@ class LeaderPromotion extends BaseModel
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->select('lpm.*',
-                'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
+                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
                 'pm.status',
                 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
             ->first();

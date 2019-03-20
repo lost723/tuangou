@@ -16,40 +16,31 @@ class PromotionDetail extends Resource
     {
         return [
             "id"    =>  $this->id,
-            "sales" =>  $this->sales,
             "promotion" =>[
                 'id'        =>  $this->promotionid,
-                'price'     =>  $this->price,
+                'price'     =>  sprintf("%.2f",$this->price / 100),
                 'expire'    =>  $this->expire,
-                'stock'     =>  $this->stock,
+                'deliveryday'=> $this->deliveryday,
+                'sales'     =>  $this->sales,
+                'stockable' =>  $this->stockable,
+                "stock"     =>  $this->when(($this->stockable <> 0), function () {
+                    return $this->stock;
+                }, function(){
+                    return 1000000000;
+                }),
                 'status'    =>  $this->status,
             ],
             "bussiness" =>  $this->btitle,
-            "leader"    =>  [
-                'id'        =>  $this->leaderid,
-                'commid'    =>  $this->commid,
-                'name'      =>  $this->name,
-                'mobile'    =>  $this->mobile,
-                'status'    =>  $this->lstatus,
-            ],
             "product"   =>  [
                 'title'     =>  $this->title,
                 'norm'      =>  $this->norm,
-                'rate'      =>  $this->rate,
-                'quotation' =>  $this->quotation,
+                'rate'      =>  sprintf("%.2f", $this->rate/100),
+                'quotation' =>  sprintf("%.2f", $this->quotation/100),
                 'intro'     =>  $this->intro,
-                'picture'   =>  $this->picture,
-                'content'   =>  $this->content,
-
+                'thumb'     =>  stripslashes($this->thumb),
+                'picture'   =>  json_decode($this->picture),
+                'content'   =>  json_decode($this->content),
             ],
-            "cate"      =>  [
-                'id'        =>  $this->catid,
-                'title'     =>  $this->ctitle,
-                'parentid'  =>  $this->parentid,
-                'level'     =>  $this->level,
-                'logo'      =>  $this->logo,
-            ]
-
         ];
     }
 }

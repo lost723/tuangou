@@ -32,6 +32,7 @@ class CustomerController extends Controller
 
     /**
      * 获取某个团长活动详情
+     * #todo 记录访问数据
      * @param $id 团长活动id
      * @return PromotionDetail|\Illuminate\Http\JsonResponse
      */
@@ -70,5 +71,8 @@ class CustomerController extends Controller
         }
     }
 
+
+    # 邻居购买推荐
+//    public function Recommend
 
 }

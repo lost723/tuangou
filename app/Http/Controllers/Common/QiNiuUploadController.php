@@ -16,20 +16,33 @@ class QiNiuUploadController extends Controller
      * @param string $jsonString
      * @return mixed|void
      */
-     public function  decodePath($jsonString = '')
+     public function  accessPath($jsonString = '')
     {
         if(!empty($jsonString)) {
-            $result = json_decode($jsonString);
+            $result = json_decode($jsonString, true);
             if('private' == $result['access']) {
                 $disk = Storage::disk('qiniu_private');
             }
             else {
                 $disk = Storage::disk('qiniu_public');
             }
-            return $disk->imagePreviewUrl($result['savePath']);
+            return $disk->imagePreviewUrl($result['path']);
         }
         return "";
     }
+
+    static function savePath($path = [])
+    {
+        if(!is_array($path)) {
+            throw new \Exception('解析格式不正确');
+        }
+        $savePath = [
+            'access'    =>  $path['access'],
+            'path'      =>  $path['savePath'],
+        ];
+        return json_encode($savePath, true);
+    }
+
     //  定义PictureStyle
     static function getUrl($jsonString = '', $option)
     {

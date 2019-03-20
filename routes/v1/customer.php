@@ -33,7 +33,10 @@ Route::post('customer/order/sub/detail', 'Customer\OrderController@subOrderDetai
 Route::post('customer/order/pay', 'Customer\PaymentController@Pay');
 Route::post('customer/order/refund', 'Customer\RefundController@Refund');
 
-#
+# 统计
+Route::post('customer/count/view', 'Customer\StatisticController@viewCount');
+Route::post('customer/count/share', 'Customer\StatisticController@shareCount');
+Route::post('customer/count/cargo', 'Customer\StatisticController@cargoCount');
 
 #通知
 Route::post('notify/pay', 'Customer\PaymentController@notify');

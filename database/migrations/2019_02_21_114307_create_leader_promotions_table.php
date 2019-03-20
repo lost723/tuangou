@@ -31,7 +31,7 @@ class CreateLeaderPromotionsTable extends Migration
                 退款次数        refundcount
             */
             $table->unsignedInteger('checkcount')->default(0)->comment('实际签收数量');
-            $table->unsignedInteger('verifycount')->default(0)->comment('实际数量');
+            $table->unsignedInteger('verifycount')->default(0)->comment('实际核销数量');
             $table->unsignedInteger('sharecount')->default(0)->comment('分享数量');
             $table->unsignedInteger('viewcount')->default(0)->comment('浏览数量');
             $table->unsignedInteger('paycount')->default(0)->comment('支付数量');

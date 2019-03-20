@@ -21,36 +21,31 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     # 消费者用户 订单相关接口处理
-    protected  $customer;
-
-    public function __construct()
-    {
-        $this->customer = auth()->user();
-    }
-
 
     # todo 检测当前我的订单是否有超时订单
     public function checkOrderTimeout()
     {
         # 检测我的未支付订单中 是否有超时订单
-        Order::updateTimeoutOrder($this->customer->id);
+        $customer = auth()->user();
+        Order::updateTimeoutOrder($customer->id);
     }
 
     # 计算商品价格
     public function calculate($data, $total, &$items=[])
-    {   # todo  修改stockable
+    {
         $price = 0.0;
+        $customer = auth()->user();
         foreach ($data as $key => $val) {
                 $item = (array)Promotion::getPromotion($val['id']);
                 # 检测商品列表中是否有商品不属于当前小区
-                if(empty($item)) {
-                    throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
-                }
-                if($item['lid'] != $this->customer->leaderid) {
+//                if(empty($item)) {
+//                    throw  new \Exception('id:'.$val['id'].'没有查找到相应活动');
+//                }
+                if($item['lid'] != $customer->leaderid) {
                     throw new \Exception("请选择已在团长服务区域内商品，方便您提货!");
                 }
                 # 库存 订单检测
-                if($item['stock'] < $val['num']) {
+                if($item['stockable'] && ($item['stock'] < $val['num'])) {
                     throw new \Exception('库存不足');
                 }
                 if($item['expire'] < time()) {
@@ -66,16 +61,18 @@ class OrderController extends Controller
     }
 
     # 创建主订单
-    public function createMasterOrder($data, $total, &$items)
+    public function createMasterOrder($data, $total, $carrier, $mobile, &$items)
     {
         # crate order;
+        $customer = auth()->user();
         $order = [];
-        $order['customerid'] = $this->customer->id;
+        $order['customerid'] = $customer->id;
         $order['trade_no']   = Order::OrderPrefix.LeaderPromotionController::createOrderSn();
         $order['total']      = $this->calculate($data, $total, $items);
         $order['createtime'] = time();
         $order['status']     = Order::Unpaid;
-        # todo 收货人 手机号
+        $order['carrier']   = $carrier;
+        $order['mobile']    = $mobile;
         $order['note']       = '';
         if($order['total'] <= 0) {
             throw new \Exception('订单总价格异常');
@@ -89,9 +86,10 @@ class OrderController extends Controller
     {
         $orderpromotion = [];
         $insert = [];
+        $customer = auth()->user();
         # create orderpromotion 创建相关子订单
         foreach ($data as $key => $val) {
-            $insert['customerid']  =   $this->customer->id;
+            $insert['customerid']  =   $customer->id;
             $insert['orderid']     =   $orderid;
             $insert['lpmid']       =   $val['id'];
             $insert['promotionid'] =   $items[$val['id']]['promotionid'];
@@ -114,11 +112,14 @@ class OrderController extends Controller
         try{
             $data =  $request->post('data');
             $total = $request->post('total');
+            $mobile = $request->post('mobile');
+            $carrier = $request->post('carrier');
             $items = [];
             DB::beginTransaction();
-            $orderid = $this->createMasterOrder($data, $total, $items);
+            $orderid = $this->createMasterOrder($data, $total, $carrier, $mobile, $items);
             $this->createSubOrder($data, $orderid, $items);
             DB::commit();
+            # 触发下单事件
             event(new CreateOrderEvent($orderid));
             $order = Order::findOrder($orderid);
             return $this->okWithResource($order, '成功生成订单');
@@ -162,7 +163,8 @@ class OrderController extends Controller
     public function listOrder()
     {
         try{
-            $list = Order::getUnpaidList($this->customer->id);
+            $customer = auth()->user();
+            $list = Order::getUnpaidList($customer->id);
             $resource =  OrderResource::collection($list);
             return $this->okWithResourcePaginate($resource);
         }
