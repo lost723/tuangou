@@ -48,7 +48,7 @@ class Order extends BaseModel
             ->where('orders.customerid', $customerid)
             ->where('createtime', '>', (time()-Order::TimeOut*60))
             ->where('orders.status', Order::Unpaid)
-            ->select('*')
+            ->select('id', 'createtime', 'status', 'total', 'trade_no')
             ->orderBy('createtime', 'DESC')
             ->paginate(self::NPP);
     }

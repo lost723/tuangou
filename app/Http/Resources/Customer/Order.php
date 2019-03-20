@@ -22,7 +22,7 @@ class Order extends Resource
             'createtime'    =>  $this->createtime,
             'status'        =>  $this->status,
             'count'         =>  $orderItems->count(),
-            'total'         =>  $this->total,
+            'total'         =>  sprintf("%.2f",$this->total / 100),
             'trade_no'      =>  $this->trade_no,
             'suborders'     =>  SubOrder::collection($orderItems),
         ];
