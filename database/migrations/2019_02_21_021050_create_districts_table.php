@@ -21,6 +21,7 @@ class CreateDistrictsTable extends Migration
             $table->unsignedInteger('totals')->comment('小区数量');
             $table->string('note')->comment('备注');
             $table->unsignedTinyInteger('status')->comment('0:禁用， 9:正常');
+            $table->unsignedInteger('version')->default(0)->comment('最后修改的时间戳，用于防止同时修改的冲突');
             $table->timestamps();
         });
     }

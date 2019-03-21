@@ -31,6 +31,7 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('price')->comment('商品售价单位分');
             $table->unsignedBigInteger('quotation')->comment('商品市场价单位分');
 
+            $table->unsignedInteger('version')->default(0)->comment('最后修改的时间戳，用于防止同时修改的冲突');
             $table->tinyInteger('status')->default(9)->comment('默认9: 正常， 1:下架, 0:删除');
             $table->timestamps();
         });

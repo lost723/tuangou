@@ -12,7 +12,7 @@ class District extends BaseModel
 {
     #
     protected $fillable = [
-        'orgid', 'title', 'note', 'status'
+        'orgid', 'title', 'note', 'status','version'
     ];
 
     /**

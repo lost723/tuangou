@@ -20,7 +20,7 @@ class Product extends BaseModel
 
     protected $fillable = [
         'title', 'intro', 'thumb', 'price', 'content', 'norm', 'mtpd', 'rate',
-        'quotation', 'picture', 'orgid', 'optid', 'distid', 'catid'
+        'quotation', 'picture', 'orgid', 'optid', 'distid', 'catid', 'version'
     ];
 
 

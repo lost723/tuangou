@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Business;
 
+use App\Exceptions\VersionExpiredException;
 use App\Http\Controllers\Controller;
 use App\Models\Business\District;
 use App\Models\Business\Product;
@@ -39,6 +40,7 @@ class PromotionController extends Controller
         try{
             $user = Auth::user();
             $all = $request->all();
+            $all['start'] = time();
             $all['optid'] = $user->id;
             $all['orgid'] = $user->orgid;
             if(!$all['published']){
@@ -89,6 +91,10 @@ class PromotionController extends Controller
         try{
             $all = $request->all();
             $item = Promotion::find($id);
+            if($item->version > $all['version']){
+                throw new VersionExpiredException();
+            }
+            $all['version'] = time();
             $this->checkBusinessOwnship($item->orgid);
             $item->update($all);
             return $this->ok($item);
@@ -132,6 +138,10 @@ class PromotionController extends Controller
             $item = Promotion::find($id);
             if(in_array($stat, Promotion::Status) and $stat>$item->status){
                 $item->status = $stat;
+                # 新发布，重置开始时间
+                if($stat == Promotion::Ordering){
+                    $item->start = time();
+                }
                 $item->save();
                 return $this->note();
             }else{
@@ -140,8 +150,6 @@ class PromotionController extends Controller
         }catch (\Exception $e){
             return $this->warning($e->getMessage());
         }
-
-
     }
 
     /**
