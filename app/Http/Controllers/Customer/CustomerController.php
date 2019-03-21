@@ -56,6 +56,7 @@ class CustomerController extends Controller
 
     /**
      * #todo 应该是以商品为单位 且在该团长下的购买记录 而不是以活动
+     * todo 做数据字段索引
      * 商品的购买记录
      * @param $id 团长活动id
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -63,7 +64,9 @@ class CustomerController extends Controller
     public function record(Request $request)
     {
         try{
-            $list =  Promotion::getPurchaseRecord($request);
+            # 获取商品id + 团长id
+            $preRecord = Promotion::getPrePromotionForRecord($request);
+            $list =  Promotion::getPurchaseRecord($request, 2,2);
             $result = PurchaseRecord::collection($list);
             return $this->okWithResourcePaginate($result);
         }

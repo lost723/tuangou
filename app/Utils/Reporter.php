@@ -92,26 +92,27 @@ trait Reporter
     protected function okWithResource($data= [], $message = '请求成功', $code = 1)
     {
         return response()->json([
-            'data'  =>  $data,
-            'timestamp'=>time(),
+            'data'      =>  $data,
+            'timestamp' =>time(),
             'message'   =>  $message,
-            'code'  =>  $code,
+            'code'      =>  $code,
         ], 200);
     }
 
     protected function okWithResourcePaginate($data= [], $message = '请求成功', $code = 1)
     {
         return response()->json(['data' => [
-            'data'  =>  $data,
-            'timestamp'=>time(),
+            'data'      =>  $data,
+            'timestamp' =>  time(),
             'message'   =>  $message,
-            'code'  =>  $code,
+            'code'      =>  $code,
         ],
             'link'=> [
                 'total'     =>  $data->total(),
                 'pageSize'  =>  $data->perPage(),
                 'current'   =>  $data->currentPage(),
-            ]], 200);
+            ]
+        ], 200);
     }
 
 }

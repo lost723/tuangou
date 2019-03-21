@@ -31,6 +31,7 @@ Route::post('customer/order/detail', 'Customer\OrderController@orderDetail');
 Route::post('customer/order/sub/detail', 'Customer\OrderController@subOrderDetail');
 Route::get('customer/order/finished', 'Customer\OrderController@finishedOrder');
 Route::post('customer/order/refundlist', 'Customer\OrderController@refundOrder');
+Route::get('customer/order/count', 'Customer\OrderController@orderCount');
 
 # 订单支付 退款
 Route::post('customer/order/pay', 'Customer\PaymentController@Pay');

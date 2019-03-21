@@ -23,13 +23,13 @@ class OrderPromotion extends BaseModel
         'checkcode', 'status', 'note'];
     protected $table = 'order_promotions';
 
-    # 获取待发货+待提货子订单列表 * 获取总订单下的订单详情
+    #  获取总订单下的订单详情 获取待发货+待提货子订单列表 *
     static function getOrderPromotions($request, $customerid)
     {
         $status = $request->post('status');
         $orderid = $request->post('orderid');
         return DB::table('order_promotions as om')
-            ->whereIn('om.status', [OrderPromotion::UnReceived, OrderPromotion::Dispatched])
+            ->whereIn('om.status', [OrderPromotion::Unpaid, OrderPromotion::UnReceived, OrderPromotion::Dispatched])
             ->when($status, function ($query) use ($status) {
                 $query->where('om.status', $status);
             })
@@ -59,6 +59,7 @@ class OrderPromotion extends BaseModel
             ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
                 , 'om.status', 'om.createtime',
                 'pd.title', 'pd.norm', 'pd.thumb')
+            ->orderBy('om.id',  'DESC')
             ->paginate(self::NPP);
     }
 
@@ -87,10 +88,12 @@ class OrderPromotion extends BaseModel
         return DB::table('order_promotions as om')
             ->whereIn('om.status', [OrderPromotion::Refunding, OrderPromotion::Refund, OrderPromotion::CHANGE, OrderPromotion::REFUNDCLOSE])
             ->where('customerid', $customerid)
-            ->when(($status==OrderPromotion::REFUNDCLOSE), function ($query) {
-                $query->whereIn('om.status', [OrderPromotion::CHANGE, OrderPromotion::REFUNDCLOSE]);
-            }, function ($query) use ($status) {
-                $query->where('om.status', $status);
+            ->when($status, function ($query) use ($status) {
+                $query->when(($status==OrderPromotion::REFUNDCLOSE), function ($query) {
+                    $query->whereIn('om.status', [OrderPromotion::CHANGE, OrderPromotion::REFUNDCLOSE]);
+                }, function ($query) use ($status) {
+                    $query->where('om.status', $status);
+                });
             })
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
@@ -141,7 +144,25 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
-
+    static function getOrderCount($request, $customerid)
+    {
+        $unPaidCount = DB::table('orders')
+            ->where('customerid', $customerid)
+            ->where('status', Order::Unpaid)->count();
+        $paidCount = DB::table('order_promotions')
+            ->where('customerid', $customerid)
+            ->where('status', OrderPromotion::UnReceived)
+            ->count();
+        $dispatchedCount = DB::table('order_promotions')
+            ->where('customerid', $customerid)
+            ->where('status', OrderPromotion::Dispatched)
+            ->count();
+        return [
+            'unpaid'    =>  $unPaidCount,
+            'paid'      =>  $paidCount,
+            'dispatch'  =>  $dispatchedCount,
+        ];
+    }
 
 //    static function findOrderById($id)
 //    {

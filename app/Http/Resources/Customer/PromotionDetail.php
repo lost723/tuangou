@@ -19,6 +19,7 @@ class PromotionDetail extends Resource
             "promotion" =>[
                 'id'        =>  $this->promotionid,
                 'price'     =>  sprintf("%.2f",$this->price / 100),
+                'quotation' =>  sprintf("%.2f", $this->quotation/100),
                 'expire'    =>  $this->expire,
                 'deliveryday'=> $this->deliveryday,
                 'sales'     =>  $this->sales,
@@ -35,7 +36,6 @@ class PromotionDetail extends Resource
                 'title'     =>  $this->title,
                 'norm'      =>  $this->norm,
                 'rate'      =>  sprintf("%.2f", $this->rate/100),
-                'quotation' =>  sprintf("%.2f", $this->quotation/100),
                 'intro'     =>  $this->intro,
                 'thumb'     =>  stripslashes($this->thumb),
                 'picture'   =>  json_decode($this->picture),

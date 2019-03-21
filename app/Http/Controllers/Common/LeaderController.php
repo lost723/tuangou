@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Common;
 use App\Models\Common\Leader;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redis;
 
 class LeaderController extends Controller
 {
@@ -96,16 +97,14 @@ class LeaderController extends Controller
                 return $this->note('请勿重复提交团长表单！');
             }
             $request->validate([
-                'idcard'        =>  'required|string|identitycards',
-                'mobile'        =>  'required|string|telphone',
-                'name'          =>  'required|string',
-                'address'       =>  'required|string',
-                'formid'        =>  'required'
+                'formid'        =>  'required|string'
             ]);
+
             Redis::set('openid:'.$customer['openid'].':registerformid',$request->post('formid'));
             $all = $request->all();
+            $all['customerid']      = $customer->id;
             $all['status']          = Leader::CREATE;
-            Leader::create($all);
+            Leader::createLeader($all);
             return $this->okWithResource([], '提交成功');
         }
         catch (\Exception $exception) {

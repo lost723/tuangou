@@ -19,6 +19,7 @@ class Promotions extends Resource
             "promotion" =>[
                 'id'        =>  $this->promotionid,
                 'price'     =>  sprintf("%.2f", $this->price/100),
+                'quotation' =>  sprintf("%.2f", $this->quotation/100),
                 'expire'    =>  $this->expire,
                 'deliveryday'=> $this->deliveryday,
                 'stockable' =>  $this->stockable,

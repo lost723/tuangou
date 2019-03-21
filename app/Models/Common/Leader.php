@@ -27,4 +27,26 @@ class Leader extends BaseModel
         return sprintf("%06X", (self::BaseNO+$id));
     }
 
+    static function createLeader($data)
+    {
+        $leader =  self::updateOrCreate(
+            [
+                'customerid'    =>  $data['customerid'],
+            ],
+            [
+                'commid'            =>  $data['commid'],
+                'name'              =>  $data['name'],
+                'mobile'            =>  $data['mobile'],
+                'idcard'            =>  $data['idcard'],
+                'idcard_front_url'  =>  $data['idcard_front_url'],
+                'idcard_back_url'   =>  $data['idcard_back_url'],
+                'address'           =>  $data['address'],
+                'commission'        =>  $data['commission'],
+                'status'            =>  empty($data['status'])? Leader::CREATE:$data['status'],
+            ]);
+
+        $leader->leaderno = self::getLeaderNo($leader->id);
+        return $leader;
+    }
+
 }

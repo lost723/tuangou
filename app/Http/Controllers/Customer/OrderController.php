@@ -186,22 +186,21 @@ class OrderController extends Controller
             $id = $request->post('id');
             $order = Order::getOrder($request);
             $data = Order::getUnpaidOrderDetail($id);
-            $count = $data->count();
+            $count = Order::getUnPaidPromotionCount($id);//die($count);
             $result['id'] = $order->id;
             $result['createtime'] = $order->createtime;
             $result['expire']     = $order->createtime+Order::TimeOut*60;
             $result['total'] = sprintf("%.2f",$order->total/100);
             $result['trade_no'] = $order->trade_no;
-            $result['count'] = $count;
+            $result['count'] = $count->count;
             $result['status'] = $order->status;
             $result['suborder'] = [];
             foreach ($data as $key => $val) {
                 array_push($result['suborder'], new UnPaidSubOrderList($val));
-            }
+            } ;
             $leaderid = $data->first()->leaderid;
-            $result['pickupStation'] = [];
             $leader = new PickUpStation(Leader::find($leaderid));
-            array_push($result['pickupStation'], $leader);
+            $result['pickupStation'] = $leader;
             return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
@@ -256,7 +255,7 @@ class OrderController extends Controller
 
     # 退款订单
 
-    public function  refundOrder(Request $request)
+    public function refundOrder(Request $request)
     {
         try{
             $customer = auth()->user();
@@ -268,6 +267,19 @@ class OrderController extends Controller
             return $this->warning($exception->getMessage());
         }
 
+    }
+
+    # 获取相应的 订单数据量
+    public function orderCount(Request $request)
+    {
+        try{
+            $customer = auth()->user();
+            $list = OrderPromotion::getOrderCount($request, $customer->id);
+            return $this->okWithResource($list);
+        }
+        catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
     }
 
 }

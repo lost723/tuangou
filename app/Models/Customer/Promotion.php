@@ -56,6 +56,7 @@ class Promotion extends BaseModel
             ->where('lm.id', $id)
             ->where('lm.active', LeaderPromotion::Active)
             ->where('pm.status', BPromotion::Ordering)
+            ->where('pm.expire', '>', time())
             ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
@@ -68,7 +69,17 @@ class Promotion extends BaseModel
             ->first();
     }
 
-    #
+    # 根据团长活动 获取商品id + 团长id
+    static function getPrePromotionForRecord($request)
+    {
+        $id = $request->post('id');
+        return DB::table('leader_promotions as lm')
+            ->where('lm.id', $id)
+            ->leftjoin('promotions as pm', 'lm.promotionid', '=', 'pm.id')
+            ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
+            ->select('lm.leaderid',  'pd.id as pid')
+            ->first();
+    }
 
     /**
      * 获取团长某活动 的历史订单
@@ -76,21 +87,21 @@ class Promotion extends BaseModel
      * @param $request
      * @return mixed
      */
-    static function getPurchaseRecord($request)
+    static function getPurchaseRecord($request, $leaderid, $productid)
     {
-        $id     = $request->post('id');
         $skip   = $request->post('skip');
         $result = DB::table('order_promotions as om')
-            ->where('om.lpmid', $id)
-//            ->where('om.status', OrderPromotion::Finished)
-//            ->whereIn('pm.id',function ($query) {
-////                $query->select('')
-//            })
+            ->where('om.status', OrderPromotion::Finished)
+            ->where('pd.id', $productid)
             ->when($skip, function ($query) use ($skip) {
                 $query->skip($skip);
             })
+            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.lpmid')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
             ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.createtime')
+            ->orderByRaw("lpm.leaderid={$leaderid} ASC")
             ->orderBy('om.createtime', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;
