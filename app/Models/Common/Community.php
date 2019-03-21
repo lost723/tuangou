@@ -56,8 +56,10 @@ class Community extends BaseModel
             })
             ->when($filter, function ($query) use ($filter) {
                 $query->where(function ($qr) use ($filter) {
-                    $qr->orWhere('cms.name', 'like', "%$filter%");
-                    $qr->orWhere('cms.address', 'like', "%$filter%");
+//                    $qr->orWhere('cms.name', 'like', "%$filter%");
+//                    $qr->orWhere('cms.address', 'like', "%$filter%");
+                    $qr->orWhere('leaders.commtitle', 'like', "%$filter%");
+                    $qr->orWhere('leaders.address', 'like', "%$filter%");
                 });
             })
             ->when($road_ids, function ($query) use ($road_ids) {

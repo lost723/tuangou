@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Controllers\Log\PayLog;
 use App\Http\Resources\Customer\PromotionDetail;
 use App\Http\Resources\Customer\Promotions as PromotionResource;
 use App\Http\Resources\Customer\PurchaseRecord;
@@ -71,8 +72,25 @@ class CustomerController extends Controller
         }
     }
 
-
-    # 邻居购买推荐
-//    public function Recommend
+    /**
+     * 邻居购买推荐
+     * todo 数据查询连接过多 需后期优化
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+   public function recommend(Request $request)
+   {
+       try{
+           # 获取商品分类id
+           $id = $request->post('id');
+           $cats = Promotion::getCategroy($id);
+           $promotions = Promotion::getRecommendPromotions($request, $cats->id);
+           $list = PromotionResource::collection(($promotions));
+           return $this->okWithResourcePaginate($list);
+       }
+       catch (\Exception $exception) {
+           return $this->warning($exception->getMessage());
+       }
+   }
 
 }

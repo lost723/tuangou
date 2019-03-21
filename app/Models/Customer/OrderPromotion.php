@@ -24,26 +24,25 @@ class OrderPromotion extends BaseModel
     protected $table = 'order_promotions';
 
     # 获取全部订单列表 *
-    # status 为数组
     static function getOrderPromotions($request)
     {
         $status  = $request->post('status');
         $orderid = $request->post('orderid');
         return DB::table('order_promotions as om')
             ->when($status, function ($query) use ($status) {
-                $query->whereIn('om.status', $status);
+//                $query->whereIn('om.status', $status);
+                $query->where('om.status', $status);
             })
             ->when($orderid, function ($query) use ($orderid) {
                 $query->where('om.orderid', $orderid);
             })
-            ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
             ->orderBy('om.status', 'DESC')
             ->orderBy('om.id', 'DESC')
             ->select('om.id', 'om.orderid', 'om.lpmid', 'om.promotionid', 'om.num', 'om.ordersn', 'om.price', 'om.total'
-                , 'om.status','orders.createtime',
-                'pd.title', 'pd.norm', 'pd.picture', 'pd.quotation')
+                , 'om.status','om.createtime',
+                'pd.title', 'pd.norm', 'pd.thumb', 'pd.picture', 'pd.quotation')
             ->paginate(self::NPP);
     }
 
