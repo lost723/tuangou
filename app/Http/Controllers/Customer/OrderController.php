@@ -189,6 +189,7 @@ class OrderController extends Controller
             $count = $data->count();
             $result['id'] = $order->id;
             $result['createtime'] = $order->createtime;
+            $result['expire']     = $order->createtime+Order::TimeOut*60;
             $result['total'] = sprintf("%.2f",$order->total/100);
             $result['trade_no'] = $order->trade_no;
             $result['count'] = $count;
