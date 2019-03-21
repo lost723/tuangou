@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business;
 
 use App\Exceptions\BusinessException;
+use App\Exceptions\VersionExpiredException;
 use App\Http\Controllers\Controller;
 use App\Models\Business\Promotion;
 use Illuminate\Http\Request;
@@ -101,7 +102,11 @@ class ProductController extends Controller
         try{
             $all = $request->all();
             $item = Product::find($id);
+            if($item->version > $all['version']){
+                throw new VersionExpiredException();
+            }
             $this->checkProductOwnShip($item->orgid);
+            $all['version'] = time();
             $all['thumb'] = $all['picture'][0];
             $all['picture'] = json_encode($all['picture']);
             $all['content'] = json_encode($all['content']);

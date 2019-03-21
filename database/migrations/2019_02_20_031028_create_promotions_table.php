@@ -30,6 +30,7 @@ class CreatePromotionsTable extends Migration
             $table->unsignedInteger('sales')->default(0)->comment('卖出去的数量');
             $table->unsignedInteger('leaders')->default(0)->comment('参与的团长数量');
             $table->unsignedTinyInteger('status')->default(0)->comment('0:未发布 1：进行中 2：备货中 3：配送中 4：已签收 9：结束');
+            $table->unsignedInteger('version')->default(0)->comment('最后修改的时间戳，用于防止同时修改的冲突');
             # 统计字段
             $table->unsignedInteger('checkcount')->default(0)->comment('实际签收数量');
             $table->unsignedInteger('sharecount')->default(0)->comment('分享数量');

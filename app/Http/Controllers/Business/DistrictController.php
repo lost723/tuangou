@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business;
 
 use App\Exceptions\BusinessException;
+use App\Exceptions\VersionExpiredException;
 use App\Http\Controllers\Controller;
 use App\Models\Business\District;
 use App\Models\Business\DistrictItem;
@@ -80,6 +81,11 @@ class DistrictController extends Controller
         try{
             $all = $request->all();
             $obj = District::find($id);
+            # 同时修改控制
+            if($obj->version > $all['version']){
+                throw new VersionExpiredException();
+            }
+            $all['version'] = time();
             $this->checkBusinessOwnship($obj->orgid);
             $obj->update($all);
             return $this->ok($obj);
@@ -98,12 +104,17 @@ class DistrictController extends Controller
     {
         try{
             $obj = District::find($id);
+            # 同时修改控制
+            if($obj->version > $request->get('version')){
+                throw new VersionExpiredException();
+            }
             # 执行业务
             $items = $request->get('items');
             DB::beginTransaction();
             DistrictItem::where('distid', $id)->delete();
             DistrictItem::addAll($id, $items);
             $obj->totals = count($items);
+            $obj->version = time();
             $obj->save();
             DB::commit();
             return $this->created('更新成功');

@@ -25,8 +25,8 @@ class Promotion extends BaseModel
     const Status = [0, 1, 2, 3, 4, 5, 8, 9];
 
     protected $fillable = [
-        'orgid', 'optid', 'productid', 'price', 'quotation', 'expire', 'deliveryday',
-        'stock', 'stockable', 'aftersale', 'status'
+        'orgid', 'optid', 'productid', 'price', 'quotation', 'start', 'expire', 'deliveryday',
+        'stock', 'stockable', 'aftersale', 'status', 'version'
     ];
 
 
