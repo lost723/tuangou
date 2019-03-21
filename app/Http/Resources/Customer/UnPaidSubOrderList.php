@@ -21,7 +21,7 @@ class UnPaidSubOrderList extends Resource
             'price'         =>  sprintf("%.2f", $this->price/100),
             'num'           =>  $this->num,
             'norm'          =>  $this->norm,
-            'total'         =>  $this->total,
+            'total'         =>  sprintf("%.2f", $this->total/100),
         ];
     }
 }
