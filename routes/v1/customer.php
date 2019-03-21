@@ -25,10 +25,12 @@ Route::post('customer/order/add','Customer\OrderController@createOrder');
 Route::post('customer/order/cancel', 'Customer\OrderController@cancelOrder');
 
 # 订单列表 详情
-Route::get('customer/order/list', 'Customer\OrderController@listOrder');
-Route::get('customer/order/sublist', 'Customer\OrderController@subOrder');
+Route::get('customer/order/list', 'Customer\OrderController@listOrder');# 待支付
+Route::post('customer/order/sublist', 'Customer\OrderController@subOrder');
 Route::post('customer/order/detail', 'Customer\OrderController@orderDetail');
 Route::post('customer/order/sub/detail', 'Customer\OrderController@subOrderDetail');
+Route::get('customer/order/finished', 'Customer\OrderController@finishedOrder');
+Route::post('customer/order/refundlist', 'Customer\OrderController@refundOrder');
 
 # 订单支付 退款
 Route::post('customer/order/pay', 'Customer\PaymentController@Pay');

@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Customer;
 
 use App\Events\CancelOrderEvent;
 use App\Events\CreateOrderEvent;
-use App\Http\Resources\Customer\OrderItem;
 use App\Http\Resources\Customer\LeaderResource;
 use App\Http\Resources\Customer\Order as OrderResource;
+use App\Http\Resources\Customer\PickUpStation;
 use App\Http\Resources\Customer\SubOrder;
 use App\Http\Resources\Customer\SubOrderDetail;
+use App\Http\Resources\Customer\UnPaidSubOrderList;
 use App\Models\Common\Leader;
 use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\Promotion;
@@ -176,7 +177,7 @@ class OrderController extends Controller
 
     /**
      * 未支付订单详情
-     * @param $id  支付订单id
+     * @param $id  支付订单id todo 待修改
      * @return \Illuminate\Http\JsonResponse
      */
     public function orderDetail(Request $request)
@@ -186,29 +187,20 @@ class OrderController extends Controller
             $order = Order::getOrder($request);
             $data = Order::getUnpaidOrderDetail($id);
             $count = $data->count();
-            $data = $data->groupBy('leaderid');
             $result['id'] = $order->id;
             $result['createtime'] = $order->createtime;
-            $result['total'] = $order->total;
+            $result['total'] = sprintf("%.2f",$order->total/100);
             $result['trade_no'] = $order->trade_no;
             $result['count'] = $count;
             $result['status'] = $order->status;
-            $result['order'] = [];
+            $result['suborder'] = [];
             foreach ($data as $key => $val) {
-                $tmp = [];
-                foreach ($val as $k => $v) {
-                    if(!array_key_exists('leader', $tmp)) {
-                        $tmp['leader'] = [];
-                        $leader = new LeaderResource(Leader::find($v->leaderid));
-                        array_push($tmp['leader'], $leader);
-                    }
-                    if(!array_key_exists('items', $tmp)) {
-                        $tmp['items'] = [];
-                    }
-                    array_push($tmp['items'], new OrderItem($v));
-                }
-                array_push($result['order'], $tmp);
+                array_push($result['suborder'], new UnPaidSubOrderList($val));
             }
+            $leaderid = $data->first()->leaderid;
+            $result['pickupStation'] = [];
+            $leader = new PickUpStation(Leader::find($leaderid));
+            array_push($result['pickupStation'], $leader);
             return $this->okWithResource($result);
         }
         catch (\Exception $exception) {
@@ -217,11 +209,12 @@ class OrderController extends Controller
     }
 
 
-    # 全部订单 待收货订单 已完成
+    # 待发货 待提货  子订单列表
     public function subOrder(Request $request)
     {
         try{
-            $list = OrderPromotion::getOrderPromotions($request);
+            $customer = auth()->user();
+            $list = OrderPromotion::getOrderPromotions($request, $customer->id);
             $resource =  SubOrder::collection($list);
             return $this->okWithResourcePaginate($resource);
         }
@@ -242,6 +235,38 @@ class OrderController extends Controller
         catch (\Exception $exception) {
             $this->warning($exception->getMessage());
         }
+    }
+
+    # 已完成订单列表
+    public function finishedOrder(Request $request)
+    {
+         # 已完成 + 已取消订单
+         try{
+             $customer = auth()->user();
+             $list = OrderPromotion::getFinishedOrderPromotion($request, $customer->id);
+             $resource =  SubOrder::collection($list);
+             return $this->okWithResourcePaginate($resource);
+         }
+         catch (\Exception $exception) {
+             return $this->warning($exception->getMessage());
+         }
+    }
+
+
+    # 退款订单
+
+    public function  refundOrder(Request $request)
+    {
+        try{
+            $customer = auth()->user();
+            $list = OrderPromotion::getRefundOrder($request, $customer->id);
+            $resource =  SubOrder::collection($list);
+            return $this->okWithResourcePaginate($resource);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+
     }
 
 }

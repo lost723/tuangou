@@ -16,7 +16,8 @@ class Order extends Resource
     public function toArray($request)
     {
         $request->offsetSet('orderid', $this->id);
-        $orderItems = OrderPromotion::getOrderPromotions($request);
+        $customer = auth()->user();
+        $orderItems = OrderPromotion::getOrderPromotions($request, $customer->id);
         return [
             'id'            =>  $this->id,
             'createtime'    =>  $this->createtime,
@@ -24,7 +25,7 @@ class Order extends Resource
             'count'         =>  $orderItems->count(),
             'total'         =>  sprintf("%.2f",$this->total / 100),
             'trade_no'      =>  $this->trade_no,
-            'suborders'     =>  SubOrder::collection($orderItems),
+            'suborders'     =>  UnPaidSubOrderList::collection($orderItems),
         ];
     }
 }

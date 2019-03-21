@@ -93,6 +93,7 @@ trait Reporter
     {
         return response()->json([
             'data'  =>  $data,
+            'timestamp'=>time(),
             'message'   =>  $message,
             'code'  =>  $code,
         ], 200);
@@ -102,6 +103,7 @@ trait Reporter
     {
         return response()->json(['data' => [
             'data'  =>  $data,
+            'timestamp'=>time(),
             'message'   =>  $message,
             'code'  =>  $code,
         ],

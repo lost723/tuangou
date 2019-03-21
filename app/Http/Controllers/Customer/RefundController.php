@@ -36,6 +36,7 @@ class RefundController extends BasePaymentController
         try {
             $id = $request->post('id');
             $order = $this->checkTimeOut($id);
+            # todo 调订单查询接口 查看订单状态
             $result = $this->payment->refund->byOutTradeNumber($order->trade_no, $order->ordersn,
                 $order->ototal, $order->total);
             if ($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {

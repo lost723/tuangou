@@ -16,32 +16,29 @@ class SubOrderDetail extends Resource
      */
     public function toArray($request)
     {
-        $leader = OrderPromotion::getLeaderInfo($this->id);
+        $leader = Leader::find($this->leaderid);
         return [
-            'id'            =>  $this->orderid, # 总订单id
-
-            'order'         =>  [[
-                'leader'        =>  new LeaderResource($leader),
-                'items'          =>  [ [
-                                'id'            =>  $this->id,
-                                'lpmid'         =>  $this->lpmid,
-                                'promotionid'   =>  $this->promotionid,
-                                'title'         =>  $this->title,
-                                'picture'       =>  $this->picture,
-                                'price'         =>  $this->price,
-                                'quotation'     =>  $this->quotation,
-                                'num'           =>  $this->num,
-                                'norm'          =>  $this->norm,
-                                'total'         =>  $this->total,
-                                'status'        =>  $this->status,
-                                'checkcode'     =>  $this->checkcode,
-                                'ordersn'       =>  $this->ordersn,
-                                'createtime'    =>  $this->createtime,
-                ],
-
-                ],
-            ],
-            ]
+            'id'           => $this->oid,
+            'createtime'   => $this->createtime,
+            'total'        => sprintf("%.2f", $this->total/100),
+            'checkcode'    => $this->checkcode,
+            'trade_no'     => $this->ordersn,
+            'count'        => $this->num,
+            'state'        => $this->when($this->status == OrderPromotion::CHANGE, function () {
+                return OrderPromotion::REFUNDCLOSE;
+            }, function() {
+                return $this->status;
+            }),
+            'suborder'     => [[
+                'id'            =>  $this->id,
+                'title'         =>  $this->title,
+                'thumb'         =>  $this->thumb,
+                'price'         =>  sprintf("%.2f", $this->price/100),
+                'num'           =>  $this->num,
+                'norm'          =>  $this->norm,
+                'total'         => sprintf("%.2f", $this->total/100),
+            ]],
+            'pickupStation'    =>  new PickUpStation($leader),
         ];
     }
 }

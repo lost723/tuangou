@@ -4,8 +4,8 @@ namespace App\Http\Resources\Customer;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class OrderItem extends Resource
-{   # 子订单列表信息
+class UnPaidSubOrderList extends Resource
+{   # 未支付子订单列表
     /**
      * Transform the resource into an array.
      *
@@ -16,16 +16,12 @@ class OrderItem extends Resource
     {
         return [
             'id'            =>  $this->id, # 子订单id
-            'lpmid'         =>  $this->lpmid,
             'title'         =>  $this->title,
-            'picture'       =>  $this->picture,
-            'price'         =>  $this->price,
-            'quotation'     =>  $this->quotation,
+            'thumb'         =>  $this->thumb,
+            'price'         =>  sprintf("%.2f", $this->price/100),
             'num'           =>  $this->num,
             'norm'          =>  $this->norm,
             'total'         =>  $this->total,
-            'ordersn'       =>  $this->ordersn,
-            'status'         =>  $this->status,
         ];
     }
 }

@@ -23,28 +23,46 @@ class OrderPromotion extends BaseModel
         'checkcode', 'status', 'note'];
     protected $table = 'order_promotions';
 
-    # 获取全部订单列表 *
-    static function getOrderPromotions($request)
+    # 获取待发货+待提货子订单列表 * 获取总订单下的订单详情
+    static function getOrderPromotions($request, $customerid)
     {
-        $status  = $request->post('status');
+        $status = $request->post('status');
         $orderid = $request->post('orderid');
         return DB::table('order_promotions as om')
+            ->whereIn('om.status', [OrderPromotion::UnReceived, OrderPromotion::Dispatched])
             ->when($status, function ($query) use ($status) {
-//                $query->whereIn('om.status', $status);
                 $query->where('om.status', $status);
             })
             ->when($orderid, function ($query) use ($orderid) {
                 $query->where('om.orderid', $orderid);
             })
+            ->where('customerid', $customerid)
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+            ->leftjoin('products as pd', 'pd.id', 'pm.productid')
+            ->orderBy('om.id', 'DESC')//'om.orderid', 'om.lpmid', 'om.promotionid',
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
+                , 'om.status', 'om.createtime',
+                'pd.title', 'pd.norm', 'pd.thumb')
+            ->paginate(self::NPP);
+    }
+
+    # 获取已完成+ 已取消订单列表
+    static function getFinishedOrderPromotion($request, $customerid)
+    {
+        return DB::table('order_promotions as om')
+            ->whereIn('om.status', [OrderPromotion::Expire, OrderPromotion::Finished])
+            ->where('customerid', $customerid)
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
             ->orderBy('om.status', 'DESC')
-            ->orderBy('om.id', 'DESC')
-            ->select('om.id', 'om.orderid', 'om.lpmid', 'om.promotionid', 'om.num', 'om.ordersn', 'om.price', 'om.total'
-                , 'om.status','om.createtime',
-                'pd.title', 'pd.norm', 'pd.thumb', 'pd.picture', 'pd.quotation')
+            ->orderBy('om.id', 'DESC')//'om.orderid', 'om.lpmid', 'om.promotionid',
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
+                , 'om.status', 'om.createtime',
+                'pd.title', 'pd.norm', 'pd.thumb')
             ->paginate(self::NPP);
     }
+
+
 
     # 获取子订单详情 *
     static function getOrderPromotionDetail($id)
@@ -54,13 +72,35 @@ class OrderPromotion extends BaseModel
             ->leftjoin('orders', 'orders.id', '=', 'om.orderid')
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
-            ->select('om.id', 'om.orderid', 'om.lpmid', 'om.promotionid', 'om.num', 'om.ordersn', 'om.price',
-                'om.total', 'om.status', 'om.checkcode',
-                'orders.transaction_id', 'orders.createtime',
-                'pd.title', 'pd.norm', 'pd.picture', 'pd.quotation')
+            ->leftjoin('leader_promotions as lm', 'lm.id', '=', 'om.lpmid')
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price',
+                'om.total', 'om.status', 'om.checkcode', 'om.createtime', 'lm.leaderid',
+                'orders.id as oid',
+                'pd.title', 'pd.norm', 'pd.thumb')
             ->first();
     }
 
+    # 获取退款订单列表
+    static function getRefundOrder($request, $customerid)
+    {
+        $status = $request->post('status');
+        return DB::table('order_promotions as om')
+            ->whereIn('om.status', [OrderPromotion::Refunding, OrderPromotion::Refund, OrderPromotion::CHANGE, OrderPromotion::REFUNDCLOSE])
+            ->where('customerid', $customerid)
+            ->when(($status==OrderPromotion::REFUNDCLOSE), function ($query) {
+                $query->whereIn('om.status', [OrderPromotion::CHANGE, OrderPromotion::REFUNDCLOSE]);
+            }, function ($query) use ($status) {
+                $query->where('om.status', $status);
+            })
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+            ->leftjoin('products as pd', 'pd.id', 'pm.productid')
+            ->orderBy('om.status', 'ASC')
+            ->orderBy('om.id', 'DESC')
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
+                , 'om.status', 'om.createtime',
+                'pd.title', 'pd.norm', 'pd.thumb')
+            ->paginate(self::NPP);
+    }
 
     # 查询订单状态 是否可退款 *
     # 只有已支付状态 且 活动未结束
@@ -78,7 +118,7 @@ class OrderPromotion extends BaseModel
                 ->first();
     }
 
-    # 获取子订单信息
+    # 查询订单是否存在
     static function getOrderPromotion($request)
     {
         $id = $request->post('id');
@@ -101,13 +141,15 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
+
+
 //    static function findOrderById($id)
 //    {
 //        return DB::table('order_promotions')->find($id);
 //
 //    }
 
-    # 创建 批量订单 *
+    # 创建 批量子订单 *
     static function createOrderPromotions($data)
     {
         return DB::table('order_promotions')->insert($data);
@@ -135,13 +177,7 @@ class OrderPromotion extends BaseModel
             ->first();
     }
 
-//    # 通过总订单id 查询 所有子订单
-//    static function getOrderPromotionsByOrderid($id)
-//    {
-//        return DB::table('order_promotions as om')
-//            ->where('orderid',$id)
-//            ->get();
-//    }
+
 
 
 }

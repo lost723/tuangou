@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 
 class Leader extends BaseModel
 {
-    //
+    const BaseNO = 100000;
     const FROZEN = 0;  # 身份冻结
     const DENY   = 1;  # 审核拒绝
     const CREATE = 2;  # 审核中
@@ -19,6 +19,12 @@ class Leader extends BaseModel
     public function customer()
     {
         return $this->belongsTo('App\Models\Auth\Customer', 'customerid', 'id');
+    }
+
+    # 获取团长编号
+    static function getLeaderNo($id)
+    {
+        return sprintf("%06X", (self::BaseNO+$id));
     }
 
 }

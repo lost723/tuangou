@@ -16,14 +16,9 @@ class SubOrder extends Resource
     {
         return [
             'id'            =>  $this->id, # 子订单id
-            'orderid'       =>  $this->orderid,
-            'lpmid'         =>  $this->lpmid,
-            'promotionid'   =>  $this->promotionid,
             'title'         =>  $this->title,
             'thumb'         =>  $this->thumb,
-            'picture'       =>  json_decode($this->picture, true),
             'price'         =>  sprintf("%.2f",$this->price / 100),
-            'quotation'     =>  sprintf("%.2f",$this->quotation / 100),
             'num'           =>  $this->num,
             'norm'          =>  $this->norm,
             'total'         =>  sprintf("%.2f",$this->total / 100),
