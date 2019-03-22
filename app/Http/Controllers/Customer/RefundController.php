@@ -57,6 +57,22 @@ class RefundController extends BasePaymentController
         }
 
     }
+    # 退款成功 请求接口
+//    public function refundSuccess(Request $request)
+//    {
+//        try{
+//            $id = $request->post('id');
+//            $order = OrderPromotion::find($id);
+//            $reuslt = $this->payment->refund->queryByOutTradeNumber($order->ordersn); dump($reuslt);die;
+//            if($reuslt['return_code'] <> 'SUCCESS' and $reuslt['result_code'] <> 'SUCCESS'
+//                and $reuslt['refund_channel_$n'] <> 'SUCCESS') {
+//
+//            }
+//        }
+//        catch (\Exception $exception) {
+//            return $exception->getMessage();
+//        }
+//    }
 
     /**
      * 退款通知

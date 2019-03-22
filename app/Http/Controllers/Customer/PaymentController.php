@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Customer;
 
 use App\Events\PaySuccessEvent;
 use App\Models\Customer\Order;
+use App\Models\Customer\OrderPromotion;
 use App\Models\Customer\PayLog;
 use function EasyWeChat\Kernel\Support\generate_sign;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Customer\Order as OrderResource;
+use Illuminate\Support\Facades\Log;
 
 
 class PaymentController extends BasePaymentController
@@ -76,6 +79,43 @@ class PaymentController extends BasePaymentController
             # ---end---
             $response['paySign'] = generate_sign($response, $this->config['key'], 'md5');
             return $this->okWithResource($response);
+        }
+        catch (\Exception $exception) {
+            return $this->warning($exception->getMessage());
+        }
+    }
+
+    public function paySuccess(Request $request)
+    {
+        try{
+            $id = $request->post('id');
+            $order = $this->checkTimeOut($id);
+            $result = $this->payment->order->queryByOutTradeNumber($order->trade_no);//dump($result);die;
+            if($result['return_code'] <> 'SUCCESS' OR $result['result_code'] <> 'SUCCESS' OR $result['trade_state'] <> 'SUCCESS') {
+                throw new \Exception($result['err_code_des']);
+            }
+            # 更新订单状态为已支付
+            if($order->total == $result['total_fee'] and $order->status <> Order::Finished) {
+                try{
+                    DB::beginTransaction();
+                    DB::table('orders')->where('id', $id)->update(['status'=>Order::Finished]);
+                    DB::table('order_promotions')->where('orderid', $id)->update(['status'=> OrderPromotion::UnReceived]);
+                    DB::commit();
+                }
+                catch (\Exception $exception) {
+                    DB::rollback(); echo $exception->getMessage();
+                    //Log::info($exception->getMessage());
+                }
+                $order = Order::find($id);
+                $resource = new OrderResource($order);
+                return $this->okWithResource($resource);
+            }
+            else {
+//                echo "当前订单状态为".$order->status;
+                $order = Order::find($id);
+                $resource = new OrderResource($order);
+                return $this->okWithResource($resource);
+            }
         }
         catch (\Exception $exception) {
             return $this->warning($exception->getMessage());

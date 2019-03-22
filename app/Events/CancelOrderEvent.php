@@ -15,18 +15,24 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
  * Class CancelOrderEvent
  * @package App\Events
  */
-class CancelOrderEvent
+class CancelOrderEvent extends Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $id;
+    public $sale;
+    public $stock;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($id)
     {
-        //
+        $this->action = 'cancelOrder';
+        $this->id = $id;
+        $this->sale = 'desc';
+        $this->stock = 'asc';
     }
 
     /**

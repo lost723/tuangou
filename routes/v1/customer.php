@@ -33,9 +33,12 @@ Route::get('customer/order/finished', 'Customer\OrderController@finishedOrder');
 Route::post('customer/order/refundlist', 'Customer\OrderController@refundOrder');
 Route::get('customer/order/count', 'Customer\OrderController@orderCount');
 
+
 # 订单支付 退款
 Route::post('customer/order/pay', 'Customer\PaymentController@Pay');
+Route::post('customer/order/paySuccess', 'Customer\PaymentController@paySuccess');
 Route::post('customer/order/refund', 'Customer\RefundController@Refund');
+Route::post('customer/order/refundSuccess', 'Customer\RefundController@refundSuccess');
 
 # 统计
 Route::post('customer/count/view', 'Customer\StatisticController@viewCount');

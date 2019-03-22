@@ -13,6 +13,10 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
+        'App\Events\CreateOrderEvent' => [
+            'App\Listeners\UpdateSalesAndStockListener', # 更新库存+销量
+            'App\Listeners\AddDelayedTaskListener',      # 添加延迟任务检测订单超时
+        ],
         'App\Events\LeaderCheckEvent' => [
             'App\Listeners\LeaderCheckListener',
         ],
@@ -23,7 +27,8 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\PaySuccessListener',
         ],
         'App\Events\RefundSuccessEvent' => [
-            'App\Listeners\RefundSuccessListener'
+            'App\Listeners\UpdateSalesAndStockListener',# 更新库存+销量
+//            'App\Listeners\RefundSuccessListener'
         ],
     ];
 

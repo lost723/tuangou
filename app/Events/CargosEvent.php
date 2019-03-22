@@ -15,18 +15,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
  * Class CargosEvent
  * @package App\Events
  */
-class CargosEvent
+class CargosEvent extends Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    public $id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($id)
     {
-        //
+        $this->id = $id;
+        $this->action = 'cargoEvent';
     }
 
     /**

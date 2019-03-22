@@ -15,18 +15,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
  * Class ViewEvent
  * @package App\Events
  */
-class ViewEvent
+class ViewEvent extends Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    public $id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($id)
     {
-        //
+        $this->action = 'view';
+        $this->id = $id;
     }
 
     /**

@@ -8,6 +8,8 @@
 
 namespace App\Http\Controllers\Log;
 
+
+use App\Jobs\CheckOrderTimeout;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger as MonologLogger;
@@ -17,10 +19,11 @@ class PayLog
 
     public function test()
     {   #todo 测试
-
-       $id = 10;
-       $basenum = 100000;
-       echo sprintf("%06X",$basenum+$id);
+//
+//       $id = 10;
+//       $basenum = 100000;
+//       echo sprintf("%06X",$basenum+$id);
+        CheckOrderTimeout::dispatch(63);
     }
 
     /**
@@ -38,7 +41,7 @@ class PayLog
         $payLogHandler->setFormatter(new JsonFormatter());//JsonFormatter
         $logger->pushHandler($payLogHandler);
 
-        $logger->{$name}($arguments[0], $arguments[1]);
+        $logger->{$name}($arguments[0]);
     }
 
 }

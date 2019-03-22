@@ -107,6 +107,7 @@ class OrderPromotion extends BaseModel
 
     # 查询订单状态 是否可退款 *
     # 只有已支付状态 且 活动未结束
+    # todo 退款条件 只要团长未签收即可退款
     static function checkOrderPromotionsEnableRefund($id)
     {   # todo 线下环境无法接受微信支付回调通知 暂时注释订单状态
         return DB::table('order_promotions as om')
@@ -148,6 +149,7 @@ class OrderPromotion extends BaseModel
     {
         $unPaidCount = DB::table('orders')
             ->where('customerid', $customerid)
+            ->where('createtime', '>', time()-Order::TimeOut*60)
             ->where('status', Order::Unpaid)->count();
         $paidCount = DB::table('order_promotions')
             ->where('customerid', $customerid)

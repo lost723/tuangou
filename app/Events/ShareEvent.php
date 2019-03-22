@@ -15,18 +15,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
  * Class ShareEvent
  * @package App\Events
  */
-class ShareEvent
+class ShareEvent extends Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    public $id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($id)
     {
-        //
+        $this->id = $id;
+        $this->action = "share";
     }
 
     /**
