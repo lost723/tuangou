@@ -14,7 +14,6 @@ class RefundSuccessEvent extends Event
 {
     public $id;
     public $sale;
-    public $stock;
     # 某活动商品退款成功
     /**
      * Create a new event instance.
@@ -25,7 +24,6 @@ class RefundSuccessEvent extends Event
     {
         $this->id = $id;
         $this->action = 'RefundSuccess';
-        $this->stock = 'asc';
         $this->sale = 'desc';
     }
 

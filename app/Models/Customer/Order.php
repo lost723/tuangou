@@ -12,8 +12,8 @@ class Order extends BaseModel
     const Cancel = 0; # 订单超时异常
     const Unpaid = 1; # 未支付
     const Finished = 2; # 已支付
-    const TimeOut = 1;//5;
-    const LockTime = 2;# 超时未支付 锁定 LockTime后 进行状态更新时 防止超时数据更新不一致
+    const TimeOut = 15;
+//    const LockTime = 2;# 超时未支付 锁定 LockTime后 进行状态更新时 防止超时数据更新不一致
 
     protected $fillable = ['customerid', 'trade_no', 'transaction_id', 'total', 'createtime', 'paytime', 'status', 'note'];
 

@@ -20,7 +20,6 @@ class CancelOrderEvent extends Event
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $id;
     public $sale;
-    public $stock;
 
     /**
      * Create a new event instance.
@@ -31,8 +30,7 @@ class CancelOrderEvent extends Event
     {
         $this->action = 'cancelOrder';
         $this->id = $id;
-        $this->sale = 'desc';
-        $this->stock = 'asc';
+        $this->sale = 0;
     }
 
     /**

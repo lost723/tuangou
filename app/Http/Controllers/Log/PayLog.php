@@ -23,7 +23,7 @@ class PayLog
 //       $id = 10;
 //       $basenum = 100000;
 //       echo sprintf("%06X",$basenum+$id);
-        CheckOrderTimeout::dispatch(63);
+//        CheckOrderTimeout::dispatch(63);
     }
 
     /**

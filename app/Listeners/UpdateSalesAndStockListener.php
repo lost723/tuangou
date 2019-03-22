@@ -23,17 +23,18 @@ class UpdateSalesAndStockListener
     }
 
     /**
-     * Handle the event.
-     *
+     *  关联 创建订单  + 取消订单事件
+     *  创建订单 +销量-库存 取消订单 -销量+库存
      * @param  object  $event
      * @return void
      */
     public function handle($event)
-    {
+    {   Log::info("更新销量+库存".$event->id);
         try{
             # 主订单id
             $id = $event->id;
-            $order_promotions = DB::table('order_promotions')->where('orderid', $id)->where('status', OrderPromotion::Unpaid)->get(['lpmid', 'promotionid', 'num']);
+            $order_promotions = DB::table('order_promotions')->where('orderid', $id)->get(['lpmid', 'promotionid', 'num']);
+            Log::info(print_r($order_promotions, 1));
             DB::beginTransaction();
             if($event->sale == 1) {
                 foreach ($order_promotions as $key=>$val) {
@@ -46,6 +47,7 @@ class UpdateSalesAndStockListener
                 }
             }
             else {
+                Log::info("处理主动取消订单");
                 foreach ($order_promotions as $key=>$val) {
                     DB::table('leader_promotions')->where('id', $val->lpmid)->decrement('sales', $val->num);
                     $promotions = DB::table('promotions')->where('id', $val->promotionid)->first();
@@ -58,7 +60,7 @@ class UpdateSalesAndStockListener
             DB::commit();
         }
         catch (\Exception $exception) {
-            DB::rollbakc();
+            DB::rollback();
             Log::info($exception->getMessage());
         }
 

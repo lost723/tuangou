@@ -23,8 +23,8 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\LeaderVerifyEvent' => [
             'App\Listeners\LeaderVerifyListener',
         ],
-        'App\Events\PaySuccessEvent' => [
-            'App\Listeners\PaySuccessListener',
+        'App\Events\CancelOrderEvent' => [              # 取消订单
+            'App\Listeners\UpdateSalesAndStockListener',# 更新库存+销量
         ],
         'App\Events\RefundSuccessEvent' => [
             'App\Listeners\UpdateSalesAndStockListener',# 更新库存+销量
