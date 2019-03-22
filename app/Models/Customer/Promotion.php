@@ -91,7 +91,7 @@ class Promotion extends BaseModel
     {
         $skip   = $request->post('skip');
         $result = DB::table('order_promotions as om')
-            ->where('om.status', OrderPromotion::Finished)
+//            ->where('om.status', OrderPromotion::Finished)
             ->where('pd.id', $productid)
             ->when($skip, function ($query) use ($skip) {
                 $query->skip($skip);
@@ -101,7 +101,7 @@ class Promotion extends BaseModel
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->leftjoin('customers', 'customers.id', '=', 'om.customerid')
             ->select('customers.id', 'customers.avatar', 'customers.nickname', 'om.num', 'om.createtime')
-            ->orderByRaw("lpm.leaderid={$leaderid} ASC")
+            ->orderByRaw("lm.leaderid={$leaderid} ASC")
             ->orderBy('om.createtime', 'DESC')
             ->Paginate(BaseModel::NPP);
         return $result;

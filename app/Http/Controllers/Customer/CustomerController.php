@@ -66,7 +66,7 @@ class CustomerController extends Controller
         try{
             # 获取商品id + 团长id
             $preRecord = Promotion::getPrePromotionForRecord($request);
-            $list =  Promotion::getPurchaseRecord($request, 2,2);
+            $list =  Promotion::getPurchaseRecord($request, $preRecord->leaderid,$preRecord->pid);
             $result = PurchaseRecord::collection($list);
             return $this->okWithResourcePaginate($result);
         }
