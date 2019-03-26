@@ -34,7 +34,6 @@ class UpdateSalesAndStockListener
             # 主订单id
             $id = $event->id;
             $order_promotions = DB::table('order_promotions')->where('orderid', $id)->get(['lpmid', 'promotionid', 'num']);
-            Log::info(print_r($order_promotions, 1));
             DB::beginTransaction();
             if($event->sale == 1) {
                 foreach ($order_promotions as $key=>$val) {
