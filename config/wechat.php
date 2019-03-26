@@ -117,6 +117,14 @@ return [
                  'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', '../cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
                  'notify_url'         => 'http://tg.hlbapp.com/notify/pay',                           // 默认支付结果通知地址
          ],
+         'transfer' =>[
+                'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx68f2dc67c99f4b05'),
+                'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
+                 'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
+                 'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', '../cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
+                 'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', '../cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
+                 'notify_url'         => 'http://tg.hlbapp.com/notify/pay',                           // 默认支付结果通知地址
+         ],
 
      ],
 
