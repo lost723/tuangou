@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use phpDocumentor\Reflection\Location;
 
 class QiNiuUploadController extends Controller
 {
@@ -12,23 +13,28 @@ class QiNiuUploadController extends Controller
     private $allowedImgExt = ['jpg', 'png', 'jpeg', 'bmp'];
 
     /**
-     * 从数据库中解析相应json字符串 如果为私有存储并生成临时访问路径
+     * @param Location 七牛云保存路径
+     * @param access  文件访问属性 公有0 私有1
      * @param string $jsonString
      * @return mixed|void
      */
-     public function  accessPath($jsonString = '')
+    static function  accessPathWithInc($location, $width, $height, $access = 0)
     {
-        if(!empty($jsonString)) {
-            $result = json_decode($jsonString, true);
-            if('private' == $result['access']) {
-                $disk = Storage::disk('qiniu_private');
-            }
-            else {
-                $disk = Storage::disk('qiniu_public');
-            }
-            return $disk->imagePreviewUrl($result['path']);
+        if($access) {
+           $disk =  $disk = Storage::disk('qiniu_private');
         }
-        return "";
+        else {
+            $disk = Storage::disk('qiniu_public');
+        }
+
+        return $disk->imagePreviewUrl($location, "imageView2/1/w/{$width}/h/{$height}/q/100");
+    }
+    # todo  临时路径保存
+    static function  accessPathWithOption($location, $op)
+    {
+        $disk = Storage::disk('qiniu_public');
+//        return $disk->imagePreviewUrl($location)."-{$op}";
+        return $location."-{$op}";
     }
 
     static function savePath($path = [])
@@ -49,7 +55,7 @@ class QiNiuUploadController extends Controller
         if(is_array($option)) {
             $option = implode('|', $option);
         }
-        return self::decodePath($jsonString).$option;
+        return self::accessPath($jsonString).$option;
     }
 
 
