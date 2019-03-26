@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Http\Controllers\Log\PayLog;
+use App\Events\ViewEvent;
 use App\Http\Resources\Customer\PromotionDetail;
 use App\Http\Resources\Customer\Promotions as PromotionResource;
-use App\Http\Resources\Customer\PurchaseRecord;
+use App\Http\Resources\Customer\PurchaseRecordCollection;
 use App\Models\Customer\Promotion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -46,6 +47,7 @@ class CustomerController extends Controller
                 throw new \Exception('商品走丢了');
             }
             $resouce = new PromotionDetail($promotion);
+            event(new ViewEvent($id));
             return $this->okWithResource($resouce);
         }
         catch (\Exception $exception) {
@@ -67,7 +69,8 @@ class CustomerController extends Controller
             # 获取商品id + 团长id
             $preRecord = Promotion::getPrePromotionForRecord($request);
             $list =  Promotion::getPurchaseRecord($request, $preRecord->leaderid,$preRecord->pid);
-            $result = PurchaseRecord::collection($list);
+            $countArr = Promotion::getRecordsCount($request, $preRecord->pid);
+            $result = new PurchaseRecordCollection($list, $countArr);
             return $this->okWithResourcePaginate($result);
         }
         catch (\Exception $exception) {
@@ -87,7 +90,8 @@ class CustomerController extends Controller
            # 获取商品分类id
            $id = $request->post('id');
            $cats = Promotion::getCategroy($id);
-           $promotions = Promotion::getRecommendPromotions($request, $cats->id);
+           $lpm = DB::table('leader_promotions')->where('id', $id)->select('id', 'leaderid')->first();
+           $promotions = Promotion::getRecommendPromotions($request, $cats->id, $lpm->leaderid);
            $list = PromotionResource::collection(($promotions));
            return $this->okWithResourcePaginate($list);
        }

@@ -91,7 +91,7 @@ class Promotion extends BaseModel
     {
         $skip   = $request->post('skip');
         $result = DB::table('order_promotions as om')
-//            ->where('om.status', OrderPromotion::Finished)
+            ->where('om.status', OrderPromotion::Finished)
             ->where('pd.id', $productid)
             ->when($skip, function ($query) use ($skip) {
                 $query->skip($skip);
@@ -107,7 +107,27 @@ class Promotion extends BaseModel
         return $result;
     }
 
-    static function getRecommendPromotions($request, $catid)
+    /**
+     * 获取购买的数量 + 记录数量
+     * @param $request
+     * # @param
+     */
+    static function getRecordsCount($request, $productid)
+    {
+        $sales = DB::table('promotions')->where('productid', $productid)->sum('sales');
+
+        $records = DB::table('order_promotions as om')
+            ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
+            ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
+            ->where('pd.id', $productid)
+            ->count();
+        return [
+            'sales'     =>  $sales,
+            'records'   =>  $records
+        ];
+    }
+
+    static function getRecommendPromotions($request, $catid, $leaderid)
     {
         $id = $request->post('id');
         return DB::table('leader_promotions as  lm')
@@ -115,6 +135,9 @@ class Promotion extends BaseModel
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
             ->where('pd.catid', $catid)
+            ->where('lm.leaderid', $leaderid)
+            ->where('pm.status', BPromotion::Ordering)
+            ->where('pm.expire', '>', time())
             ->whereNotExists(function ($query) use ($id) {
                 $query->select('id')
                     ->from('leader_promotions as lpm')
