@@ -2,10 +2,12 @@
 
 namespace App\Http\Resources\Customer;
 
+use App\Utils\ImageView;
 use Illuminate\Http\Resources\Json\Resource;
 
 class Promotions extends Resource
 {
+    use ImageView;
     /**
      * Transform the resource into an array.
      *
@@ -37,7 +39,7 @@ class Promotions extends Resource
                 'rate'      =>  sprintf("%.2f", $this->rate/100),
                 'quotation' =>  sprintf("%.2f", $this->quotation/100),
                 'intro'     =>  $this->intro,
-                'thumb'     =>  stripslashes($this->thumb),
+                'thumb'     =>  $this->ImageViewWithOption(stripslashes($this->thumb), "dissolve"),
                 'picture'   =>  json_decode($this->picture),
 
             ],
