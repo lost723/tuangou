@@ -12,6 +12,9 @@ use App\Http\Controllers\BasePaymentController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Customer\Order as OrderResource;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Common\NoticeController;
+use App\Models\Auth\Customer;
+
 
 
 class PaymentController extends BasePaymentController
@@ -67,6 +70,27 @@ class PaymentController extends BasePaymentController
                 'signType'  =>  'MD5',
                 'package'   =>  'prepay_id='.$result['prepay_id'],
             ];
+            # todo 发起支付
+
+//            $notice = new NoticeController();
+//            $customer = Customer::find(28);
+//            $templateid = 'eVWV28sTr5Ht_J3Scm_PFFRFiUQ8DRWTR-cEnugRruE';
+//            $page = 'pages/home/home/home';
+////            $formid = 'prepay_id=wx2611013052570893968d0fb22410531545';
+//            $formid = $result['prepay_id'];
+//            Log::info($formid);
+//            $oms = OrderPromotion::getOrderPromotionDetail(5);
+//            $data = [
+//                'keyword1' => date('Y-m-d H:i:s', $oms->deliveryday),
+//                'keyword2' => date('Y-m-d H:i:s', $oms->createtime),
+//                'keyword3' => $oms->title,
+//                'keyword4' => $oms->ordersn,
+//                'keyword5' => $oms->checkcode,
+//                'keyword6' => '已发货',
+//            ];
+//            $result = $notice->sendTemplateMessage($customer->openid, $templateid, $page, $formid, $data);
+//            Log::info(print_r($result,1));
+
             # 日志--发起支付
             $log = [
                 'customerid'    =>  $customer->id,
@@ -136,6 +160,7 @@ class PaymentController extends BasePaymentController
                     $order->paytime = time(); // 更新支付时间为当前时间
                     $order->transaction_id = $message['transaction_id'];
                     $order->status = Order::Finished;
+                    event(new PaySuccessEvent($order->id));
                 } elseif (array_get($message, 'result_code') === 'FAIL') {
                     $order->status = Order::Cancel;
                     $order->note   = '订单支付失败';
@@ -144,7 +169,6 @@ class PaymentController extends BasePaymentController
                 return $fail('通信失败，请稍后再通知我');
             }
             $order->save();
-            event(new PaySuccessEvent($order->id));
             return true;
         });
         return $response;
