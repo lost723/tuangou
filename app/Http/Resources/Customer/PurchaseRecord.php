@@ -19,7 +19,7 @@ class PurchaseRecord extends Resource
             'avatar'        => $this->avatar,
             'nickname'      => $this->nickname,
             'num'           => $this->num,
-            'createtime'          => $this->createtime,
+            'createtime'    => $this->createtime,
         ];
     }
 }
