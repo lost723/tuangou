@@ -30,7 +30,8 @@ class LeaderPromotion extends BaseModel
         $result = DB::table('promotions as pm')
             ->where('pm.id', $id)
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.id', 'pm.stockable', 'pm.stock', 'pm.sales', 'pm.price', 'pm.quotation', 'pm.expire', 'pm.deliveryday',
+                'pd.title', 'pd.norm', 'pd.rate', 'pd.intro', 'pd.picture', 'pd.content')
             ->first();
         return $result;
     }
@@ -44,10 +45,9 @@ class LeaderPromotion extends BaseModel
             ->where('lpm.id', $id)
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('lpm.*',
-                'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
-                'pm.status',
-                'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('lpm.id', 'lpm.note',
+                'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.stockable', 'pm.stock', 'pm.sales', 'pm.quotation',
+                'pd.title', 'pd.norm', 'pd.rate',  'pd.intro', 'pd.thumb', 'pd.picture', 'pd.content')
             ->first();
     }
 
@@ -63,19 +63,21 @@ class LeaderPromotion extends BaseModel
         $result = DB::table('leader_promotions as lpm')
                 ->where('lpm.leaderid', $leaderid)
                 ->where('lpm.active', LeaderPromotion::Active)
-                ->when($filter, function ($query) use ($filter) {
+                ->where('expire', '>', time())
+                ->where('pm.status',  self::Ordering)
+            ->when($filter, function ($query) use ($filter) {
                     $query->where(function ($qr) use ($filter) {
                        $qr->orWhere('pd.title', 'like', "%$filter%");
-                       $qr->orWhere('bs.title', 'like', "%$filter%");
+//                       $qr->orWhere('bs.title', 'like', "%$filter%");
                     });
                 })
                 ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
                 ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
                 ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
-                ->select('lpm.*',
-                    'pm.orgid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
-                    'pm.status',
-                    'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
+                ->select('lpm.id', 'lpm.leaderid', 'lpm.promotionid',
+                    'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday',
+                    'pm.status', 'pm.stockable', 'pm.stock', 'pm.sales',
+                    'pd.title', 'pd.norm', 'pd.intro', 'pd.rate', 'pd.quotation', 'pd.thumb')
                 ->Paginate(self::NPP);
         return $result;
     }
@@ -107,15 +109,15 @@ class LeaderPromotion extends BaseModel
             ->when($filter, function ($query) use ($filter) {
                 $query->where(function ($qr) use ($filter) {
                     $qr->orWhere('pd.title', 'like', "%$filter%");
-                    $qr->orWhere('bs.title', 'like', "%$filter%");
                 });
             })
             ->leftjoin('promotions as pm', 'pm.id', '=', 'lpm.promotionid')
             ->leftjoin('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
-            ->select('lpm.*',
-                'pm.orgid', 'pm.optid', 'pm.productid', 'pm.price', 'pm.expire', 'pm.deliveryday', 'pm.aftersale',
-                'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture')
+            ->select('lpm.id', 'lpm.promotionid',
+                'pm.productid', 'pm.price', 'pm.quotation', 'pm.expire', 'pm.deliveryday', 'pm.stockable', 'pm.stock',
+                'pm.sales',
+                'pd.title', 'pd.norm', 'pd.rate', 'pd.intro', 'pd.thumb')
             ->orderBy('lpm.status')
             ->paginate(self::NPP);
     }
@@ -130,7 +132,7 @@ class LeaderPromotion extends BaseModel
      */
     static function getVerifyList($leaderid, $request)
     {
-        $filter = $request->get('filter');
+        $filter = $request->post('filter');
         return DB::table('leader_promotions as lm')
             ->where('lm.status', LeaderPromotion::Received)
             ->where('lm.leaderid', $leaderid)
@@ -139,11 +141,13 @@ class LeaderPromotion extends BaseModel
                     $qr->orWhere('pd.title', 'like', "%$filter%");
                 });
             })
+            ->leftjoin('order_promotions as om', 'om.lpmid', '=', 'lm.id')
             ->join('promotions as pm', 'pm.id', '=', 'lm.promotionid')
             ->join('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('lm.*',
-                'pm.price',
-                'pd.title', 'pd.picture', 'pd.norm')
+            ->where('om.status', OrderPromotion::Dispatched)
+            ->select('lm.id',
+                'pm.price', 'pm.quotation', 'pm.stockable', 'pm.stock', 'pm.sales', 'pm.aftersale',
+                'pd.title', 'pd.intro', 'pd.rate', 'pd.thumb', 'pd.norm')
             ->paginate(self::NPP);
     }
 
@@ -160,11 +164,12 @@ class LeaderPromotion extends BaseModel
         $id = $request->post('id');
         return DB::table('order_promotions as om')
             ->where('om.lpmid', $id)
-            ->where('om.status', OrderPromotion::Dispatched)
+//            ->where('om.status', OrderPromotion::Dispatched)
             ->leftjoin('customers as cms', 'cms.id', '=', 'om.customerid')
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', '=', 'pm.productid')
-            ->select('cms.avatar', 'cms.nickname', 'cms.mobile','om.num')
+            ->select('cms.avatar', 'cms.nickname', 'cms.mobile','om.num', 'om.status', 'om.checktime')
+            ->orderBy('om.status', 'ASC')
 //            ->select(DB::raw("distinct cms.id, cms.avatar, cms.nickname, cms.mobile, om.num"))
             ->paginate(self::NPP);
     }

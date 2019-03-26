@@ -30,7 +30,7 @@ class LeaderPromotionController extends Controller
     public function getChoicePromotions(Request $request)
     {
         try{
-            $leader = auth()->user->leader;
+            $leader = auth()->user()->leader;
             $request->offsetSet('leaderid', $leader->id);
             $list = Promotion::getLeaderChoiceList($leader->commid, $request);
             $result =  BusinessPromotions::collection($list);
@@ -48,7 +48,7 @@ class LeaderPromotionController extends Controller
     public function getOwnPromotions(Request $request)
     {
         try{
-            $leader = auth()->user->leader;
+            $leader = auth()->user()->leader;
             $list = LeaderPromotion::getSelectedPromotions($leader->id, $request);
             $result =  LeaderPromotions::collection($list);
             return $this->okWithResourcePaginate($result);
@@ -106,22 +106,18 @@ class LeaderPromotionController extends Controller
     public function addPromotions(Request $request)
     {
         try {
-            # 整理上传数据
-            $leader = auth()->user->leader;
-            $data = $request->post('data');
+            $leader = auth()->user()->leader;
+            $promotionid = $request->post('promotionid');
+            $data['promotionid'] = $promotionid;
+            $data['leaderid']    = $leader->id;
             $this->checkAddPromotions($data);
             $promotions = [];
-            foreach ($data as $key => $val) {
-                $val['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
-                $val['leaderid']    = $leader->id;
-                $val['active']      = LeaderPromotion::Active;
-                $val['status']      = LeaderPromotion::UnReceived;
-                array_push($promotions, $val);
-                unset($val);
-            }
-            DB::beginTransaction();
+            $promotions['promotionid'] = $promotionid;
+            $promotions['ordersn']     = LeaderPromotion::LeaderPrefix.self::createOrderSn();
+            $promotions['leaderid']    = $leader->id;
+            $promotions['active']      = LeaderPromotion::Active;
+            $promotions['status']      = LeaderPromotion::UnReceived;
             LeaderPromotion::addPromotions($promotions);
-            DB::commit();
             return $this->okWithResource([], '添加成功');
         }
         catch (\Exception $exception) {
@@ -140,13 +136,6 @@ class LeaderPromotionController extends Controller
     {
         try{
             $id = $request->post('id');
-            $orders = DB::table('order_promotions')
-                ->where('lpmid', $id)
-                ->where('status', '>', OrderPromotion::Expire)
-                ->first();
-            if(!empty($orders)) {
-                throw new \Exception('已有用户购买该活动，禁止取消');
-            }
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update(['active'=>LeaderPromotion::Unactive]);
@@ -202,19 +191,25 @@ class LeaderPromotionController extends Controller
      */
     public function doCheck(Request $request)
     {
-        # todo  货物签收 为order_promotions 生成 checkcode 更新用户订单为 待提货
         # 核销需检测团长订单是否已完成
         try{
             $update['status']     = LeaderPromotion::Received;
             $update['note']       = strval($request->post('note'));
             $update['checktime']  = time(); #  验收时间
+            $update['checkcount'] = $request->post('count');
             $id = $request->post('id');
+            $lpm = DB::table('leader_promotions')->where('active', LeaderPromotion::Active)->where('id', $id)
+                ->select('id', 'status')->first();
+            if($lpm && $lpm->status == LeaderPromotion::Received) {
+                throw new \Exception('请勿重复签收');
+            }
             # 更新订单状态为已签收
             DB::table('leader_promotions')
                 ->where('id', $id)
                 ->update($update);
              # 触发团长签收事件
-            event(new LeaderCheckEvent($id));
+            # 实际签收数量
+            event(new LeaderCheckEvent($id, $update['checkcount']));
             return $this->okWithResource([], '签收成功');
         }
         catch (\Exception $exception)
@@ -228,8 +223,15 @@ class LeaderPromotionController extends Controller
     public function getVerifyList(Request $request)
     {
         try{
-            $leader = auth()->user->leader;
+            $leader = auth()->user()->leader;
             $list = LeaderPromotion::getVerifyList($leader->id, $request);
+
+            foreach ($list as &$val) {
+                $val->count = DB::table('order_promotions')
+                    ->where('lpmid', $val->id)
+                    ->where('status', OrderPromotion::Dispatched)
+                    ->count();
+            }
             $resource = VerifyPromotion::collection($list);
             return $this->okWithResourcePaginate($resource);
         }
@@ -244,9 +246,6 @@ class LeaderPromotionController extends Controller
     {
         try{
             $list = LeaderPromotion::getVerifyDetail($request);
-            if(empty($list)) {
-                throw new \Exception('请检查该订单是否已核销!');
-            }
             $resource =   VerifyPromotionDetail::collection($list);
             return $this->okWithResourcePaginate($resource);
         }
@@ -264,9 +263,7 @@ class LeaderPromotionController extends Controller
              if(empty($order)) {
                  throw new \Exception('核销码有误!');
              }
-             DB::beginTransaction();
-             $order->save(['status' => OrderPromotion::Finished]);
-             DB::commit();
+             DB::table('order_promotions')->where('id', $order->id)->update(['status' => OrderPromotion::Finished]);
              event(new LeaderVerifyEvent($order->id));
              return $this->okWithResource([], '核销成功');
          }
@@ -280,7 +277,14 @@ class LeaderPromotionController extends Controller
     public function checkAddPromotions($data)
     {
         # 检测货物是否在该小区
-
+        # 检测团长是否已选该货物
+        $lpm = DB::table('leader_promotions')
+            ->where('promotionid', $data['promotionid'])
+            ->where('leaderid', $data['leaderid'])
+            ->where('active', LeaderPromotion::Active)->first();
+        if($lpm) {
+            throw new \Exception('请勿重复添加活动');
+        }
     }
 
     /**
