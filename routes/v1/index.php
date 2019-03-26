@@ -37,6 +37,7 @@ Route::post('upload/private/image','Common\QiNiuUploadController@uploadPrivateIm
 Route::post('system/parse/mobile', 'Auth\CustomerController@parseMobile');
 Route::get('system/qr', 'Customer\SystemController@QRcode');
 
-Route::get('test', 'Log\PayLog@test');
+Route::post('test', 'Log\PayLog@test');
+Route::get('testtransfer', 'Common\TestTraderPayTransafer@doTransfer');
 
 

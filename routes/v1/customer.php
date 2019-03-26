@@ -41,9 +41,8 @@ Route::post('customer/order/refund', 'Customer\RefundController@Refund');
 Route::post('customer/order/refundSuccess', 'Customer\RefundController@refundSuccess');
 
 # 统计
-Route::post('customer/count/view', 'Customer\StatisticController@viewCount');
 Route::post('customer/count/share', 'Customer\StatisticController@shareCount');
-Route::post('customer/count/cargo', 'Customer\StatisticController@cargoCount');
+Route::post('customer/count/cargo', 'Customer\StatisticController@cargosCount');
 
 #通知
 Route::post('notify/pay', 'Customer\PaymentController@notify');
