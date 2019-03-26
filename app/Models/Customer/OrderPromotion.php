@@ -40,7 +40,7 @@ class OrderPromotion extends BaseModel
             ->leftjoin('promotions as pm', 'pm.id', '=', 'om.promotionid')
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
             ->orderBy('om.id', 'DESC')//'om.orderid', 'om.lpmid', 'om.promotionid',
-            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total', 'om.checkcode'
                 , 'om.status', 'om.createtime',
                 'pd.title', 'pd.norm', 'pd.thumb')
             ->paginate(self::NPP);
@@ -56,7 +56,7 @@ class OrderPromotion extends BaseModel
             ->leftjoin('products as pd', 'pd.id', 'pm.productid')
             ->orderBy('om.status', 'DESC')
             ->orderBy('om.id', 'DESC')//'om.orderid', 'om.lpmid', 'om.promotionid',
-            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total'
+            ->select('om.id', 'om.num', 'om.ordersn', 'om.price', 'om.total', 'om.checkcode'
                 , 'om.status', 'om.createtime',
                 'pd.title', 'pd.norm', 'pd.thumb')
             ->orderBy('om.id',  'DESC')
@@ -77,6 +77,7 @@ class OrderPromotion extends BaseModel
             ->select('om.id', 'om.num', 'om.ordersn', 'om.price',
                 'om.total', 'om.status', 'om.checkcode', 'om.createtime', 'lm.leaderid',
                 'orders.id as oid',
+                'pm.deliveryday',
                 'pd.title', 'pd.norm', 'pd.thumb')
             ->first();
     }
