@@ -20,8 +20,8 @@ class ViewEvent extends Event
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $id;
     /**
-     * Create a new event instance.
-     *
+     * 商品详情接口调用次数
+     * @see App\Http\Controllers\Customer @getPromotionDetail(Request $request)
      * @return void
      */
     public function __construct($id)
