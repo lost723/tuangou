@@ -75,8 +75,8 @@ class Promotion extends BaseModel
     static function getLeaderChoiceList($commid, $request)
     {
         # todo 把团长已经挑选的，剔除掉
-        $leaderid = $request->get('leaderid');
-        $filter   = $request->get('filter');
+        $leaderid = $request->post('leaderid');
+        $filter   = $request->post('filter');
         $resutl = DB::table('promotions as pm')
             ->where('expire', '>', time())
             ->where('pm.status',  self::Ordering)
@@ -89,7 +89,6 @@ class Promotion extends BaseModel
             ->when($filter, function ($query) use ($filter) {
                 $query->where(function ($qr) use ($filter) {
                     $qr->orwhere('pd.title', 'like', "%$filter%");
-                    $qr->orwhere('bs.title', 'like', "%$filter%");
                 });
             })
             ->whereNotExists( function ($query) use ($leaderid) {
@@ -101,7 +100,7 @@ class Promotion extends BaseModel
             })
             ->join('products as pd', 'pm.productid', '=', 'pd.id')
             ->leftjoin('businesses as bs', 'bs.id', '=', 'pm.orgid')
-            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.picture', 'pd.content')
+            ->select('pm.*', 'pd.title', 'pd.norm', 'pd.rate', 'pd.quotation', 'pd.intro', 'pd.thumb', 'pd.content')
             ->Paginate(self::NPP);
         return $resutl;
     }
