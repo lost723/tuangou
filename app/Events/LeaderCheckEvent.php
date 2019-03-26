@@ -13,14 +13,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class LeaderCheckEvent extends Event
 {
     public $id;
+    public $count;
     /**
      * 团长签收订单
-     *
+     * @param id 团长活动id
      * @return void
      */
-    public function __construct($id)
+    public function __construct($id, $count)
     {
         $this->id = $id;
+        $this->count = $count;
         $this->action = 'LeaderCheck';
     }
 
