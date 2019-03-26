@@ -4,10 +4,12 @@ namespace App\Http\Resources\Customer;
 
 use App\Models\Common\Leader;
 use App\Models\Customer\OrderPromotion;
+use App\Utils\ImageView;
 use Illuminate\Http\Resources\Json\Resource;
 
 class SubOrderDetail extends Resource
 {
+    use ImageView;
     /**
      * Transform the resource into an array.
      *
@@ -21,7 +23,12 @@ class SubOrderDetail extends Resource
             'id'           => $this->oid,
             'createtime'   => $this->createtime,
             'total'        => sprintf("%.2f", $this->total/100),
-            'checkcode'    => $this->checkcode,
+            'checkcode'     =>  $this->when($this->checkcode, function (){
+                return $this->checkcode;
+            }),
+            'qrcode'        =>  $this->when($this->checkcode, function (){
+                return $this->createQrCode($this->checkcode);
+            }),
             'trade_no'     => $this->ordersn,
             'count'        => $this->num,
             'state'        => $this->when($this->status == OrderPromotion::CHANGE, function () {
@@ -32,7 +39,7 @@ class SubOrderDetail extends Resource
             'suborder'     => [[
                 'id'            =>  $this->id,
                 'title'         =>  $this->title,
-                'thumb'         =>  $this->thumb,
+                'thumb'         =>  $this->ImageViewWithOption(stripslashes($this->thumb), "dissolve"),
                 'price'         =>  sprintf("%.2f", $this->price/100),
                 'num'           =>  $this->num,
                 'norm'          =>  $this->norm,
