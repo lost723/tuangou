@@ -19,7 +19,6 @@ class CommunityResource extends Resource
         return [
             'id'        =>  $this->id,
             'name'      =>  $this->name,
-//            'logo'      =>  QiNiuUploadController::decodePath($this->logo),
             'address'   =>  $this->address,
             'longitude' =>  $this->longitude,
             'latitude'  =>  $this->latitude,
