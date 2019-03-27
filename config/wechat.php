@@ -55,15 +55,16 @@ return [
     ],
 
     /*
+     * http://tg.hlbapp.com/wechat
      * 公众号
      */
     'official_account' => [
         'default' => [
-            'app_id' => env('WECHAT_OFFICIAL_ACCOUNT_APPID', 'your-app-id'),         // AppID
-            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET', 'your-app-secret'),    // AppSecret
-            'token' => env('WECHAT_OFFICIAL_ACCOUNT_TOKEN', 'your-token'),           // Token
-            'aes_key' => env('WECHAT_OFFICIAL_ACCOUNT_AES_KEY', ''),                 // EncodingAESKey
-
+            'app_id' => env('WECHAT_OFFICIAL_ACCOUNT_APPID', 'wx8bc33962b0a8ecef'),         // AppID
+            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET', '9db21c90c52ab7c7575d3d45de2b6bc6'),    // AppSecret
+            'token' => env('WECHAT_OFFICIAL_ACCOUNT_TOKEN', '24C8150D747ED0708AF7063031D99093'),           // Token
+            'aes_key' => env('WECHAT_OFFICIAL_ACCOUNT_AES_KEY', 'IIURTZsVOZL8IghihMWop52jqVaO7c8s79B3j4C1IXj'),                 // EncodingAESKey
+            'response_type' =>  'array',
             /*
              * OAuth 配置
              *
@@ -80,14 +81,14 @@ return [
     /*
      * 开放平台第三方平台
      */
-    // 'open_platform' => [
-    //     'default' => [
-    //         'app_id'  => env('WECHAT_OPEN_PLATFORM_APPID', ''),
-    //         'secret'  => env('WECHAT_OPEN_PLATFORM_SECRET', ''),
-    //         'token'   => env('WECHAT_OPEN_PLATFORM_TOKEN', ''),
-    //         'aes_key' => env('WECHAT_OPEN_PLATFORM_AES_KEY', ''),
-    //     ],
-    // ],
+//     'open_platform' => [
+//         'default' => [
+//             'app_id'  => env('WECHAT_OPEN_PLATFORM_APPID', ''),
+//             'secret'  => env('WECHAT_OPEN_PLATFORM_SECRET', ''),
+//             'token'   => env('WECHAT_OPEN_PLATFORM_TOKEN', ''),
+//             'aes_key' => env('WECHAT_OPEN_PLATFORM_AES_KEY', ''),
+//         ],
+//     ],
 
     /*
      * 小程序
@@ -103,6 +104,7 @@ return [
 
     /*
      * 微信支付
+     *1528321701
      */# todo 修改证书路径
      'payment' => [
          'default' => [
@@ -110,7 +112,7 @@ return [
                  'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx8bc33962b0a8ecef'),
                  'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
                  'sub_appid'          => env('WECHAT_PAYMENT_SUB_APPID', 'wx68f2dc67c99f4b05'),
-                 'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1528321701'),
+                 'sub_mch_id'         => env('WECHAT_PAYMENT_SUB_MCH_ID', '1529568371'),
 
                  'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
                  'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', '../cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
@@ -119,10 +121,10 @@ return [
          ],
          'transfer' =>[
                 'app_id'             => env('WECHAT_PAYMENT_APPID', 'wx68f2dc67c99f4b05'),
-                'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1502229801'),
+                'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', '1529568371'),
                  'key'                => env('WECHAT_PAYMENT_KEY', 'KRMpHDp2obFYl41jddEyW3tGOzDx1Ig4'),
-                 'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', '../cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
-                 'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', '../cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
+                 'cert_path'          => env('WECHAT_PAYMENT_CERT_PATH', '../cert/transfer_cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
+                 'key_path'           => env('WECHAT_PAYMENT_KEY_PATH', '../cert/transfer_cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
                  'notify_url'         => 'http://tg.hlbapp.com/notify/pay',                           // 默认支付结果通知地址
          ],
 

@@ -162,7 +162,7 @@ class CustomerController extends Controller
             ]
             ,
             [
-//                'unionid'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
+                'unionid'  => array_key_exists('unionId', $userinfo)?$userinfo['unionId']:null,
                 'avatar'   => $userinfo['avatarUrl'],
                 'nickname' => $userinfo['nickName'],
                 'country'  => $userinfo['country'],

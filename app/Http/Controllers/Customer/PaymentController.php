@@ -59,7 +59,7 @@ class PaymentController extends BasePaymentController
             $data['trade_type']         = 'JSAPI';
 //            $data['profit_sharing']     = 'Y';
             $result = $this->payment->order->unify($data);
-
+            dump($result);die;
             if($result['return_code'] <> 'SUCCESS' ||$result['result_code'] <> 'SUCCESS') {
                 throw new \Exception($result['err_code_des']);
             }
