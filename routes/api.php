@@ -13,5 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::any('wechat', 'WeiXin\WeiXinController@serve');
 
 Route::prefix('v1')->group(base_path('routes/v1/routes.php'));
